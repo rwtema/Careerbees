@@ -1,0 +1,16 @@
+{
+  "type": "forge:ore_shapeless",
+  "group": "practicalbess:crafting",
+  "ingredients": [
+    {
+      "item": "forestry:frame_untreated"
+    },
+    {
+      "type": "forge:ore_dict",
+      "ore": "paper"
+    }
+  ],
+  "result": {
+    "item": "careerbees:pheremone_frame"
+  }
+}

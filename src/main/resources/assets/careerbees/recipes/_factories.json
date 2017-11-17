@@ -1,0 +1,7 @@
+{
+  "ingredients" :{
+    "bee": "com.rwtema.careerbees.recipes.BeeIngredient$Factory",
+    "potion":"com.rwtema.careerbees.recipes.PotionIngredient$Factory"
+
+  }
+}

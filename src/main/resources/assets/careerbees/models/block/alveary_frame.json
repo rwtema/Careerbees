@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "forestry:blocks/apiculture/alveary.plain",
+    "down": "forestry:blocks/apiculture/alveary.bottom",
+    "up": "forestry:blocks/apiculture/alveary.bottom",
+    "north": "careerbees:blocks/alveary_frame",
+    "east": "careerbees:blocks/alveary_frame",
+    "south": "careerbees:blocks/alveary_frame",
+    "west": "careerbees:blocks/alveary_frame"
+  }
+}

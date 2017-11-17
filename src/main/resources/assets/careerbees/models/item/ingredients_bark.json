@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "careerbees:items/ingredients_bark",
+    "layer1": "careerbees:items/ingredients_bark_outline"
+  }
+}

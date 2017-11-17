@@ -1,0 +1,27 @@
+{
+  "type":"forge:ore_shaped",
+  "group":"practicalbess:crafting",
+  "pattern":[
+    "sss",
+    "sps",
+    "sss"
+  ],
+  "key":{
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    },
+
+    "p":{
+      "type": "careerbees:potion",
+      "potion": "poison",
+      "level": 0
+
+    }
+  },
+  "result": {
+    "item": "careerbees:poison_frame",
+    "count": 1
+  }
+
+}

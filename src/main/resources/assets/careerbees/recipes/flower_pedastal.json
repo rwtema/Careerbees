@@ -1,0 +1,21 @@
+{
+  "type":"forge:ore_shaped",
+  "group":"practicalbess:crafting",
+  "pattern":[
+    "sps",
+    " s "
+  ],
+  "key": {
+    "p": {
+      "type": "forge:ore_dict",
+      "ore": "flower"
+    },
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "stickWood"
+    }
+  },
+  "result": {
+    "item": "careerbees:flower_pedastal"
+  }
+}

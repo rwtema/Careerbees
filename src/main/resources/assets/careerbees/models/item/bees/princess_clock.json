@@ -1,0 +1,10 @@
+{
+    "parent": "forestry:item/mirror_hands",
+    "textures": {
+        "layer2": "forestry:items/bees/default/princess.outline",
+        "layer3": "forestry:items/bees/default/body1",
+        "layer4": "forestry:items/bees/default/princess.body2",
+        "layer0": "careerbees:items/bees/clock",
+        "layer1": "careerbees:items/bees/clock2"
+    }
+}

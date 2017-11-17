@@ -1,0 +1,9 @@
+{
+  "parent": "forestry:item/mirror_hands",
+  "textures": {
+    "layer0": "careerbees:items/bees/blank",
+    "layer1": "careerbees:items/bees/blank",
+    "layer2": "careerbees:items/bees/clockwork",
+    "layer3": "careerbees:items/bees/generic_queen"
+  }
+}

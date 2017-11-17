@@ -1,0 +1,16 @@
+{
+  "type": "forge:ore_shapeless",
+  "group": "practicalbess:crafting",
+  "ingredients": [
+    {
+      "item": "forestry:frame_untreated"
+    },
+    {
+      "item": "forestry:alveary.plain",
+      "data": 0
+    }
+  ],
+  "result": {
+    "item": "careerbees:alveary_frame"
+  }
+}

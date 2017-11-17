@@ -1,0 +1,8 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "careerbees:items/ingredients_pheremones",
+    "layer1": "careerbees:items/ingredients_pheremones_0",
+    "layer2": "careerbees:items/ingredients_pheremones_1"
+  }
+}

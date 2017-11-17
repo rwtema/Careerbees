@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=basic": {
+      "model": "careerbees:flower_pedastal"
+    },
+    "type=advanced": {
+      "model": "careerbees:flower_pedastal_advanced"
+    }
+  }
+}
