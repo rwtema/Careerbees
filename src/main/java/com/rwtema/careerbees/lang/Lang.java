@@ -1,7 +1,6 @@
 package com.rwtema.careerbees.lang;
 
 import com.google.common.collect.Maps;
-
 import com.rwtema.careerbees.BeeMod;
 import com.rwtema.careerbees.ClientRunnable;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -94,10 +93,13 @@ public class Lang {
 			for (Map.Entry<String, String> entry : langMap.entrySet()) {
 				String key = makeKey(entry.getValue());
 				if (!key.equals(entry.getKey()))
-					lang.put(entry.getKey(), entry.getValue());
+					lang.put(entry.getKey().toLowerCase(Locale.ENGLISH), entry.getValue());
 			}
 		} else {
-			lang.putAll(langMap);
+			for (Map.Entry<String, String> entry : langMap.entrySet()) {
+				lang.put(entry.getKey().toLowerCase(Locale.ENGLISH), entry.getValue());
+			}
+
 		}
 	}
 
@@ -143,7 +145,7 @@ public class Lang {
 
 	public static String translate(String key, String _default) {
 		if (BeeMod.deobf_folder && FMLLaunchHandler.side() == Side.CLIENT) {
-			if(!key.equals(key.toLowerCase())) {
+			if (!key.equals(key.toLowerCase())) {
 //				LogHelper.oneTimeInfo("Lang: " + key + " is not lowercased");
 			}
 
@@ -188,7 +190,7 @@ public class Lang {
 				String t = null;
 				for (Map.Entry<String, String> entry : lang.entrySet()) {
 					String key_prefix = entry.getKey();
-					if(key_prefix.startsWith("careerbees.")){
+					if (key_prefix.startsWith("careerbees.")) {
 						key_prefix = key_prefix.substring("careerbees.".length());
 					}
 
@@ -256,7 +258,6 @@ public class Lang {
 			err.printStackTrace();
 		}
 	}
-
 
 
 	private static File getMissedEntriesFile() {

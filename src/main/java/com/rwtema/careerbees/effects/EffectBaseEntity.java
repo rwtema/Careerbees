@@ -47,7 +47,8 @@ public abstract class EffectBaseEntity<T extends Entity> extends EffectBaseThrot
 	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
 		AxisAlignedBB aabb = getAABB(genome, housing);
 		List<T> entities = world.getEntitiesWithinAABB(entityClazz, aabb, entityPredicate::test);
-		workOnEntities(entities, genome, storedData, housing, random, world, pos, beeHousingModifier, beeModeModifier, settings);
+		if (!entities.isEmpty())
+			workOnEntities(entities, genome, storedData, housing, random, world, pos, beeHousingModifier, beeModeModifier, settings);
 	}
 
 	protected abstract void workOnEntities(List<T> entities, IBeeGenome genome, IEffectData storedData, IBeeHousing housing, Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings);

@@ -218,6 +218,10 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 		return false;
 	}
 
+	public String getAlleleName() {
+		return species.getAlleleName();
+	}
+
 
 	public static class CustomBeeFactory implements IAlleleBeeSpeciesBuilder {
 		public static final HashMap<IAlleleBeeSpecies, IAlleleBeeEffect> SPECIES_EFFECT_MAP = new HashMap<>();

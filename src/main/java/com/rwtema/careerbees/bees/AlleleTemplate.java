@@ -6,6 +6,7 @@ import forestry.api.apiculture.IAlleleBeeEffect;
 import forestry.api.apiculture.IAlleleBeeSpecies;
 import forestry.api.genetics.AlleleManager;
 import forestry.api.genetics.IAllele;
+import forestry.core.config.Constants;
 import org.apache.commons.lang3.Validate;
 
 import java.util.EnumMap;
@@ -48,11 +49,11 @@ public class AlleleTemplate {
 		BeeManager.beeRoot.registerTemplate(alleles);
 	}
 
-	public IAlleleBeeEffect getEffect(){
+	public IAlleleBeeEffect getEffect() {
 		return getValue(EnumBeeChromosome.EFFECT, IAlleleBeeEffect.class);
 	}
 
-	public <T extends IAllele> T getValue(EnumBeeChromosome chromosome, Class<T> clazz){
+	public <T extends IAllele> T getValue(EnumBeeChromosome chromosome, Class<T> clazz) {
 		Validate.isTrue(chromosome.getAlleleClass().isAssignableFrom(clazz));
 		IAllele iAllele = map.get(chromosome);
 		return (T) iAllele;
@@ -63,12 +64,22 @@ public class AlleleTemplate {
 			map.put(chromosome, (IAllele) value);
 			return this;
 		} else if (value instanceof String) {
+
 			for (IAllele iAllele : AlleleManager.alleleRegistry.getRegisteredAlleles(chromosome)) {
 				if (value.equals(iAllele.getUID())) {
 					map.put(chromosome, iAllele);
 					return this;
 				}
 			}
+
+
+			for (IAllele iAllele : AlleleManager.alleleRegistry.getRegisteredAlleles(chromosome)) {
+				if (iAllele.getModID().equals(Constants.MOD_ID) && iAllele.getUID().contains((String) value)) {
+					map.put(chromosome, iAllele);
+					return this;
+				}
+			}
+
 			String s = AlleleManager.alleleRegistry.getRegisteredAlleles(chromosome)
 					.stream()
 					.map(IAllele::getUID)

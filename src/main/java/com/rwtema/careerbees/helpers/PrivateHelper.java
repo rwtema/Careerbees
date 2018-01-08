@@ -4,9 +4,11 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class PrivateHelper {
@@ -25,6 +27,28 @@ public class PrivateHelper {
 		} catch (IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static Field getField(Class clazz, String... fields){
+		for (String fieldName : fields) {
+			if (Stream.of(clazz.getDeclaredFields()).map(Field::getName).noneMatch(fieldName::equals)) {
+				continue;
+			}
+
+			try{
+				Field declaredField =  clazz.getDeclaredField(fieldName);
+				if(declaredField != null){
+					declaredField.setAccessible(true);
+					return declaredField;
+				}
+			} catch (NoSuchFieldException e) {
+				throw new RuntimeException(e);
+			}
+		}
+		if(clazz == Object.class){
+			throw new RuntimeException("Unable to find fields: " + Stream.of(fields).collect(Collectors.joining(", ")) );
+		}
+		return getField(clazz.getSuperclass());
 	}
 
 	@Nullable

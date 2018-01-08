@@ -21,6 +21,8 @@ build
 eclipse
 run
 
+src/test
+
 README.txt
 LICENSE-new.txt
 MinecraftForge-Credits.txt

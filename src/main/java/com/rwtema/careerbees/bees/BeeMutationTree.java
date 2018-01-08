@@ -31,6 +31,7 @@ public class BeeMutationTree {
 	}
 
 	public List<SpeciesEntry> getVanillaParents(SpeciesEntry entry) {
+		HashSet<SpeciesEntry> checked = new HashSet<>();
 		LinkedList<SpeciesEntry> toCheck = new LinkedList<>();
 		toCheck.add(entry);
 		ArrayList<SpeciesEntry> results = new ArrayList<>();
@@ -40,8 +41,8 @@ public class BeeMutationTree {
 				results.add(poll);
 			}
 			for (Entry e : recipes.get(poll)) {
-				toCheck.add(e.a);
-				toCheck.add(e.b);
+				if (checked.add(e.a)) toCheck.add(e.a);
+				if (checked.add(e.b)) toCheck.add(e.b);
 			}
 		}
 		return results;
@@ -68,27 +69,33 @@ public class BeeMutationTree {
 	}
 
 	public int getComplexity(SpeciesEntry spc) {
-		return recipes.get(spc).stream()
-				.mapToInt(entry -> 1 + Math.max(getComplexity(entry.a), getComplexity(entry.b)))
-				.min()
-				.orElse(0);
+		return getLeastParents(spc).stream().mapToInt(HashSet::size).min().orElse(0);
 	}
 
 	public Set<HashSet<SpeciesEntry>> getLeastParents(SpeciesEntry spc) {
+		return getLeastParents(spc, new HashSet<>());
+	}
+
+	public Set<HashSet<SpeciesEntry>> getLeastParents(SpeciesEntry spc, Set<SpeciesEntry> visited) {
 		Set<HashSet<SpeciesEntry>> entries = new HashSet<>();
 		if (!recipes.containsKey(spc)) return ImmutableSet.of(Sets.newHashSet(spc));
 
+		Set<SpeciesEntry > updatedVisited = Sets.newHashSet(visited);
+		updatedVisited.add(spc);
+
 		for (Entry e : recipes.get(spc)) {
+			if (updatedVisited.contains(e.a) || updatedVisited.contains(e.b)) continue;
+
 			if (e.a == e.b) {
-				for (HashSet<SpeciesEntry> sa : getLeastParents(e.a)) {
+				for (HashSet<SpeciesEntry> sa : getLeastParents(e.a, updatedVisited)) {
 					HashSet<SpeciesEntry> s = new HashSet<>();
 					s.addAll(sa);
 					s.add(spc);
 					entries.add(s);
 				}
 			} else {
-				for (HashSet<SpeciesEntry> sa : getLeastParents(e.a)) {
-					for (HashSet<SpeciesEntry> sb : getLeastParents(e.b)) {
+				for (HashSet<SpeciesEntry> sa : getLeastParents(e.a, updatedVisited)) {
+					for (HashSet<SpeciesEntry> sb : getLeastParents(e.b, updatedVisited)) {
 						HashSet<SpeciesEntry> s = new HashSet<>();
 						s.addAll(sa);
 						s.addAll(sb);

@@ -93,6 +93,7 @@ public class BeeMod {
 	public ItemBlock alvearyHiveFrameHolderItemBlock;
 	public BlockFlowerPedastal plantFrame;
 	public ItemBlock plantFrameItemBlock;
+	public ItemEternalFrame itemEternalFrame;
 	public ItemMutationFrame itemMutationFrame;
 	public ItemPoisonFrame itemPoisonFrame;
 	public ItemPheremoneFrame itemPheremoneFrame;
@@ -117,6 +118,7 @@ public class BeeMod {
 		plantFrameItemBlock = new ItemBlock(plantFrame);
 //		plantFrameItemBlock = new ItemMultiTexture(plantFrame, plantFrame, stack -> plantFrame.getStateFromMeta(stack.getMetadata()).getValue(BlockFlowerPedastal.PLANT_TYPE).getName());
 		itemMutationFrame = (ItemMutationFrame) new ItemMutationFrame().setUnlocalizedName(BeeMod.MODID + ":mutationframe").setRegistryName(BeeMod.MODID + ":mutation_frame");
+		itemEternalFrame = (ItemEternalFrame) new ItemEternalFrame().setUnlocalizedName(BeeMod.MODID + ":eternalframe").setRegistryName(BeeMod.MODID + ":eternalframe");
 		beeArmors = initArmors(ItemBeeArmor::new);
 		itemPheremoneFrame = (ItemPheremoneFrame) new ItemPheremoneFrame().setUnlocalizedName(BeeMod.MODID + ":pheremoneframe").setRegistryName(BeeMod.MODID + ":pheremone_frame");
 		itemSettingsFrame = (ItemSettingsFrame) (new ItemSettingsFrame().setUnlocalizedName(BeeMod.MODID + ":settingsframe").setRegistryName(BeeMod.MODID+":settings_frame"));
@@ -133,6 +135,7 @@ public class BeeMod {
 		registerBlockItemBlock(plantFrame, plantFrameItemBlock);
 		registerBlockItemBlock(alvearyHiveFrameHolder, alvearyHiveFrameHolderItemBlock);
 		registerItem(itemMutationFrame);
+		registerItem(itemEternalFrame);
 		registerItem(itemPoisonFrame);
 		registerItem(itemPheremoneFrame);
 		registerItem(itemIngredients);

@@ -39,6 +39,9 @@ public class EffectAcceleration extends EffectBase {
 	public IEffectData doEffectBase(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, IEffectSettingsHolder settings) {
 		if (processing) return storedData;
 		World world = housing.getWorldObj();
+		if(world.isRemote){
+			return storedData;
+		}
 
 		if ((world.getTotalWorldTime() % 20) != 0) return storedData;
 		BlockPos coordinates = housing.getCoordinates();
@@ -62,22 +65,24 @@ public class EffectAcceleration extends EffectBase {
 			for (int dx = -mx; dx <= mx; dx++) {
 				for (int dz = -mz; dz <= mz; dz++) {
 					for (int dy = -my; dy <= my; dy++) {
-						mutableBlockPos.setPos(
+						BlockPos pos = new BlockPos(
 								coordinates.getX() + dx,
 								coordinates.getY() + dy,
 								coordinates.getZ() + dz);
-						IBlockState blockState = world.getBlockState(mutableBlockPos);
+
+						IBlockState blockState = world.getBlockState(pos);
 						Block block = blockState.getBlock();
-						if (!block.isAir(blockState, world, mutableBlockPos)) {
-							TileEntity tileEntity = world.getTileEntity(mutableBlockPos);
+						if (!block.isAir(blockState, world, pos)) {
+							TileEntity tileEntity = world.getTileEntity(pos);
 							if (tileEntity instanceof ITickable) {
-								toTickPos.put(mutableBlockPos.toImmutable(), 40);
+								toTickPos.put(pos.toImmutable(), 40);
 							}
 
 							if (block.getTickRandomly()) {
-								for (int i = 0; i < 4; i++) {
-									block.randomTick(world, mutableBlockPos, blockState, world.rand);
-								}
+								world.scheduleUpdate(pos, block, 1);
+//								for (int i = 0; i < 4; i++) {
+//									block.randomTick(world, pos.toImmutable(), blockState, world.rand);
+//								}
 							}
 						}
 					}

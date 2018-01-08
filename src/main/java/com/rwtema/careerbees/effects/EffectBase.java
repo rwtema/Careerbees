@@ -2,36 +2,53 @@ package com.rwtema.careerbees.effects;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Streams;
 import com.rwtema.careerbees.BeeMod;
 import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
 import com.rwtema.careerbees.effects.settings.Setting;
 import com.rwtema.careerbees.helpers.ParticleHelper;
+import com.rwtema.careerbees.helpers.RandomHelper;
 import com.rwtema.careerbees.helpers.StringHelper;
+import com.rwtema.careerbees.items.ItemEternalFrame;
 import com.rwtema.careerbees.lang.Lang;
 import forestry.api.apiculture.*;
 import forestry.api.genetics.AlleleManager;
 import forestry.api.genetics.IEffectData;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class EffectBase implements IAlleleBeeEffect {
+	public static HashMap<IAlleleBeeSpecies, EffectBase> registeredEffectSpecies = new HashMap<>();
+	protected static WeakHashMap<IBeeHousing, Iterable<BlockPos>> adjacentPosCache = new WeakHashMap<>();
+	static int n = 0;
+
+	static {
+		MinecraftForge.EVENT_BUS.register(EffectBase.class);
+	}
+
 	private final String uuid, rawname, unlocalizedName;
 	private final boolean isDominant;
 	private final boolean isCombinable;
 	@Nonnull
 	public Set<IAlleleBeeSpecies> validSpecies = ImmutableSet.of();
-	public static HashMap<IAlleleBeeSpecies, EffectBase > registeredEffectSpecies = new HashMap<>();
 	public List<Setting<?, ?>> settings = new ArrayList<>();
 
 	public EffectBase(String rawname) {
@@ -53,10 +70,13 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 	}
 
 	public static float getSpeed(IBeeGenome genome, IBeeHousing housing) {
+		ItemEternalFrame.checkProduction.set(true);
 		float speed = genome.getSpeed() * getModifier(genome, housing, (m, g) -> m.getProductionModifier(g, 1));
+		ItemEternalFrame.checkProduction.set(false);
 		if ("forestry.apiculture.tiles.TileBeeHouse".equals(housing.getClass().getName())) {
 			speed *= 0.4F;
 		}
+
 		return speed;
 	}
 
@@ -105,6 +125,17 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		}
 	}
 
+	@SubscribeEvent
+	public static void tickCleanup(TickEvent.ServerTickEvent event) {
+		if (event.phase == TickEvent.Phase.END) {
+			n++;
+			if (n > 20 * 20) {
+				adjacentPosCache.clear();
+				n = 0;
+			}
+		}
+	}
+
 	private IEffectSettingsHolder getSettings(IBeeHousing housing) {
 		if (!settings.isEmpty()) {
 			for (IBeeModifier iBeeModifier : housing.getBeeModifiers()) {
@@ -118,7 +149,7 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 	@Override
 	@Nonnull
 	public IEffectData doEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing) {
-		if (isValidSpecies(genome)) {
+		if (isValidSpecies(genome) && !housing.getWorldObj().isRemote) {
 			return doEffectBase(genome, storedData, housing, getSettings(housing));
 		}
 
@@ -203,7 +234,6 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		return false;
 	}
 
-
 	public <V, NBT extends NBTBase> void addSetting(Setting vnbtSetting) {
 		settings.add(vnbtSetting);
 	}
@@ -238,5 +268,65 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		}
 
 		return builder.build();
+	}
+
+	protected Iterable<BlockPos> getAdjacentTiles(IBeeHousing h) {
+
+		BlockPos pos = h.getCoordinates();
+		World world = h.getWorldObj();
+		TileEntity tileEntity = world.getTileEntity(pos);
+		if (!(tileEntity instanceof IBeeHousing)) {
+			return Stream.concat(
+					Stream.of(pos),
+					Stream.of(RandomHelper.getPermutation()).map(pos::offset))
+					::iterator;
+		}
+
+		return adjacentPosCache.computeIfAbsent(h, this::getBlockPos);
+	}
+
+	private Iterable<BlockPos> getBlockPos(IBeeHousing h) {
+		World world = h.getWorldObj();
+		Random rand = world.rand;
+		BlockPos pos = h.getCoordinates();
+		IBeeHousingInventory beeInventory = h.getBeeInventory();
+		HashSet<BlockPos> checked = new HashSet<>();
+
+		ArrayList<BlockPos> adjToHousing = new ArrayList<>();
+		LinkedList<BlockPos> toCheck = new LinkedList<>();
+
+		Arrays.stream(RandomHelper.getPermutation(rand)).map(pos::offset).forEach(toCheck::add);
+		BlockPos blockPos;
+		while ((blockPos = toCheck.poll()) != null) {
+			TileEntity te = world.getTileEntity(blockPos);
+			if (te instanceof IBeeHousing && ((IBeeHousing) te).getBeeInventory() == beeInventory) {
+				for (EnumFacing facing : RandomHelper.getPermutation(rand)) {
+					BlockPos newpos = blockPos.offset(facing);
+					if (checked.add(newpos)) {
+						toCheck.add(newpos);
+					}
+				}
+			} else {
+				adjToHousing.add(blockPos);
+			}
+		}
+		return adjToHousing;
+	}
+
+	public  <C> List<C> getAdjacentCapabilities(IBeeHousing housing, Capability<C> capability) {
+		return getAdjacentCapabilities(housing, capability, t -> true);
+	}
+
+	public  <C> List<C> getAdjacentCapabilities(IBeeHousing housing, Capability<C> capability, Predicate<TileEntity> tileEntityFilter) {
+		return Streams.stream(getAdjacentTiles(housing)).map(housing.getWorldObj()::getTileEntity).filter(Objects::nonNull).filter(tileEntityFilter).map(t -> t.getCapability(capability, null)).filter(Objects::nonNull).distinct().collect(Collectors.toList());
+	}
+
+	public static int getRand(int a, int b, Random random) {
+		if (a == b) return a;
+		else if (a < b) {
+			return a + random.nextInt(b - a);
+		} else {
+			return b + random.nextInt(a - b);
+		}
 	}
 }

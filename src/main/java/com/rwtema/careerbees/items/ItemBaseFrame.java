@@ -35,6 +35,7 @@ public abstract class ItemBaseFrame extends Item implements IHiveFrame {
 	@Nonnull
 	@Override
 	public ItemStack frameUsed(@Nonnull IBeeHousing housing, @Nonnull ItemStack frame, @Nonnull IBee queen, int wear) {
+		if (!isDamageable()) return frame;
 		frame.attemptDamageItem(wear, housing.getWorldObj().rand, null);
 		if (frame.getItemDamage() >= frame.getMaxDamage()) {
 			return ItemStack.EMPTY;

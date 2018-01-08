@@ -65,6 +65,7 @@ public class ProxyClient extends Proxy {
 		registerBlockModel(BeeMod.instance.alvearyHiveFrameHolderItemBlock);
 		registerModel(BeeMod.instance.itemPheremoneFrame);
 		registerModel(BeeMod.instance.itemMutationFrame);
+		registerModel(BeeMod.instance.itemEternalFrame);
 		registerModel(BeeMod.instance.itemPoisonFrame);
 		registerModel(BeeMod.instance.itemSettingsFrame);
 

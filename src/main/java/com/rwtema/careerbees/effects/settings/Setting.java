@@ -8,11 +8,13 @@ import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -122,15 +124,28 @@ public abstract class Setting<V, NBT extends NBTBase> {
 		return 0;
 	}
 
+	@Nullable
+	public List<String> getTooltip(V value) {
+		return null;
+	}
+
 	public enum Entry_Type {
 		TEXT(1),
 		BUTTON(2),
-		ITEMSTACK(2);
+		ITEMSTACK(2),
+		SCROLL_BAR(1);
+
 		public final int height;
 
 		Entry_Type(int height) {
 			this.height = height;
 		}
+	}
+
+	interface IScrollBar {
+		float getMinValue();
+
+		float getMaxValue();
 	}
 
 	public static abstract class SettingFunc<V, NBT extends NBTBase> extends Setting<V, NBT> {
@@ -244,6 +259,36 @@ public abstract class Setting<V, NBT extends NBTBase> {
 		@Override
 		public Entry_Type getType() {
 			return Entry_Type.BUTTON;
+		}
+	}
+
+	public static class Slider extends SettingFunc<Float, NBTTagFloat> implements IScrollBar {
+
+		private final float minValue;
+		private final float maxValue;
+
+		public Slider(EffectBase parent, String keyname, float _default, float minValue, float maxValue) {
+			super(parent, keyname, _default, NBTTagFloat::new, NBTTagFloat::getFloat, NBTTagFloat.class);
+			this.minValue = minValue;
+			this.maxValue = maxValue;
+		}
+
+		@Override
+		public Entry_Type getType() {
+			return Entry_Type.SCROLL_BAR;
+		}
+
+		public float getMinValue() {
+			return minValue;
+		}
+
+		public float getMaxValue() {
+			return maxValue;
+		}
+
+		@Override
+		public Float overrideInput(Float input) {
+			return MathHelper.clamp(input, minValue, maxValue);
 		}
 	}
 

@@ -28,14 +28,7 @@ public abstract class EffectWorldInteraction extends EffectBaseThrottled {
 		super(name, isDominant, isCombinable, baseTicksBetweenProcessing, chanceOfProcessing);
 	}
 
-	public static int getRand(int a, int b, Random random) {
-		if (a == b) return a;
-		else if (a < b) {
-			return a + random.nextInt(b - a);
-		} else {
-			return b + random.nextInt(a - b);
-		}
-	}
+
 
 	@Override
 	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
