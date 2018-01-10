@@ -1,17 +1,22 @@
 package com.rwtema.careerbees.effects;
 
 import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
+import forestry.api.apiculture.BeeManager;
 import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeModifier;
 import forestry.api.genetics.IEffectData;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Random;
 
 public abstract class EffectWorldInteraction extends EffectBaseThrottled {
@@ -47,4 +52,23 @@ public abstract class EffectWorldInteraction extends EffectBaseThrottled {
 	}
 
 	protected abstract boolean performPosEffect(World world, BlockPos blockPos, IBlockState state, IBeeGenome genome, IBeeHousing housing);
+
+
+	@Override
+	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		IBlockState blockState = world.getBlockState(pos);
+		return performPosEffect(world, pos, blockState, genome, housing);
+	}
+
+	@Override
+	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return false;
+	}
+
+	@Nullable
+	@Override
+	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return null;
+	}
+
 }

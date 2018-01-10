@@ -14,6 +14,8 @@ import com.rwtema.careerbees.lang.Lang;
 import forestry.api.apiculture.*;
 import forestry.api.genetics.AlleleManager;
 import forestry.api.genetics.IEffectData;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.tileentity.TileEntity;
@@ -136,7 +138,16 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		}
 	}
 
-	private IEffectSettingsHolder getSettings(IBeeHousing housing) {
+	public static int getRand(int a, int b, Random random) {
+		if (a == b) return a;
+		else if (a < b) {
+			return a + random.nextInt(b - a);
+		} else {
+			return b + random.nextInt(a - b);
+		}
+	}
+
+	public IEffectSettingsHolder getSettings(IBeeHousing housing) {
 		if (!settings.isEmpty()) {
 			for (IBeeModifier iBeeModifier : housing.getBeeModifiers()) {
 				if (iBeeModifier instanceof IEffectSettingsHolder)
@@ -313,20 +324,28 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		return adjToHousing;
 	}
 
-	public  <C> List<C> getAdjacentCapabilities(IBeeHousing housing, Capability<C> capability) {
+	public <C> List<C> getAdjacentCapabilities(IBeeHousing housing, Capability<C> capability) {
 		return getAdjacentCapabilities(housing, capability, t -> true);
 	}
 
-	public  <C> List<C> getAdjacentCapabilities(IBeeHousing housing, Capability<C> capability, Predicate<TileEntity> tileEntityFilter) {
+	public <C> List<C> getAdjacentCapabilities(IBeeHousing housing, Capability<C> capability, Predicate<TileEntity> tileEntityFilter) {
 		return Streams.stream(getAdjacentTiles(housing)).map(housing.getWorldObj()::getTileEntity).filter(Objects::nonNull).filter(tileEntityFilter).map(t -> t.getCapability(capability, null)).filter(Objects::nonNull).distinct().collect(Collectors.toList());
 	}
 
-	public static int getRand(int a, int b, Random random) {
-		if (a == b) return a;
-		else if (a < b) {
-			return a + random.nextInt(b - a);
-		} else {
-			return b + random.nextInt(a - b);
-		}
+	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return false;
+	}
+
+	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return false;
+	}
+
+	@Nullable
+	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return null;
+	}
+
+	public int getCooldown(EntityPlayer playerIn, IBeeGenome genome){
+		return 0;
 	}
 }

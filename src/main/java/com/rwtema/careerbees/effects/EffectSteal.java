@@ -5,6 +5,7 @@ import com.rwtema.careerbees.helpers.ParticleHelper;
 import forestry.api.apiculture.*;
 import forestry.api.genetics.IEffectData;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -14,6 +15,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 public abstract class EffectSteal<T extends EntityLivingBase> extends EffectBaseThrottled {
@@ -93,5 +95,29 @@ public abstract class EffectSteal<T extends EntityLivingBase> extends EffectBase
 		return storedData;
 	}
 
+
+	@Override
+	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return false;
+	}
+
+	@Override
+	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		if (getEntityClazz().isInstance(livingBase)) {
+			T t = getEntityClazz().cast(livingBase);
+			if (canHandle(t)) {
+				int count = BeeManager.armorApiaristHelper.wearsItems(livingBase, getUID(), true);
+				if (count > 0 || steal(t, housing, this)) return true;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	@Nullable
+	@Override
+	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return null;
+	}
 
 }

@@ -1,17 +1,14 @@
 package com.rwtema.careerbees.effects;
 
-import com.google.common.collect.Streams;
-import com.rwtema.careerbees.BeeMod;
-import com.rwtema.careerbees.bees.CareerBeeEntry;
 import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
-import forestry.api.apiculture.EnumBeeChromosome;
 import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.genetics.IEffectData;
-import net.minecraft.block.Block;
 import net.minecraft.block.material.EnumPushReaction;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -19,52 +16,14 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
-import java.lang.reflect.Field;
-import java.util.List;
+import javax.annotation.Nullable;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class EffectRandomSwap extends EffectBase {
 	public static final EffectRandomSwap INSTANCE = new EffectRandomSwap();
 
 	public EffectRandomSwap() {
 		super("teleposition");
-	}
-	{
-		if(BeeMod.deobf_folder) {
-			Field blockHardness;
-			try {
-				StringBuilder s = new StringBuilder();
-				blockHardness = Block.class.getDeclaredField("blockHardness");
-				blockHardness.setAccessible(true);
-				List<IBlockState> states = Streams.stream(Block.REGISTRY.iterator())
-						.filter(block -> "minecraft".equals(block.getRegistryName().getResourceDomain()))
-						.flatMap(block -> block.getBlockState().getValidStates().stream())
-						.map(state -> state.getBlock().getStateFromMeta(state.getBlock().getMetaFromState(state)))
-						.distinct()
-						.collect(Collectors.toList());
-
-				for (int i = 0; i < (states.size()-1); i++) {
-					IBlockState a = states.get(i);
-					if(!isNormalCube(a) || a.getMaterial() == Material.AIR) continue;
-					Float a_hard = (Float)blockHardness.get(a.getBlock());
-					if(a_hard < 0) continue;
-					for (int j = (i+1); j < states.size(); j++) {
-						IBlockState b = states.get(j);
-						if(!isNormalCube(b) || a.getMaterial() != b.getMaterial()) continue;
-						Float b_hard = (Float)blockHardness.get(b.getBlock());
-						if(!b_hard.equals(a_hard)) continue;
-
-						s.append(a).append("+").append(b).append("\n");
-					}
-				}
-				BeeMod.logger.info(s.toString());
-			} catch (NoSuchFieldException | IllegalAccessException e) {
-				throw  new RuntimeException(e);
-			}
-
-
-		}
 	}
 
 	@Nonnull
@@ -79,25 +38,47 @@ public class EffectRandomSwap extends EffectBase {
 //		if (rand.nextInt(10) != 0) return storedData;
 		AxisAlignedBB aabb = getAABB(genome, housing);
 		BlockPos a = getRandomBlockPosInAABB(rand, aabb);
-		if (worldObj.isAirBlock(a)) return storedData;
+		processPosition(worldObj, rand, aabb, a);
+		return storedData;
+	}
+
+	@Override
+	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return processPosition(world, world.rand, getAABB(genome, housing), pos);
+	}
+
+	@Override
+	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return false;
+	}
+
+	@Nullable
+	@Override
+	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return null;
+	}
+
+
+	public boolean processPosition(World worldObj, Random rand, AxisAlignedBB aabb, BlockPos a) {
+		if (worldObj.isAirBlock(a)) return false;
 
 		TileEntity tileEntity = worldObj.getTileEntity(a);
 		if (tileEntity != null) {
-			return storedData;
+			return false;
 		}
 		IBlockState state = worldObj.getBlockState(a);
 		float blockHardness = state.getBlockHardness(worldObj, a);
 		if (blockHardness < 0
 				|| !isNormalCube(state)
 				)
-			return storedData;
+			return false;
 
 		BlockPos b = getRandomBlockPosInAABB(rand, aabb);
 
-		if (worldObj.isAirBlock(b)) return storedData;
+		if (worldObj.isAirBlock(b)) return false;
 		tileEntity = worldObj.getTileEntity(b);
 		if (tileEntity != null) {
-			return storedData;
+			return false;
 		}
 
 		IBlockState otherState = worldObj.getBlockState(b);
@@ -105,7 +86,7 @@ public class EffectRandomSwap extends EffectBase {
 				|| !isNormalCube(otherState)
 				|| state.getMaterial() != otherState.getMaterial()
 				|| otherState.getBlockHardness(worldObj, b) != blockHardness)
-			return storedData;
+			return false;
 
 
 		worldObj.setBlockState(a, otherState, 2);
@@ -114,7 +95,7 @@ public class EffectRandomSwap extends EffectBase {
 		worldObj.notifyNeighborsOfStateChange(a, otherState.getBlock(), true);
 		worldObj.notifyNeighborsOfStateChange(b, state.getBlock(), true);
 
-		return storedData;
+		return true;
 	}
 
 	public boolean isNormalCube(IBlockState state) {
@@ -129,7 +110,6 @@ public class EffectRandomSwap extends EffectBase {
 		int z = getRand(MathHelper.floor(aabb.minZ), MathHelper.ceil(aabb.maxZ), rand);
 		return new BlockPos(x, y, z);
 	}
-
 
 
 }

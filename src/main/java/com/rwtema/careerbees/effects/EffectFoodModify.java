@@ -110,7 +110,7 @@ public abstract class EffectFoodModify extends EffectItemModification {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, TileFlowerPedastal frame, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
 		if (stack.getItem() instanceof ItemFood) {
 			NBTTagCompound prevTag = stack.getTagCompound() != null && stack.getTagCompound().hasKey(BEE_FOOD_NBT, Constants.NBT.TAG_COMPOUND) && stack.getTagCompound().getCompoundTag(BEE_FOOD_NBT).hasKey(getName(), Constants.NBT.TAG_COMPOUND) ? stack.getTagCompound().getCompoundTag(BEE_FOOD_NBT).getCompoundTag(getName()) : null;
 

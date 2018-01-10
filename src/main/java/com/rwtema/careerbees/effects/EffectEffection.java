@@ -20,7 +20,7 @@ public class EffectEffection extends EffectItemModification {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, TileFlowerPedastal frame, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
 		return modifyStack(stack);
 	}
 

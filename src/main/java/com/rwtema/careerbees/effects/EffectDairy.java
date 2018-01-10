@@ -3,15 +3,11 @@ package com.rwtema.careerbees.effects;
 import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
 import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
-import forestry.api.apiculture.IBeeModifier;
-import forestry.api.genetics.IEffectData;
 import net.minecraft.entity.passive.EntityCow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
@@ -32,7 +28,7 @@ public class EffectDairy extends EffectBaseEntity<EntityCow> {
 	}
 
 	@Override
-	protected void workOnEntities(List<EntityCow> entities, IBeeGenome genome, IEffectData storedData, IBeeHousing housing, Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
+	protected void workOnEntities(List<EntityCow> entities, IBeeGenome genome, IBeeHousing housing, Random random, IEffectSettingsHolder settings) {
 		Fluid milk = FluidRegistry.getFluid("milk");
 		if (milk == null) return;
 		WorldServer worldObj = (WorldServer) housing.getWorldObj();
@@ -76,7 +72,11 @@ public class EffectDairy extends EffectBaseEntity<EntityCow> {
 						break;
 					}
 				}
+				if(fluidContained.amount > 1000){
+
+				}
 			}
+
 			heldItem.setCount(0);
 		}
 	}

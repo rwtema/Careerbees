@@ -1,6 +1,5 @@
 package com.rwtema.careerbees.effects;
 
-import com.rwtema.careerbees.blocks.TileFlowerPedastal;
 import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import net.minecraft.entity.EntityLiving;
@@ -25,7 +24,7 @@ public class EffectArmorer extends EffectAttributeBoost {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, TileFlowerPedastal frame, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
 		return modifyStack(stack);
 	}
 

@@ -1,10 +1,10 @@
 package com.rwtema.careerbees.effects;
 
 import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
-import com.rwtema.careerbees.helpers.RandomHelper;
 import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.genetics.IEffectData;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -13,8 +13,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
-import java.util.WeakHashMap;
-import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 public class EffectPower extends EffectBase {
 	public static EffectPower INSTANCE = new EffectPower("rf");
@@ -30,9 +29,7 @@ public class EffectPower extends EffectBase {
 	@Nonnull
 	@Override
 	public IEffectData doEffectBase(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, IEffectSettingsHolder settings) {
-		float speed = getSpeed(genome, housing);
-
-		int rfrate = MathHelper.ceil(400 * speed * speed);
+		int rfrate = getRFRate(genome, housing);
 
 		TileEntity entity = housing.getWorldObj().getTileEntity(housing.getCoordinates());
 		if (!(entity instanceof IBeeHousing)) {
@@ -53,11 +50,30 @@ public class EffectPower extends EffectBase {
 				IEnergyStorage energyStorage = tileEntity.getCapability(CapabilityEnergy.ENERGY, null);
 				if (energyStorage != null) {
 					energyleft -= energyStorage.receiveEnergy(energyleft, false);
-					if(energyleft <= 0 )break;
+					if (energyleft <= 0) break;
 				}
 			}
 		}
 		return storedData;
+	}
+
+	public int getRFRate(@Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+		float speed = getSpeed(genome, housing);
+
+		return MathHelper.ceil(400 * speed * speed);
+	}
+
+	@Override
+	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		TileEntity tile = world.getTileEntity(pos);
+		if (tile == null || !tile.hasCapability(CapabilityEnergy.ENERGY, null)) return false;
+		int rfRate = getRFRate(genome, housing);
+		IEnergyStorage storage = tile.getCapability(CapabilityEnergy.ENERGY, null);
+		if (storage != null) {
+			storage.receiveEnergy(rfRate, false);
+			return true;
+		}
+		return false;
 	}
 
 }

@@ -1,12 +1,19 @@
 package com.rwtema.careerbees.effects;
 
 import com.mojang.authlib.GameProfile;
+import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class EffectStealPlayer extends EffectSteal<EntityPlayer> {
 	public static final EffectSteal PLAYER = new EffectStealPlayer();
@@ -59,4 +66,5 @@ public class EffectStealPlayer extends EffectSteal<EntityPlayer> {
 		}
 		return true;
 	}
+
 }

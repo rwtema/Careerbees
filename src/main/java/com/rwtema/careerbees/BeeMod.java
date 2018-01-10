@@ -100,6 +100,7 @@ public class BeeMod {
 	public ItemSettingsFrame itemSettingsFrame;
 	public ItemIngredients itemIngredients;
 	public EnumMap<EntityEquipmentSlot, ItemBeeArmor> beeArmors;
+	public ItemBeeGun itemBeeGun;
 
 	public static <T extends Item> EnumMap<EntityEquipmentSlot, T> initArmors(Function<EntityEquipmentSlot, T> constructor) {
 		EnumMap<EntityEquipmentSlot, T> map = new EnumMap<>(EntityEquipmentSlot.class);
@@ -121,6 +122,7 @@ public class BeeMod {
 		itemEternalFrame = (ItemEternalFrame) new ItemEternalFrame().setUnlocalizedName(BeeMod.MODID + ":eternalframe").setRegistryName(BeeMod.MODID + ":eternalframe");
 		beeArmors = initArmors(ItemBeeArmor::new);
 		itemPheremoneFrame = (ItemPheremoneFrame) new ItemPheremoneFrame().setUnlocalizedName(BeeMod.MODID + ":pheremoneframe").setRegistryName(BeeMod.MODID + ":pheremone_frame");
+		itemBeeGun = (ItemBeeGun) new ItemBeeGun().setUnlocalizedName(BeeMod.MODID + ":beegun").setRegistryName(BeeMod.MODID + ":beegun");
 		itemSettingsFrame = (ItemSettingsFrame) (new ItemSettingsFrame().setUnlocalizedName(BeeMod.MODID + ":settingsframe").setRegistryName(BeeMod.MODID+":settings_frame"));
 	}
 
@@ -136,6 +138,7 @@ public class BeeMod {
 		registerBlockItemBlock(alvearyHiveFrameHolder, alvearyHiveFrameHolderItemBlock);
 		registerItem(itemMutationFrame);
 		registerItem(itemEternalFrame);
+		registerItem(itemBeeGun);
 		registerItem(itemPoisonFrame);
 		registerItem(itemPheremoneFrame);
 		registerItem(itemIngredients);

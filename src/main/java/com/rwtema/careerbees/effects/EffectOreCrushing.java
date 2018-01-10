@@ -1,6 +1,5 @@
 package com.rwtema.careerbees.effects;
 
-import com.rwtema.careerbees.blocks.TileFlowerPedastal;
 import com.rwtema.careerbees.recipes.OreRecipes;
 import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
@@ -17,10 +16,10 @@ public class EffectOreCrushing extends EffectItemModification {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, TileFlowerPedastal frame, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
 		ItemStack itemStack = OreRecipes.ORE_TO_DUST.get(stack);
 		if (itemStack.isEmpty()) return null;
-		itemStack.setCount(2 + frame.getWorld().rand.nextInt(3));
+		itemStack.setCount(2 + housing.getWorldObj().rand.nextInt(3));
 		return itemStack;
 	}
 

@@ -8,6 +8,7 @@ import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
@@ -19,6 +20,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -33,6 +35,19 @@ public class EffectAcceleration extends EffectBase {
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
+	@Override
+	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		TObjectIntHashMap<BlockPos> toTickPos = posToTick.computeIfAbsent(world, w -> new TObjectIntHashMap<>());
+		TileEntity tileEntity = world.getTileEntity(pos);
+		if (tileEntity instanceof ITickable) {
+			toTickPos.put(pos, 40);
+		}
+		Block block = world.getBlockState(pos).getBlock();
+		if (block.getTickRandomly()) {
+			world.scheduleUpdate(pos, block, 1);
+		}
+		return true;
+	}
 
 	@Nonnull
 	@Override
@@ -59,8 +74,6 @@ public class EffectAcceleration extends EffectBase {
 			int mx = MathHelper.floor(territory.x);
 			int my = MathHelper.floor(territory.y);
 			int mz = MathHelper.floor(territory.z);
-
-			BlockPos.MutableBlockPos mutableBlockPos = new BlockPos.MutableBlockPos();
 
 			for (int dx = -mx; dx <= mx; dx++) {
 				for (int dz = -mz; dz <= mz; dz++) {

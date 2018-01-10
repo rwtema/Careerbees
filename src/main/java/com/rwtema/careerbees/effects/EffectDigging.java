@@ -9,6 +9,7 @@ import gnu.trove.map.hash.TIntByteHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -24,6 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -76,68 +78,74 @@ public class EffectDigging extends EffectBaseThrottled {
 					0,
 					z0 + rand.nextInt(z1 - z0)
 			);
-			pooledBlockPos.setY(rand.nextInt( world.getChunkFromBlockCoords(pooledBlockPos).getTopFilledSegment() + 16));
+			pooledBlockPos.setY(rand.nextInt(world.getChunkFromBlockCoords(pooledBlockPos).getTopFilledSegment() + 16));
 
-			IBlockState blockState = world.getBlockState(pooledBlockPos);
-			Block block = blockState.getBlock();
-			if (blockState.getBlock().isAir(blockState, world, pooledBlockPos)) {
+			processPosition(housing, world, pooledBlockPos);
+		}
+	}
+
+	public boolean processPosition(@Nonnull IBeeHousing housing, World world, BlockPos pooledBlockPos) {
+		IBlockState blockState = world.getBlockState(pooledBlockPos);
+		Block block = blockState.getBlock();
+		if (blockState.getBlock().isAir(blockState, world, pooledBlockPos)) {
+			return false;
+		}
+
+		ItemStack item = blockState.getBlock().getPickBlock(blockState, new RayTraceResult(new Vec3d(pooledBlockPos), EnumFacing.DOWN, pooledBlockPos), world, pooledBlockPos, FakePlayerFactory.getMinecraft((WorldServer) world));
+		if (item.isEmpty()) return false;
+
+		boolean isOre = isOre(item);
+
+		if (!isOre) return false;
+
+		List<ItemStack> products = new ArrayList<>();
+
+		try {
+			captureStacks.set(products);
+
+			switch (digType) {
+				case NORMAL:
+					block.dropBlockAsItem(world, pooledBlockPos, blockState, 0);
+					break;
+				case FORTUNE:
+					block.dropBlockAsItem(world, pooledBlockPos, blockState, 2);
+					break;
+				case SILKY:
+					FakePlayer fakePlayer = FakePlayerFactory.getMinecraft((WorldServer) world);
+					ItemStack stack = new ItemStack(Items.DIAMOND_PICKAXE);
+					stack.addEnchantment(Enchantments.SILK_TOUCH, 1);
+					block.harvestBlock(world, fakePlayer, pooledBlockPos, blockState, world.getTileEntity(pooledBlockPos), stack);
+					break;
+			}
+		} finally {
+			captureStacks.set(null);
+		}
+
+		boolean addedSomething = false;
+		for (Iterator<ItemStack> iterator = products.iterator(); iterator.hasNext(); ) {
+			ItemStack product = iterator.next();
+			if (product.isEmpty()) {
+				iterator.remove();
 				continue;
 			}
+			ItemStack remainder = tryAdd(product, housing.getBeeInventory());
+			addedSomething |= (remainder.getCount() != product.getCount());
+			if (remainder.isEmpty())
+				iterator.remove();
+			else
+				product.setCount(remainder.getCount());
 
-			ItemStack item = blockState.getBlock().getPickBlock(blockState, new RayTraceResult(new Vec3d(pooledBlockPos), EnumFacing.DOWN, pooledBlockPos), world, pooledBlockPos, FakePlayerFactory.getMinecraft((WorldServer) world));
-			if (item.isEmpty()) continue;
+		}
 
-			boolean isOre = isOre(item);
-
-			if (!isOre) continue;
-
-			List<ItemStack> products = new ArrayList<>();
-
-			try {
-				captureStacks.set(products);
-
-				switch (digType) {
-					case NORMAL:
-						block.dropBlockAsItem(world, pooledBlockPos, blockState, 0);
-						break;
-					case FORTUNE:
-						block.dropBlockAsItem(world, pooledBlockPos, blockState, 2);
-						break;
-					case SILKY:
-						FakePlayer fakePlayer = FakePlayerFactory.getMinecraft((WorldServer) world);
-						ItemStack stack = new ItemStack(Items.DIAMOND_PICKAXE);
-						stack.addEnchantment(Enchantments.SILK_TOUCH, 1);
-						block.harvestBlock(world, fakePlayer, pooledBlockPos, blockState, world.getTileEntity(pooledBlockPos), stack);
-						break;
-				}
-			} finally {
-				captureStacks.set(null);
-			}
-
-			boolean addedSomething = false;
-			for (Iterator<ItemStack> iterator = products.iterator(); iterator.hasNext(); ) {
-				ItemStack product = iterator.next();
-				if (product.isEmpty()) {
-					iterator.remove();
-					continue;
-				}
-				ItemStack remainder = tryAdd(product, housing.getBeeInventory());
-				addedSomething |= (remainder.getCount() != product.getCount());
-				if (remainder.isEmpty())
-					iterator.remove();
-				else
-					product.setCount(remainder.getCount());
-
-			}
-
-			if (addedSomething) {
-				world.playEvent(2001, pooledBlockPos, Block.getStateId(blockState));
-				world.setBlockToAir(pooledBlockPos);
-				for (ItemStack product : products) {
-					Block.spawnAsEntity(world, pooledBlockPos, product);
-				}
+		if (addedSomething) {
+			world.playEvent(2001, pooledBlockPos, Block.getStateId(blockState));
+			world.setBlockToAir(pooledBlockPos);
+			for (ItemStack product : products) {
+				Block.spawnAsEntity(world, pooledBlockPos, product);
 			}
 		}
+
+		return true;
 	}
 
 	private boolean isOre(ItemStack item) {
@@ -160,6 +168,11 @@ public class EffectDigging extends EffectBaseThrottled {
 
 	private boolean hasOrePrefix(String oreName, String prefix) {
 		return oreName.length() > prefix.length() && oreName.startsWith(prefix) && Character.isUpperCase(oreName.charAt(prefix.length()));
+	}
+
+	@Override
+	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return processPosition(housing, world, pos);
 	}
 
 

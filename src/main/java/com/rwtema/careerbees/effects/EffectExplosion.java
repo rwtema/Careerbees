@@ -5,6 +5,7 @@ import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeModifier;
 import forestry.api.genetics.IEffectData;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
@@ -12,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -27,6 +29,11 @@ public class EffectExplosion extends EffectBaseThrottled {
 	@Override
 	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
 
+		tryCreateSplosion(random, world, pos);
+
+	}
+
+	public void tryCreateSplosion(@Nonnull Random random, World world, BlockPos pos) {
 		Explosion explosion = new Explosion(world, null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 2 + random.nextFloat() * 2, false, true);
 		if (net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, explosion)) return;
 		explosion.doExplosionA();
@@ -53,6 +60,11 @@ public class EffectExplosion extends EffectBaseThrottled {
 					1,
 					1.0D, 0.0D, 0.0D, 0);
 		}
+	}
 
+	@Override
+	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		tryCreateSplosion(world.rand, world, pos);
+		return true;
 	}
 }

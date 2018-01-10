@@ -1,6 +1,5 @@
 package com.rwtema.careerbees.effects;
 
-import com.rwtema.careerbees.blocks.TileFlowerPedastal;
 import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -15,9 +14,9 @@ import java.util.UUID;
 public class EffectSharpen extends EffectAttributeBoost {
 	public static final EffectSharpen INSTANCE = new EffectSharpen();
 
-	static {
-		test(getDoubleUnaryOperator(5.0, 8.0, 100.0), 0);
-	}
+//	static {
+//		test(getDoubleUnaryOperator(5.0, 8.0, 100.0), 0);
+//	}
 
 	public EffectSharpen() {
 		super("sharpen", false, false, 20, 0.2F, UUID.fromString("78EE8D4A-80DC-4639-9A4E-266B7591794D"));
@@ -25,7 +24,7 @@ public class EffectSharpen extends EffectAttributeBoost {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, TileFlowerPedastal frame, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
 		return modifyStack(stack);
 	}
 

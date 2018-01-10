@@ -13,7 +13,7 @@ public class EffectRepair extends EffectItemModification {
 	}
 
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, TileFlowerPedastal frame, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
 		if (!stack.getItem().isRepairable()) {
 			return null;
 		}

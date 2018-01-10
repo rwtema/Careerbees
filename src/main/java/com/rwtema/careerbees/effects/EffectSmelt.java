@@ -18,7 +18,7 @@ public class EffectSmelt extends EffectItemModification {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, TileFlowerPedastal frame, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
 		ItemStack smeltingResult = FurnaceRecipes.instance().getSmeltingResult(stack);
 		if (smeltingResult.isEmpty()) return null;
 		return smeltingResult.copy();

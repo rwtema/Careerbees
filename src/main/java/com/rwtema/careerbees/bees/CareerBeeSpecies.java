@@ -210,27 +210,28 @@ public class CareerBeeSpecies {
 
 
 	static BeeMutationTree tree = new BeeMutationTree();
+	public static ArrayList<CareerBeeEntry> sorted_bee_entries;
 
 	public static void register() {
 		SpecialProperties.init();
 
-		ArrayList<CareerBeeEntry> entries = Lists.newArrayList(CareerBeeEntry.BEE_ENTRIES);
-		Map<CareerBeeEntry, Integer> bee_complexity = entries.stream().collect(Collectors.toMap(t -> t, s -> tree.getLeastParents(s).stream().mapToInt(Set::size).min().orElse(0)));
-		Map<String, Double> bee_model_complexity = entries.stream().collect(
+		sorted_bee_entries = Lists.newArrayList(CareerBeeEntry.BEE_ENTRIES);
+		Map<CareerBeeEntry, Integer> bee_complexity = sorted_bee_entries.stream().collect(Collectors.toMap(t -> t, s -> tree.getLeastParents(s).stream().mapToInt(Set::size).min().orElse(0)));
+		Map<String, Double> bee_model_complexity = sorted_bee_entries.stream().collect(
 				Collectors.groupingBy(
 						s -> s.modelName,
 						Collectors.collectingAndThen(
 								Collectors.mapping(bee_complexity::get, Collectors.toList()),
 								s -> s.stream().mapToInt(Integer::intValue).average().orElseThrow(RuntimeException::new))));
-		entries.sort(Comparator
+		sorted_bee_entries.sort(Comparator
 				.comparing(CareerBeeEntry::isSecret)
 				.thenComparingDouble(t -> bee_model_complexity.get(t.modelName))
 				.thenComparingInt(bee_complexity::get));
-		entries.forEach(CareerBeeEntry::build);
+		sorted_bee_entries.forEach(CareerBeeEntry::build);
 
 		CareerBeeEntry.BEE_ENTRIES.forEach(CareerBeeEntry::init);
 
-		registeredSpecies.addAll(entries.stream().map(t -> t.species).filter(Objects::nonNull).collect(Collectors.toSet()));
+		registeredSpecies.addAll(sorted_bee_entries.stream().map(t -> t.species).filter(Objects::nonNull).collect(Collectors.toSet()));
 
 		PlayerSpawnHandler.registerBeeSpawn("dire", UUID.fromString("BBB87DBE-690F-4205-BDC5-72FFB8EBC29D"), DIRE);
 		PlayerSpawnHandler.registerBeeSpawn("soaryn", UUID.fromString("4F3A8D1E-33C1-44E7-BCE8-E683027C7DAC"), SOARYN);
@@ -258,10 +259,10 @@ public class CareerBeeSpecies {
 		tree.registerMutations();
 
 		if (BeeMod.deobf_folder) {
-			BeeMod.logger.info(entries.stream().map(CareerBeeEntry::get).map(IAllele::getAlleleName).collect(Collectors.joining("\n")));
+			BeeMod.logger.info(sorted_bee_entries.stream().map(CareerBeeEntry::get).map(IAllele::getAlleleName).collect(Collectors.joining("\n")));
 
 
-			BeeMod.logger.info(entries.stream().map(c -> {
+			BeeMod.logger.info(sorted_bee_entries.stream().map(c -> {
 				IAlleleBeeSpecies t = c.get();
 				String alleleName = t.getAlleleName();
 

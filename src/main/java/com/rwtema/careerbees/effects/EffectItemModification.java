@@ -10,6 +10,8 @@ import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeModifier;
 import forestry.api.genetics.IEffectData;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -47,7 +49,7 @@ public abstract class EffectItemModification extends EffectBaseThrottled {
 		for (TileFlowerPedastal plantFrame : frameList) {
 			ItemStack stack = plantFrame.getStack();
 			if (stack.isEmpty()) continue;
-			ItemStack itemStack = modifyStack(genome, plantFrame, stack, housing);
+			ItemStack itemStack = modifyStack(genome, stack, housing);
 			if (itemStack != null) {
 				plantFrame.setStack(itemStack);
 				BlockFlowerPedastal.sendPulse(plantFrame, getParticleType(genome, plantFrame, stack, itemStack));
@@ -101,6 +103,19 @@ public abstract class EffectItemModification extends EffectBaseThrottled {
 		return frameList;
 	}
 
+	@Nullable
+	@Override
+	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+		return acceptItemStack(stack) ? modifyStack(genome, stack, housing) : null;
+	}
+
+	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner){
+		return false;
+	}
+
+	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner){
+		return false;
+	}
 
 	protected BlockFlowerPedastal.ParticleType getParticleType(IBeeGenome genome, TileFlowerPedastal plantFrame, ItemStack stack, ItemStack itemStack) {
 		return BlockFlowerPedastal.ParticleType.YELLOW;
@@ -108,12 +123,12 @@ public abstract class EffectItemModification extends EffectBaseThrottled {
 
 
 	@Nullable
-	public abstract ItemStack modifyStack(IBeeGenome genome, TileFlowerPedastal frame, ItemStack stack, @Nullable IBeeHousing housing);
+	public abstract ItemStack modifyStack(IBeeGenome genome, ItemStack stack, @Nullable IBeeHousing housing);
 
 	public boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, ItemStack oldStack, ItemStack newStack, IBeeHousing housing) {
 		if (!acceptItemStack(newStack)) return true;
 
-		ItemStack stack = modifyStack(genome, frame, newStack.copy(), housing);
+		ItemStack stack = modifyStack(genome, newStack.copy(), housing);
 		return stack == null || (stack.isItemEqual(newStack) && Objects.equals(stack.getTagCompound(), newStack.getTagCompound()));
 	}
 

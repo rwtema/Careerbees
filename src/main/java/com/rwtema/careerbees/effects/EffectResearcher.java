@@ -23,7 +23,7 @@ public class EffectResearcher extends EffectItemModification {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, TileFlowerPedastal frame, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
 		if (housing != null && housing.getOwner() != null) {
 			EnumBeeType type = BeeManager.beeRoot.getType(stack);
 			if(type == null) return null;
