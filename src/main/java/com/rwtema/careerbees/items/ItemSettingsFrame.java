@@ -30,7 +30,7 @@ public class ItemSettingsFrame extends ItemBaseFrame implements GuiHandler.ItemS
 
 	@Nonnull
 	@Override
-	public IBeeModifier getBeeModifier(ItemStack frame) {
+	public IBeeModifier getBeeModifier(@Nonnull ItemStack frame) {
 		NBTTagCompound tagCompound;
 		if ((tagCompound = frame.getTagCompound()) != null && tagCompound.hasKey("settings", Constants.NBT.TAG_COMPOUND)) {
 			NBTTagCompound tag = tagCompound.getCompoundTag("settings");
@@ -45,18 +45,21 @@ public class ItemSettingsFrame extends ItemBaseFrame implements GuiHandler.ItemS
 		return frame;
 	}
 
+	@Nonnull
 	@Override
-	public Container getContainer(EntityPlayer player, ItemStack stack, int slot) {
+	public Container getContainer(@Nonnull EntityPlayer player, ItemStack stack, int slot) {
 		return new ContainerSettings(player, slot);
 	}
 
+	@Nonnull
 	@Override
 	public Object getGui(EntityPlayer player, ItemStack stack, int slot) {
 		return new GuiSettings(player, slot);
 	}
 
+	@Nonnull
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
+	public ActionResult<ItemStack> onItemRightClick(@Nonnull World worldIn, EntityPlayer playerIn, @Nonnull EnumHand handIn) {
 		if (!worldIn.isRemote) {
 			playerIn.openGui(BeeMod.instance, 0, worldIn, handIn == EnumHand.MAIN_HAND ? playerIn.inventory.currentItem : playerIn.inventory.mainInventory.size() + playerIn.inventory.armorInventory.size(), 0, 0);
 		}
@@ -71,7 +74,7 @@ public class ItemSettingsFrame extends ItemBaseFrame implements GuiHandler.ItemS
 		}
 
 		@Override
-		public <V> V getValue(Setting<V, ?> setting) {
+		public <V> V getValue(@Nonnull Setting<V, ?> setting) {
 			if (tag.hasKey(setting.getKeyname(), setting.getExpectedType())) {
 				NBTBase tag = this.tag.getTag(setting.getKeyname());
 				//noinspection unchecked

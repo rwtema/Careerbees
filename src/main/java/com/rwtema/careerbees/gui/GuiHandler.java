@@ -12,19 +12,20 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 public class GuiHandler implements IGuiHandler {
-	private static TIntObjectHashMap<ElementCreator<? extends Container>> serverGuiContainer = new TIntObjectHashMap<>();
-	private static TIntObjectHashMap<ElementCreator<? extends IGuiWrapper>> clientGuiContainer = new TIntObjectHashMap<>();
+	private static final TIntObjectHashMap<ElementCreator<? extends Container>> serverGuiContainer = new TIntObjectHashMap<>();
+	private static final TIntObjectHashMap<ElementCreator<? extends IGuiWrapper>> clientGuiContainer = new TIntObjectHashMap<>();
 
 	static {
 		register(0, new ElementCreator<Container>() {
 			@Nullable
 			@Override
-			public Container getElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+			public Container getElement(int ID, @Nonnull EntityPlayer player, World world, int x, int y, int z) {
 				ItemStack stackInSlot = player.inventory.getStackInSlot(x);
 				Item item = stackInSlot.getItem();
 				if (item instanceof ItemStackGuiContainer) {
@@ -35,7 +36,7 @@ public class GuiHandler implements IGuiHandler {
 		}, new ElementCreator<IGuiWrapper>() {
 			@Nullable
 			@Override
-			public IGuiWrapper getElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+			public IGuiWrapper getElement(int ID, @Nonnull EntityPlayer player, World world, int x, int y, int z) {
 				ItemStack stackInSlot = player.inventory.getStackInSlot(x);
 				Item item = stackInSlot.getItem();
 				if (item instanceof ItemStackGuiContainer) {
@@ -60,7 +61,7 @@ public class GuiHandler implements IGuiHandler {
 		}
 	}
 
-	public static <T> void registerTE(int ID, Predicate<TileEntity> isTile, BiFunction<T, EntityPlayer, ? extends Container> serverContainer, BiFunction<T, EntityPlayer, ?> clientGuiContainer) {
+	public static <T> void registerTE(int ID, @Nonnull Predicate<TileEntity> isTile, @Nonnull BiFunction<T, EntityPlayer, ? extends Container> serverContainer, @Nonnull BiFunction<T, EntityPlayer, ?> clientGuiContainer) {
 		register(ID,
 				new fromTE<Container, T>() {
 					@Override
@@ -139,11 +140,12 @@ public class GuiHandler implements IGuiHandler {
 
 	public static abstract class fromTE<E, T> implements ElementCreator<E> {
 		@Override
-		public E getElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
+		public E getElement(int ID, EntityPlayer player, @Nonnull World world, int x, int y, int z) {
 			TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
 			if (!isValid(tileEntity)) return null;
 			T tile;
 			try {
+				//noinspection unchecked
 				tile = (T) tileEntity;
 			} catch (ClassCastException ignore) {
 				return null;

@@ -9,12 +9,14 @@ import forestry.api.genetics.IAllele;
 import forestry.core.config.Constants;
 import org.apache.commons.lang3.Validate;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.EnumMap;
 
 public class AlleleTemplate {
-	EnumMap<EnumBeeChromosome, IAllele> map = new EnumMap<>(EnumBeeChromosome.class);
+	final EnumMap<EnumBeeChromosome, IAllele> map = new EnumMap<>(EnumBeeChromosome.class);
 
-	private AlleleTemplate(IAlleleBeeSpecies beeSpecies) {
+	private AlleleTemplate(@Nullable IAlleleBeeSpecies beeSpecies) {
 		if (beeSpecies != null) {
 			setTemplateAllelle(EnumBeeChromosome.SPECIES, beeSpecies);
 		}
@@ -33,6 +35,7 @@ public class AlleleTemplate {
 	}
 
 
+	@Nonnull
 	public static AlleleTemplate createAlleleTemplate(IAlleleBeeSpecies beeSpecies) {
 		return new AlleleTemplate(beeSpecies);
 	}
@@ -49,17 +52,21 @@ public class AlleleTemplate {
 		BeeManager.beeRoot.registerTemplate(alleles);
 	}
 
+	@Nonnull
 	public IAlleleBeeEffect getEffect() {
 		return getValue(EnumBeeChromosome.EFFECT, IAlleleBeeEffect.class);
 	}
 
-	public <T extends IAllele> T getValue(EnumBeeChromosome chromosome, Class<T> clazz) {
+	@SuppressWarnings("unchecked")
+	@Nonnull
+	public <T extends IAllele> T getValue(@Nonnull EnumBeeChromosome chromosome, @Nonnull Class<T> clazz) {
 		Validate.isTrue(chromosome.getAlleleClass().isAssignableFrom(clazz));
 		IAllele iAllele = map.get(chromosome);
 		return (T) iAllele;
 	}
 
-	public AlleleTemplate setTemplateAllelle(EnumBeeChromosome chromosome, Object value) {
+	@Nonnull
+	public AlleleTemplate setTemplateAllelle(@Nonnull EnumBeeChromosome chromosome, Object value) {
 		if (value instanceof IAllele) {
 			map.put(chromosome, (IAllele) value);
 			return this;

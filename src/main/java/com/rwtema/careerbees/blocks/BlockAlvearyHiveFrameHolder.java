@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BlockAlvearyHiveFrameHolder extends Block {
@@ -27,7 +28,7 @@ public class BlockAlvearyHiveFrameHolder extends Block {
 	}
 
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(@Nonnull World worldIn, @Nonnull BlockPos pos, IBlockState state, @Nonnull EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (!worldIn.isRemote) {
 			playerIn.openGui(BeeMod.instance, 1, worldIn, pos.getX(), pos.getY(), pos.getZ());
 		}
@@ -46,7 +47,7 @@ public class BlockAlvearyHiveFrameHolder extends Block {
 
 	@Nullable
 	@Override
-	public TileEntity createTileEntity(World world, IBlockState state) {
+	public TileEntity createTileEntity(@Nonnull World world, @Nonnull IBlockState state) {
 		return new TileAlvearyHiveFrameHolder();
 	}
 }

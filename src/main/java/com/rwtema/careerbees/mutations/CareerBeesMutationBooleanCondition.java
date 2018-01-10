@@ -18,13 +18,15 @@ public abstract class CareerBeesMutationBooleanCondition implements IMutationCon
 
 	}
 
+	@Nonnull
 	final String desc;
 
-	public CareerBeesMutationBooleanCondition(String desc) {
+	public CareerBeesMutationBooleanCondition(@Nonnull String desc) {
 		this.desc = Lang.translate(desc);
 	}
 
-	public CareerBeesMutationBooleanCondition forceMutation(Supplier<IAlleleBeeSpecies> madScientist) {
+	@Nonnull
+	public CareerBeesMutationBooleanCondition forceMutation(@Nonnull Supplier<IAlleleBeeSpecies> madScientist) {
 		GendustryApiHelper.getInstance().forceMutation(madScientist.get());
 		return this;
 	}

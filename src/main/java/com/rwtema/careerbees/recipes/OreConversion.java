@@ -23,7 +23,7 @@ import java.util.stream.StreamSupport;
 public abstract class OreConversion {
 
 
-	LoadingCache<Item, Map<Integer, ItemStack>> cache = CacheBuilder.<Item, Map<Integer, ItemStack>>newBuilder()
+	final LoadingCache<Item, Map<Integer, ItemStack>> cache = CacheBuilder.<Item, Map<Integer, ItemStack>>newBuilder()
 			.maximumSize(60)
 			.build(new CacheLoader<Item, Map<Integer, ItemStack>>() {
 		@Override
@@ -72,16 +72,16 @@ public abstract class OreConversion {
 		cache.invalidateAll();
 	}
 
-	public boolean isValid(ItemStack itemStack) {
+	public boolean isValid(@Nonnull ItemStack itemStack) {
 		Map<Integer, ItemStack> map = cache.getUnchecked(itemStack.getItem());
 		return map.containsKey(itemStack.getMetadata());
 	}
 
-	public ItemStack get(ItemStack itemStack) {
+	public ItemStack get(@Nonnull ItemStack itemStack) {
 		return get(itemStack, ItemStack.EMPTY);
 	}
 
-	public ItemStack get(ItemStack itemStack, ItemStack emptyReturn) {
+	public ItemStack get(@Nonnull ItemStack itemStack, ItemStack emptyReturn) {
 		Map<Integer, ItemStack> map = cache.getUnchecked(itemStack.getItem());
 
 		if (map.isEmpty())
@@ -96,7 +96,8 @@ public abstract class OreConversion {
 	@Nullable
 	public abstract String getOreMapping(String input);
 
-	public NonNullList<ItemStack> getStacks(Item item) {
+	@Nonnull
+	public NonNullList<ItemStack> getStacks(@Nonnull Item item) {
 		NonNullList<ItemStack> objects = NonNullList.create();
 		item.getSubItems(CreativeTabs.SEARCH, objects);
 		return objects;
@@ -124,8 +125,9 @@ public abstract class OreConversion {
 			this.outPrefix = outPrefix;
 		}
 
+		@Nullable
 		@Override
-		public String getOreMapping(String input) {
+		public String getOreMapping(@Nonnull String input) {
 			if (input.length() > inPrefix.length() && input.startsWith(inPrefix) && Character.isUpperCase(input.charAt(inPrefix.length()))) {
 				return outPrefix + input.substring(inPrefix.length());
 			}

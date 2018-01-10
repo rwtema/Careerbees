@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.FoodStats;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.text.NumberFormat;
 import java.util.List;
@@ -30,7 +31,7 @@ public class EffectSalt extends EffectFoodModify {
 	}
 
 	@Override
-	protected void addTooltip(ItemStack itemStack, NBTTagCompound compoundTag, List<String> toolTip) {
+	protected void addTooltip(ItemStack itemStack, @Nonnull NBTTagCompound compoundTag, @Nonnull List<String> toolTip) {
 		float current = compoundTag.getFloat("current");
 		if (current > 0) {
 			toolTip.add(ChatFormatting.YELLOW + Lang.translateArgs("Salted: +%s Hunger Filled, -%s Saturation",
@@ -41,7 +42,7 @@ public class EffectSalt extends EffectFoodModify {
 	}
 
 	@Override
-	public void callback(EntityPlayer player, NBTTagCompound tag, ItemStack stack) {
+	public void callback(@Nonnull EntityPlayer player, @Nonnull NBTTagCompound tag, @Nonnull ItemStack stack) {
 		float current = tag.getFloat("current");
 		if (!(stack.getItem() instanceof ItemFood)) {
 			return;
@@ -64,7 +65,7 @@ public class EffectSalt extends EffectFoodModify {
 	}
 
 	@Override
-	protected boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, NBTTagCompound curTag) {
+	protected boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, @Nonnull NBTTagCompound curTag) {
 		return curTag.getFloat("current") >= MAX;
 	}
 
@@ -86,5 +87,5 @@ public class EffectSalt extends EffectFoodModify {
 		return curTag == null || curTag.getFloat("current") < MAX;
 	}
 
-	float MAX = 2;
+	final float MAX = 2;
 }

@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 public class EffectCrafting extends EffectBaseThrottled {
 
+	@Nonnull
 	public final static EffectCrafting INSTANCE;
 
 	static {
@@ -42,7 +43,7 @@ public class EffectCrafting extends EffectBaseThrottled {
 	}
 
 	@Nonnull
-	public static List<TileFlowerPedastal> getPlantFrames(World world, BlockPos pos, Vec3d territory, IBeeGenome genome) {
+	public static List<TileFlowerPedastal> getPlantFrames(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull Vec3d territory, @Nonnull IBeeGenome genome) {
 		List<TileFlowerPedastal> craftingUnits = new ArrayList<>();
 
 		int x_min = MathHelper.floor(pos.getX() - territory.x);
@@ -112,7 +113,7 @@ public class EffectCrafting extends EffectBaseThrottled {
 	}
 
 	@Override
-	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
+	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, @Nonnull World world, @Nonnull BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
 		Vec3d territory = getTerritory(genome, housing);
 
 		Pair<ItemStack, ArrayList<TileFlowerPedastal>> result = getCraftingResult(world, pos, territory, genome);
@@ -132,7 +133,7 @@ public class EffectCrafting extends EffectBaseThrottled {
 	}
 
 	@Nullable
-	private Pair<ItemStack, ArrayList<TileFlowerPedastal>> getCraftingResult(World world, BlockPos pos, Vec3d territory, IBeeGenome genome) {
+	private Pair<ItemStack, ArrayList<TileFlowerPedastal>> getCraftingResult(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull Vec3d territory, @Nonnull IBeeGenome genome) {
 		List<TileFlowerPedastal> craftingUnits = getPlantFrames(world, pos, territory, genome);
 
 		Pair<ItemStack, ArrayList<TileFlowerPedastal>> result = null;

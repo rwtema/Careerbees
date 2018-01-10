@@ -11,6 +11,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
+import javax.annotation.Nonnull;
 import java.util.UUID;
 
 import static net.minecraft.entity.player.EntityPlayer.PERSISTED_NBT_TAG;
@@ -31,7 +32,7 @@ public class PlayerSpawnHandler {
 	}
 
 	@SubscribeEvent
-	public void onSpawn(PlayerEvent.PlayerLoggedInEvent event) {
+	public void onSpawn(@Nonnull PlayerEvent.PlayerLoggedInEvent event) {
 		EntityPlayer player = event.player;
 		GameProfile gameProfile = player.getGameProfile();
 		if (BeeMod.deobf || this.DireID.equals(gameProfile.getId())) {

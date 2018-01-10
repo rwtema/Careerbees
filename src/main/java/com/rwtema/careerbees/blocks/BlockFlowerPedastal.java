@@ -15,7 +15,6 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.InventoryHelper;
@@ -44,11 +43,11 @@ public class BlockFlowerPedastal extends Block {
 		this.setCreativeTab(BeeMod.creativeTab);
 	}
 
-	public static void sendPulse(World world, BlockPos pos, ParticleType particleType) {
+	public static void sendPulse(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull ParticleType particleType) {
 		world.addBlockEvent(pos, BeeMod.instance.plantFrame, particleType.ordinal(), 0);
 	}
 
-	public static void sendPulse(TileFlowerPedastal plantFrame, ParticleType particleType) {
+	public static void sendPulse(@Nonnull TileFlowerPedastal plantFrame, @Nonnull ParticleType particleType) {
 		sendPulse(plantFrame.getWorld(), plantFrame.getPos(), particleType);
 	}
 
@@ -81,7 +80,7 @@ public class BlockFlowerPedastal extends Block {
 	}
 
 	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public boolean onBlockActivated(@Nonnull World worldIn, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (worldIn.isRemote) return true;
 
 		TileEntity tileEntity = worldIn.getTileEntity(pos);
@@ -145,7 +144,7 @@ public class BlockFlowerPedastal extends Block {
 	}
 
 	@Override
-	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+	public boolean eventReceived(IBlockState state, @Nonnull World worldIn, @Nonnull BlockPos pos, int id, int param) {
 		if (worldIn.isRemote) {
 			ParticleType particleType = ParticleType.values()[id];
 			switch (particleType) {
@@ -174,7 +173,7 @@ public class BlockFlowerPedastal extends Block {
 	}
 
 	@Override
-	public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
+	public void randomDisplayTick(IBlockState stateIn, @Nonnull World worldIn, @Nonnull BlockPos pos, Random rand) {
 		if (worldIn.getTotalWorldTime() % 8 > 0) {
 			return;
 		}

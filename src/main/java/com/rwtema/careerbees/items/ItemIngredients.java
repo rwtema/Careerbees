@@ -34,15 +34,14 @@ import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class ItemIngredients extends Item {
+	@Nonnull
 	private final static TIntObjectHashMap<IngredientType> map;
 
 	static {
@@ -64,7 +63,7 @@ public class ItemIngredients extends Item {
 		this.setCreativeTab(BeeMod.creativeTab);
 	}
 
-	public static IngredientType getIngredientType(ItemStack stack) {
+	public static IngredientType getIngredientType(@Nonnull ItemStack stack) {
 		IngredientType ingredientType = map.get(stack.getMetadata());
 		if (ingredientType == null) return IngredientType.BLANK;
 		return ingredientType;
@@ -94,22 +93,23 @@ public class ItemIngredients extends Item {
 
 	@Nullable
 	@Override
-	public Entity createEntity(World world, Entity location, ItemStack itemstack) {
+	public Entity createEntity(World world, Entity location, @Nonnull ItemStack itemstack) {
 		return getIngredientType(itemstack).createEntity(world, location, itemstack);
 	}
 
 	@Nonnull
 	@Override
-	public String getUnlocalizedName(ItemStack stack) {
+	public String getUnlocalizedName(@Nonnull ItemStack stack) {
 		return getUnlocalizedName(getIngredientType(stack));
 	}
 
-	private String getUnlocalizedName(IngredientType ingredientType) {
+	@Nonnull
+	private String getUnlocalizedName(@Nonnull IngredientType ingredientType) {
 		return super.getUnlocalizedName() + "." + ingredientType.name().toLowerCase(Locale.ENGLISH);
 	}
 
 	@Override
-	public int getEntityLifespan(ItemStack itemStack, World world) {
+	public int getEntityLifespan(@Nonnull ItemStack itemStack, World world) {
 		return getIngredientType(itemStack).getEntityLifespan(itemStack, world);
 	}
 
@@ -127,17 +127,18 @@ public class ItemIngredients extends Item {
 	}
 
 	@SideOnly(Side.CLIENT)
-	public int getColorFromItemstack(ItemStack stack, int tintIndex) {
+	public int getColorFromItemstack(@Nonnull ItemStack stack, int tintIndex) {
 		IngredientType ingredientType = getIngredientType(stack);
 		return ingredientType.getColor(stack, tintIndex);
 	}
 
 	@Override
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(@Nonnull ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 		IngredientType ingredientType = getIngredientType(stack);
 		ingredientType.addInformation(stack, worldIn, tooltip, flagIn);
 	}
 
+	@Nonnull
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
 		ItemStack stack = playerIn.getHeldItem(handIn);
@@ -174,7 +175,7 @@ public class ItemIngredients extends Item {
 			}
 
 			@Override
-			public void addCreativeStacks(NonNullList<ItemStack> items, CreativeTabs tab, ItemStack stack) {
+			public void addCreativeStacks(@Nonnull NonNullList<ItemStack> items, CreativeTabs tab, ItemStack stack) {
 				OreDictionary.getOres("logWood").stream().flatMap(
 						t -> {
 							if (t.getMetadata() == OreDictionary.WILDCARD_VALUE) {
@@ -192,7 +193,7 @@ public class ItemIngredients extends Item {
 			}
 
 			@Override
-			public String getDisplayName(ItemStack stack) {
+			public String getDisplayName(@Nonnull ItemStack stack) {
 				NBTTagCompound tagCompound;
 
 				if ((tagCompound = stack.getTagCompound()) != null) {
@@ -207,7 +208,7 @@ public class ItemIngredients extends Item {
 		PHEREMONES(2) {
 			@Override
 			@SideOnly(Side.CLIENT)
-			public int getColor(ItemStack stack, int tintIndex) {
+			public int getColor(@Nonnull ItemStack stack, int tintIndex) {
 				NBTTagCompound tagCompound;
 
 				if (tintIndex > 0 && tintIndex <= 2 && (tagCompound = stack.getTagCompound()) != null) {
@@ -225,7 +226,7 @@ public class ItemIngredients extends Item {
 			}
 
 			@Override
-			public void addCreativeStacks(NonNullList<ItemStack> items, CreativeTabs tab, ItemStack stack) {
+			public void addCreativeStacks(@Nonnull NonNullList<ItemStack> items, CreativeTabs tab, ItemStack stack) {
 				for (IBee iBee : BeeManager.beeRoot.getIndividualTemplates()) {
 					if (iBee.isSecret()) continue;
 					items.add(ItemPheremoneFrame.getPheremoneStack(iBee.getGenome().getPrimary()));
@@ -233,7 +234,7 @@ public class ItemIngredients extends Item {
 			}
 
 			@Override
-			public String getDisplayName(ItemStack stack) {
+			public String getDisplayName(@Nonnull ItemStack stack) {
 				NBTTagCompound tagCompound;
 
 				if ((tagCompound = stack.getTagCompound()) != null) {
@@ -265,7 +266,7 @@ public class ItemIngredients extends Item {
 			}
 
 			@Override
-			public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+			public void addInformation(@Nonnull ItemStack stack, World worldIn, @Nonnull List<String> tooltip, ITooltipFlag flagIn) {
 				NBTTagCompound nbt = stack.getTagCompound();
 				if (nbt != null) {
 					String name;
@@ -400,7 +401,7 @@ public class ItemIngredients extends Item {
 
 
 		@Override
-		public boolean test(ItemStack stack) {
+		public boolean test(@Nonnull ItemStack stack) {
 			return !stack.isEmpty() && stack.getItem() == BeeMod.instance.itemIngredients && stack.getMetadata() == ordinal();
 		}
 
@@ -417,12 +418,13 @@ public class ItemIngredients extends Item {
 			return inCreativeTab;
 		}
 
-		public void addCreativeStacks(NonNullList<ItemStack> items, CreativeTabs tab, ItemStack stack) {
+		public void addCreativeStacks(@Nonnull NonNullList<ItemStack> items, CreativeTabs tab, ItemStack stack) {
 			items.add(stack);
 		}
 
 
-		public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn, ItemStack stack) {
+		@Nonnull
+		public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn, @Nonnull ItemStack stack) {
 			return new ActionResult<>(EnumActionResult.PASS, stack);
 		}
 
@@ -430,6 +432,7 @@ public class ItemIngredients extends Item {
 
 		}
 
+		@Nullable
 		public Entity createEntity(World world, Entity location, ItemStack itemstack) {
 			return null;
 		}

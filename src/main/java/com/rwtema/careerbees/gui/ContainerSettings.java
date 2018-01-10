@@ -15,10 +15,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import javax.annotation.Nonnull;
 
 public class ContainerSettings extends Container {
+	@Nonnull
 	final ItemStack stack;
 	final int slot;
 
-	public ContainerSettings(EntityPlayer player, int slot) {
+	public ContainerSettings(@Nonnull EntityPlayer player, int slot) {
 		this.slot = slot;
 
 		int i = (2) * 18 - 2;
@@ -36,7 +37,7 @@ public class ContainerSettings extends Container {
 		}
 	}
 
-	private void addSlot(InventoryPlayer inventoryPlayer, int index, int xPosition, int yPosition, int slot) {
+	private void addSlot(@Nonnull InventoryPlayer inventoryPlayer, int index, int xPosition, int yPosition, int slot) {
 		if (index == slot) {
 			this.addSlotToContainer(new Slot(inventoryPlayer, index, xPosition, yPosition) {
 				@Override
@@ -102,7 +103,7 @@ public class ContainerSettings extends Container {
 		}
 
 		@Override
-		protected void runServer(MessageContext ctx, EntityPlayerMP player) {
+		protected void runServer(MessageContext ctx, @Nonnull EntityPlayerMP player) {
 			ItemStack stackInSlot = player.inventory.getStackInSlot(slot);
 			if (stackInSlot.getItem() == BeeMod.instance.itemSettingsFrame) {
 				if (tag == null) {
@@ -121,13 +122,13 @@ public class ContainerSettings extends Container {
 		}
 
 		@Override
-		public void fromBytes(ByteBuf buf) {
+		public void fromBytes(@Nonnull ByteBuf buf) {
 			tag = readNBT(buf);
 			slot = buf.readByte();
 		}
 
 		@Override
-		public void toBytes(ByteBuf buf) {
+		public void toBytes(@Nonnull ByteBuf buf) {
 			writeNBT(tag, buf);
 			buf.writeByte(slot);
 		}

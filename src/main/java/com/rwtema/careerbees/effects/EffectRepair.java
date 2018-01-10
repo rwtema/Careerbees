@@ -5,6 +5,8 @@ import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
+
 public class EffectRepair extends EffectItemModification {
 	public static final EffectRepair INSTANCE = new EffectRepair();
 
@@ -13,7 +15,7 @@ public class EffectRepair extends EffectItemModification {
 	}
 
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, @Nonnull ItemStack stack, IBeeHousing housing) {
 		if (!stack.getItem().isRepairable()) {
 			return null;
 		}
@@ -29,12 +31,12 @@ public class EffectRepair extends EffectItemModification {
 	}
 
 	@Override
-	public boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, ItemStack oldStack, ItemStack newStack, IBeeHousing housing) {
+	public boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, ItemStack oldStack, @Nonnull ItemStack newStack, IBeeHousing housing) {
 		return newStack.getMetadata() == 0;
 	}
 
 	@Override
-	public boolean acceptItemStack(ItemStack stack) {
+	public boolean acceptItemStack(@Nonnull ItemStack stack) {
 		return stack.getItem().isRepairable() && stack.getMetadata() > 0;
 	}
 }

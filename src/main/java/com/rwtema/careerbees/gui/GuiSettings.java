@@ -24,20 +24,23 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class GuiSettings extends GuiContainer {
 	final static int RIGHT_COLUMN = 166;
 	private static final ResourceLocation SETTINGS_GUI_TEXTURE = new ResourceLocation(BeeMod.MODID, "textures/gui/settings.png");
 	private static final int NUM_LINES = 11;
 	private static final int START_X = 10;
 	private final static int ENTRY_WIDTH = 81;
+	@Nonnull
 	private final ContainerSettings settings;
-	int offset = 0;
-	private EntityPlayer player;
+	final int offset = 0;
+	private final EntityPlayer player;
 
 	public GuiSettings(EntityPlayer player, int slot) {
 		super(new ContainerSettings(player, slot));
@@ -53,11 +56,11 @@ public class GuiSettings extends GuiContainer {
 		this.renderHoveredToolTip(mouseX, mouseY);
 	}
 
-	public void drawStackFromForeground(ItemStack stack, int x, int y) {
+	public void drawStackFromForeground(@Nonnull ItemStack stack, int x, int y) {
 		drawStackFromForeground(stack, x, y, null);
 	}
 
-	public void drawStackFromForeground(ItemStack stack, int x, int y, @Nullable String altText) {
+	public void drawStackFromForeground(@Nonnull ItemStack stack, int x, int y, @Nullable String altText) {
 		RenderHelper.enableGUIStandardItemLighting();
 		GlStateManager.translate(0.0F, 0.0F, 32.0F);
 		this.zLevel = 200.0F;
@@ -143,6 +146,7 @@ public class GuiSettings extends GuiContainer {
 		super.mouseClicked(mouseX, mouseY, mouseButton);
 	}
 
+	@Nonnull
 	public NBTTagCompound getSettingsTag(boolean init) {
 		ItemStack stack = settings.stack;
 
@@ -216,6 +220,7 @@ public class GuiSettings extends GuiContainer {
 		return species != null ? EffectBase.registeredEffectSpecies.get(species) : null;
 	}
 
+	@Nonnull
 	SettingsEntryList getEntries() {
 		NBTTagCompound settingsTag = getSettingsTag(false);
 		EffectBase effect = getEffect();
@@ -238,6 +243,7 @@ public class GuiSettings extends GuiContainer {
 		return new SettingsEntryList(builder.build());
 	}
 
+	@Nonnull
 	public TIntObjectHashMap<SettingsEntry> getVisibleEntries() {
 		SettingsEntryList entries = getEntries();
 		int n = 0;
@@ -252,6 +258,7 @@ public class GuiSettings extends GuiContainer {
 		return map;
 	}
 
+	@Nonnull
 	public SettingsEntry[] getAssignedEntries() {
 		TIntObjectHashMap<SettingsEntry> visibleEntries = getVisibleEntries();
 		int startPoint = MathHelper.clamp(offset, 0, Math.max(0, offset - NUM_LINES));
@@ -280,7 +287,7 @@ public class GuiSettings extends GuiContainer {
 		public final Setting<V, NBT> setting;
 		public final V value;
 
-		Button_State button_state = Button_State.DEFAULT;
+		final Button_State button_state = Button_State.DEFAULT;
 
 
 		public SettingsEntry(Setting<V, NBT> setting, V value) {
@@ -288,7 +295,7 @@ public class GuiSettings extends GuiContainer {
 			this.value = value;
 		}
 
-		public void draw(GuiSettings guiSettings, int row, int y) {
+		public void draw(@Nonnull GuiSettings guiSettings, int row, int y) {
 			List<String> strings = guiSettings.fontRenderer.listFormattedStringToWidth(setting.getKeyname(), ENTRY_WIDTH);
 			int height = setting.getType().height;
 			int color = 0XFFE0E0E0;
@@ -334,7 +341,7 @@ public class GuiSettings extends GuiContainer {
 			}
 		}
 
-		private int getButtonWidth(GuiSettings guiSettings) {
+		private int getButtonWidth(@Nonnull GuiSettings guiSettings) {
 			return setting.getEntries().stream().map(setting::format).mapToInt(guiSettings.fontRenderer::getStringWidth).max().orElseThrow(RuntimeException::new) + 4;
 		}
 	}
@@ -346,11 +353,13 @@ public class GuiSettings extends GuiContainer {
 			this.list = list;
 		}
 
+		@Nonnull
 		@Override
-		public <V> V getValue(Setting<V, ?> setting) {
+		public <V> V getValue(@Nonnull Setting<V, ?> setting) {
 			return (V) list.stream().filter(t -> t.setting == setting).findFirst().map(t -> t.value).orElse(setting.getDefault());
 		}
 
+		@Nonnull
 		@Override
 		public Iterator<SettingsEntry> iterator() {
 			return list.iterator();

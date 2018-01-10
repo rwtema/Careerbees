@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import net.minecraft.util.EnumFacing;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -17,6 +18,8 @@ public class RandomHelper {
 
 	private static EnumFacing[][] theHellIsThis() {
 		List<List<EnumFacing>> collect = ImmutableList.of(ImmutableList.of());
+		Comparator<EnumFacing> naturalOrder = Comparator.naturalOrder();
+		Comparator<Iterable<EnumFacing>> sorter = Comparators.lexicographical(naturalOrder);
 		for (int i = 6; i >= 1; i--) {
 			Map<HashSet<EnumFacing>, List<List<EnumFacing>>> m = collect.stream().collect(Collectors.groupingBy(Sets::newHashSet));
 
@@ -48,25 +51,23 @@ public class RandomHelper {
 							throw new RuntimeException();
 						}
 
-						oldValuesList.sort(Comparators.lexicographical(Comparator.naturalOrder()));
+						oldValuesList.<List<EnumFacing>>sort(sorter);
 						newValuesList.sort(Comparator.naturalOrder());
 
 						List<List<EnumFacing>> collect1 = Streams.zip(
 								oldValuesList.stream(),
 								newValuesList.stream(),
-								(List<EnumFacing> a, EnumFacing b) -> {
-									return ImmutableList.<EnumFacing>builder().addAll(a).add(b).build();
-								}
+								(List<EnumFacing> a, EnumFacing b) -> ImmutableList.<EnumFacing>builder().addAll(a).add(b).build()
 						).collect(Collectors.toList());
 						return collect1.stream();
 					}).collect(Collectors.toList());
 
 		}
-		collect.sort(Comparators.lexicographical(Comparator.naturalOrder()));
+		collect.sort(sorter);
 		return collect.stream().map(s -> s.stream().toArray(EnumFacing[]::new)).toArray(EnumFacing[][]::new);
 	}
 
-	public static EnumFacing[] getPermutation(Random random) {
+	public static EnumFacing[] getPermutation(@Nonnull Random random) {
 		return permutations[random.nextInt(60)];
 	}
 

@@ -9,7 +9,6 @@ import forestry.api.core.EnumHumidity;
 import forestry.api.core.EnumTemperature;
 import forestry.api.core.IErrorLogic;
 import forestry.api.multiblock.*;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
@@ -30,7 +29,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TileAlvearyHiveFrameHolder extends MultiblockTileEntityBase<IMultiblockLogicAlveary> implements IAlvearyComponent.BeeModifier, IAlvearyComponent.BeeListener, GuiHandler.ITileGui, IBeeHousing {
-	private ItemStackHandler handler = new ItemStackHandler(1) {
+	private final ItemStackHandler handler = new ItemStackHandler(1) {
 		@Override
 		protected void onContentsChanged(int slot) {
 			markDirty();
@@ -46,6 +45,7 @@ public class TileAlvearyHiveFrameHolder extends MultiblockTileEntityBase<IMultib
 	private final IBeeModifier iBeeModifier = new IBeeModifier() {
 		private final DefaultBeeModifier defaultBeeModifier = new DefaultBeeModifier();
 
+		@Nonnull
 		public IBeeModifier getModifier() {
 			ItemStack stackInSlot = handler.getStackInSlot(0);
 			Item item = stackInSlot.getItem();
@@ -105,6 +105,7 @@ public class TileAlvearyHiveFrameHolder extends MultiblockTileEntityBase<IMultib
 			return getModifier().isHellish();
 		}
 	};
+	@Nullable
 	private final DefaultBeeListener beeListener = new DefaultBeeListener() {
 		@Override
 		public void wearOutEquipment(int amount) {
@@ -212,11 +213,13 @@ public class TileAlvearyHiveFrameHolder extends MultiblockTileEntityBase<IMultib
 
 	}
 
+	@Nonnull
 	@Override
-	public Container createContainer(EntityPlayer player) {
+	public Container createContainer(@Nonnull EntityPlayer player) {
 		return new ContainerAlvearyFrame(this, player);
 	}
 
+	@Nonnull
 	@Override
 	@SideOnly(Side.CLIENT)
 	public Object createGui(EntityPlayer player) {

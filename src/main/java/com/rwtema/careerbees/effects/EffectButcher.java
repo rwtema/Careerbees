@@ -34,7 +34,7 @@ public class EffectButcher extends EffectBaseThrottled {
 	}
 
 	@Override
-	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
+	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, @Nonnull World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
 		AxisAlignedBB aabb = getAABB(genome, housing);
 
 		List<EntityAnimal> animals = world.getEntitiesWithinAABB(EntityAnimal.class, aabb, t -> t != null && !t.isChild());

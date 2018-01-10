@@ -13,9 +13,10 @@ import javax.annotation.Nonnull;
 
 public class FloweringBase implements IFlowerProvider {
 
+	@Nonnull
 	public final IAlleleFlowers ALLELE_FLOWERS;
 
-	public FloweringBase(String floweringName, boolean isDominant) {
+	public FloweringBase(@Nonnull String floweringName, boolean isDominant) {
 		ALLELE_FLOWERS = AlleleManager.alleleFactory.createFlowers(BeeMod.MODID, "flowers", floweringName, this, isDominant, EnumBeeChromosome.FLOWER_PROVIDER);
 	}
 

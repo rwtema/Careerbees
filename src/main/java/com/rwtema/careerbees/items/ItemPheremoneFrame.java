@@ -26,7 +26,7 @@ public class ItemPheremoneFrame extends ItemBaseFrame {
 	}
 
 	@Nonnull
-	public static ItemStack getPheremoneStack(IAlleleBeeSpecies species) {
+	public static ItemStack getPheremoneStack(@Nonnull IAlleleBeeSpecies species) {
 		ItemStack product = ItemIngredients.IngredientType.PHEREMONES.get();
 		product.setTagInfo("species", new NBTTagString(species.getUID()));
 		return product;

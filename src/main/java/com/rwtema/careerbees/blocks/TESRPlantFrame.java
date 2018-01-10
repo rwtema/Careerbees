@@ -11,9 +11,14 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.apache.commons.lang3.Validate;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 public class TESRPlantFrame extends TileEntitySpecialRenderer<TileFlowerPedastal> {
-	private RenderEntityItem travelingItemRender;
-	private EntityItem travelingEntityItem = new EntityItem(null);
+	@Nonnull
+	private final RenderEntityItem travelingItemRender;
+	@Nullable
+	private final EntityItem travelingEntityItem = new EntityItem(null);
 
 
 	{

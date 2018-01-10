@@ -7,10 +7,11 @@ import forestry.api.apiculture.IBeeHousing;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class EffectSmelt extends EffectItemModification {
-	public static EffectSmelt INSTANCE = new EffectSmelt("smelt", 20 * 10 / 10);
+	public static final EffectSmelt INSTANCE = new EffectSmelt("smelt", 20 * 10 / 10);
 
 	public EffectSmelt(String name, float baseTicksBetweenProcessing) {
 		super(name, baseTicksBetweenProcessing);
@@ -18,17 +19,18 @@ public class EffectSmelt extends EffectItemModification {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, @Nonnull ItemStack stack, IBeeHousing housing) {
 		ItemStack smeltingResult = FurnaceRecipes.instance().getSmeltingResult(stack);
 		if (smeltingResult.isEmpty()) return null;
 		return smeltingResult.copy();
 	}
 
 	@Override
-	public boolean acceptItemStack(ItemStack stack) {
+	public boolean acceptItemStack(@Nonnull ItemStack stack) {
 		return !FurnaceRecipes.instance().getSmeltingResult(stack).isEmpty();
 	}
 
+	@Nonnull
 	@Override
 	protected BlockFlowerPedastal.ParticleType getParticleType(IBeeGenome genome, TileFlowerPedastal plantFrame, ItemStack stack, ItemStack itemStack) {
 		return BlockFlowerPedastal.ParticleType.FIRE;

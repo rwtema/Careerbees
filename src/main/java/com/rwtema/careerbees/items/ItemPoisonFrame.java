@@ -16,7 +16,6 @@ import net.minecraft.world.WorldServer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class ItemPoisonFrame extends ItemBaseFrame {
 
@@ -40,9 +39,6 @@ public class ItemPoisonFrame extends ItemBaseFrame {
 		World worldObj = housing.getWorldObj();
 		BlockPos coordinates = housing.getCoordinates();
 		if(worldObj instanceof WorldServer){
-			for (int i = 0; i < 10; i++) {
-
-			}
 			((WorldServer)worldObj).spawnParticle(EnumParticleTypes.SPELL,
 					coordinates.getX() + 0.5, coordinates.getY()+ 0.5, coordinates.getZ()+ 0.5,
 					20,

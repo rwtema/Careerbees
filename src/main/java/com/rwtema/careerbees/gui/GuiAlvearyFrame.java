@@ -10,7 +10,7 @@ import net.minecraft.util.ResourceLocation;
 
 public class GuiAlvearyFrame extends GuiContainer {
 	private static final ResourceLocation SETTINGS_GUI_TEXTURE = new ResourceLocation(BeeMod.MODID, "textures/gui/frame_holder.png");
-	private EntityPlayer player;
+	private final EntityPlayer player;
 
 	public GuiAlvearyFrame(TileAlvearyHiveFrameHolder tile, EntityPlayer player) {
 		super(new ContainerAlvearyFrame(tile, player));

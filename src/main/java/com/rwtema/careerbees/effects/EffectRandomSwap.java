@@ -43,7 +43,7 @@ public class EffectRandomSwap extends EffectBase {
 	}
 
 	@Override
-	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
 		return processPosition(world, world.rand, getAABB(genome, housing), pos);
 	}
 
@@ -59,7 +59,7 @@ public class EffectRandomSwap extends EffectBase {
 	}
 
 
-	public boolean processPosition(World worldObj, Random rand, AxisAlignedBB aabb, BlockPos a) {
+	public boolean processPosition(@Nonnull World worldObj, @Nonnull Random rand, @Nonnull AxisAlignedBB aabb, @Nonnull BlockPos a) {
 		if (worldObj.isAirBlock(a)) return false;
 
 		TileEntity tileEntity = worldObj.getTileEntity(a);
@@ -69,7 +69,7 @@ public class EffectRandomSwap extends EffectBase {
 		IBlockState state = worldObj.getBlockState(a);
 		float blockHardness = state.getBlockHardness(worldObj, a);
 		if (blockHardness < 0
-				|| !isNormalCube(state)
+				|| isNonCube(state)
 				)
 			return false;
 
@@ -83,7 +83,7 @@ public class EffectRandomSwap extends EffectBase {
 
 		IBlockState otherState = worldObj.getBlockState(b);
 		if (state == otherState
-				|| !isNormalCube(otherState)
+				|| isNonCube(otherState)
 				|| state.getMaterial() != otherState.getMaterial()
 				|| otherState.getBlockHardness(worldObj, b) != blockHardness)
 			return false;
@@ -98,13 +98,13 @@ public class EffectRandomSwap extends EffectBase {
 		return true;
 	}
 
-	public boolean isNormalCube(IBlockState state) {
-		return state.isNormalCube() && state.isBlockNormalCube() && state.isFullCube() && state.isOpaqueCube() && state.getMobilityFlag() == EnumPushReaction.NORMAL && !state.getBlock().hasTileEntity(state);
+	public boolean isNonCube(@Nonnull IBlockState state) {
+		return !state.isNormalCube() || !state.isBlockNormalCube() || !state.isFullCube() || !state.isOpaqueCube() || state.getMobilityFlag() != EnumPushReaction.NORMAL || state.getBlock().hasTileEntity(state);
 	}
 
 
 	@Nonnull
-	public BlockPos getRandomBlockPosInAABB(Random rand, AxisAlignedBB aabb) {
+	public BlockPos getRandomBlockPosInAABB(@Nonnull Random rand, @Nonnull AxisAlignedBB aabb) {
 		int x = getRand(MathHelper.floor(aabb.minX), MathHelper.ceil(aabb.maxX), rand);
 		int y = getRand(MathHelper.floor(aabb.minY), MathHelper.ceil(aabb.maxY), rand);
 		int z = getRand(MathHelper.floor(aabb.minZ), MathHelper.ceil(aabb.maxZ), rand);

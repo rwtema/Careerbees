@@ -18,7 +18,6 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemMultiTexture;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.nbt.NBTTagCompound;
@@ -75,7 +74,7 @@ public class BeeMod {
 			World.class.getMethod("getBlockState", BlockPos.class);
 			d = true;
 			logger.info("Dev Enviroment detected. Releasing hounds...");
-		} catch (NoSuchMethodException | SecurityException e) {
+		} catch (@Nonnull NoSuchMethodException | SecurityException e) {
 			d = false;
 		}
 		deobf = d;
@@ -102,7 +101,8 @@ public class BeeMod {
 	public EnumMap<EntityEquipmentSlot, ItemBeeArmor> beeArmors;
 	public ItemBeeGun itemBeeGun;
 
-	public static <T extends Item> EnumMap<EntityEquipmentSlot, T> initArmors(Function<EntityEquipmentSlot, T> constructor) {
+	@Nonnull
+	public static <T extends Item> EnumMap<EntityEquipmentSlot, T> initArmors(@Nonnull Function<EntityEquipmentSlot, T> constructor) {
 		EnumMap<EntityEquipmentSlot, T> map = new EnumMap<>(EntityEquipmentSlot.class);
 		for (EntityEquipmentSlot armorSlot : BeeMod.ARMOR_SLOTS) {
 			map.put(armorSlot, constructor.apply(armorSlot));
@@ -158,19 +158,19 @@ public class BeeMod {
 		OreDictionary.registerOre("flower", new ItemStack(Blocks.YELLOW_FLOWER, 1, OreDictionary.WILDCARD_VALUE));
 	}
 
-	private void registerBlockItemBlock(Block block, ItemBlock itemBlock) {
+	private void registerBlockItemBlock(@Nonnull Block block, @Nonnull ItemBlock itemBlock) {
 		ForgeRegistries.BLOCKS.register(block);
 		registerItem(itemBlock.setRegistryName(Validate.notNull(block.getRegistryName())));
 	}
 
-	private void registerItem(Item item) {
+	private void registerItem(@Nonnull Item item) {
 		ForgeRegistries.ITEMS.register(item);
 		if (BeeMod.deobf_folder) {
 			Lang.translate(item.getUnlocalizedName() + ".name", item.getClass().getSimpleName());
 		}
 	}
 
-	private <T extends Item> void registerArmours(EnumMap<EntityEquipmentSlot, T> map) {
+	private <T extends Item> void registerArmours(@Nonnull EnumMap<EntityEquipmentSlot, T> map) {
 		for (T armor : map.values()) {
 			registerItem(armor);
 		}

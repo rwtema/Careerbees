@@ -20,17 +20,18 @@ import java.util.*;
 
 public class BeeIngredient extends Ingredient {
 	public static final Random rand = new Random();
+	@Nonnull
 	final Set<EnumBeeType> allowedTypes;
 	final IAllele[] requirements;
 	ItemStack[] stacks;
 
-	public BeeIngredient(Set<EnumBeeType> allowedTypes, IAllele[] requirements) {
+	public BeeIngredient(@Nonnull Set<EnumBeeType> allowedTypes, IAllele[] requirements) {
 		super(createMatchingStacks(allowedTypes));
 		this.allowedTypes = allowedTypes;
 		this.requirements = requirements;
 	}
 
-	private static ItemStack[] createMatchingStacks(Set<EnumBeeType> allowedTypes) {
+	private static ItemStack[] createMatchingStacks(@Nonnull Set<EnumBeeType> allowedTypes) {
 		return allowedTypes.stream()
 				.map(t -> {
 					switch (t) {
@@ -51,7 +52,8 @@ public class BeeIngredient extends Ingredient {
 				.toArray(ItemStack[]::new);
 	}
 
-	public static ItemStack[] createRandomBees(int n, Collection<EnumBeeType> allowedTypes, IAllele[] requirements, Random random) {
+	@Nonnull
+	public static ItemStack[] createRandomBees(int n, @Nonnull Collection<EnumBeeType> allowedTypes, @Nonnull IAllele[] requirements, @Nonnull Random random) {
 		ItemStack[] stacks = new ItemStack[n];
 		IAllele[][][] template = new IAllele[n][2][requirements.length];
 		EnumBeeChromosome[] values = EnumBeeChromosome.values();
@@ -135,7 +137,7 @@ public class BeeIngredient extends Ingredient {
 
 		@Nonnull
 		@Override
-		public Ingredient parse(JsonContext context, JsonObject json) {
+		public Ingredient parse(JsonContext context, @Nonnull JsonObject json) {
 
 			String type = JsonUtils.getString(json, "beetype", "any");
 			EnumSet<EnumBeeType> allowedTypes;

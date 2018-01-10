@@ -27,7 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class StudentManager extends PlacedBeeManager<BeeEntry.StudentBeeEntry> {
-	Set<IErrorState> errorTypes = Sets.newHashSet("no_flower", "no_queen", "no_drone", "no_space").stream().map(s -> "forestry:" + s).map(ForestryAPI.errorStateRegistry::getErrorState).collect(Collectors.toSet());
+	final Set<IErrorState> errorTypes = Sets.newHashSet("no_flower", "no_queen", "no_drone", "no_space").stream().map(s -> "forestry:" + s).map(ForestryAPI.errorStateRegistry::getErrorState).collect(Collectors.toSet());
 
 	public StudentManager() {
 		super(CareerBeeSpecies.STUDENT);
@@ -39,13 +39,13 @@ public class StudentManager extends PlacedBeeManager<BeeEntry.StudentBeeEntry> {
 	}
 
 	@Override
-	protected void onPlaced(EntityPlayer entityPlayer) {
+	protected void onPlaced(@Nonnull EntityPlayer entityPlayer) {
 		entityPlayer.sendMessage(new TextComponentTranslation("careerbees.message.placed.student.bee"));
 	}
 
 	@Override
 	@Nonnull
-	protected BeeEntry.StudentBeeEntry createEntry(IBeeHousing tileEntity, NBTTagCompound tag) {
+	protected BeeEntry.StudentBeeEntry createEntry(@Nonnull IBeeHousing tileEntity, NBTTagCompound tag) {
 		return new BeeEntry.StudentBeeEntry(
 				tag,
 				(byte) (checkForErrors(tileEntity) ? 1 : 0)
@@ -59,7 +59,7 @@ public class StudentManager extends PlacedBeeManager<BeeEntry.StudentBeeEntry> {
 	}
 
 	@SideOnly(Side.CLIENT)
-	protected void tickClient(Chunk chunk, Random rand, Map.Entry<BlockPos, BeeEntry.StudentBeeEntry> entry, BlockPos pos, TileEntity tileEntity, IBeeHousing entity) {
+	protected void tickClient(@Nonnull Chunk chunk, @Nonnull Random rand, @Nonnull Map.Entry<BlockPos, BeeEntry.StudentBeeEntry> entry, @Nonnull BlockPos pos, TileEntity tileEntity, IBeeHousing entity) {
 		if (entry.getValue().active == 0 && rand.nextInt(5) == 0) {
 
 			ArrayList<EnumFacing> enumFacings = Lists.newArrayList(EnumFacing.values());
@@ -90,7 +90,7 @@ public class StudentManager extends PlacedBeeManager<BeeEntry.StudentBeeEntry> {
 	}
 
 	@Override
-	protected boolean updateTile(Chunk chunk, Map.Entry<BlockPos, BeeEntry.StudentBeeEntry> k, IBeeHousing hou, TileEntity tileEntity) {
+	protected boolean updateTile(Chunk chunk, @Nonnull Map.Entry<BlockPos, BeeEntry.StudentBeeEntry> k, @Nonnull IBeeHousing hou, TileEntity tileEntity) {
 
 
 		byte t = checkForErrors(hou) ? 0 : (byte) 1;
@@ -101,7 +101,7 @@ public class StudentManager extends PlacedBeeManager<BeeEntry.StudentBeeEntry> {
 		return false;
 	}
 
-	private boolean checkForErrors(IBeeHousing hou) {
+	private boolean checkForErrors(@Nonnull IBeeHousing hou) {
 		IErrorLogic errorLogic = hou.getErrorLogic();
 		return errorTypes.stream().anyMatch(errorLogic::contains);
 	}

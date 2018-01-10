@@ -1,14 +1,10 @@
 package com.rwtema.careerbees.effects;
 
 import com.rwtema.careerbees.helpers.PrivateHelper;
-import com.rwtema.careerbees.items.ItemIngredients;
 import forestry.api.apiculture.IBeeHousing;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSource;
 import net.minecraft.util.ResourceLocation;
@@ -19,6 +15,7 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.common.util.FakePlayerFactory;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,7 +29,7 @@ public class EffectStealMobTaxation extends EffectSteal<EntityLiving> {
 	}
 
 	@Override
-	protected boolean steal(EntityLiving livingBase, IBeeHousing housing, EffectSteal effectSteal) {
+	protected boolean steal(@Nonnull EntityLiving livingBase, @Nonnull IBeeHousing housing, EffectSteal effectSteal) {
 		List<ItemStack> grabbed_stacks = new ArrayList<>();
 
 		if(!livingBase.attackEntityFrom(DamageSource.CACTUS, 0)) return false;
@@ -109,6 +106,7 @@ public class EffectStealMobTaxation extends EffectSteal<EntityLiving> {
 		return livingBase instanceof IMob;
 	}
 
+	@Nonnull
 	@Override
 	protected Class<EntityLiving> getEntityClazz() {
 		return EntityLiving.class;

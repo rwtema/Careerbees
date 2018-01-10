@@ -26,6 +26,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.function.Predicate;
 
@@ -38,13 +39,15 @@ public class ItemBeeGun extends Item {
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
+	@Nonnull
 	@Override
 	public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
 		return EnumActionResult.FAIL;
 	}
 
+	@Nonnull
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
+	public ActionResult<ItemStack> onItemRightClick(@Nonnull World worldIn, EntityPlayer playerIn, EnumHand handIn) {
 		ItemStack heldItem = playerIn.getHeldItem(handIn);
 		IBee bee = getCurrentSelectedBee(heldItem);
 		if (bee == null) {
@@ -119,7 +122,7 @@ public class ItemBeeGun extends Item {
 	}
 
 	@Nullable
-	public <T extends Entity> T getClosestEntityType(World worldIn, Vec3d start, Vec3d end, AxisAlignedBB axisAlignedBB, Class<T> clazz, Predicate<T> filter) {
+	public <T extends Entity> T getClosestEntityType(@Nonnull World worldIn, @Nonnull Vec3d start, @Nonnull Vec3d end, @Nonnull AxisAlignedBB axisAlignedBB, @Nonnull Class<T> clazz, @Nonnull Predicate<T> filter) {
 		T closest = null;
 		double closest_dist = Double.MAX_VALUE;
 		for (T entityLivingBase : worldIn.getEntitiesWithinAABB(clazz, axisAlignedBB, filter::test)) {
@@ -147,7 +150,7 @@ public class ItemBeeGun extends Item {
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void scroll(MouseEvent event) {
+	public void scroll(@Nonnull MouseEvent event) {
 		int k = event.getDwheel();
 		if (k == 0) return;
 		Minecraft mc = Minecraft.getMinecraft();
@@ -190,7 +193,7 @@ public class ItemBeeGun extends Item {
 		}
 
 		@Override
-		protected boolean addProduct(ItemStack product, boolean all) {
+		protected boolean addProduct(@Nonnull ItemStack product, boolean all) {
 			if (!all) {
 				return player.addItemStackToInventory(product.copy());
 			} else {

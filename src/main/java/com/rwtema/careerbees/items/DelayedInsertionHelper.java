@@ -28,11 +28,11 @@ public class DelayedInsertionHelper {
 		MinecraftForge.EVENT_BUS.register(DelayedInsertionHelper.class);
 	}
 
-	public static ItemStack addEntityStack(ItemStack stack, IBeeHousing housing, Entity item) {
+	public static ItemStack addEntityStack(@Nonnull ItemStack stack, @Nonnull IBeeHousing housing, @Nonnull Entity item) {
 		return addStack(stack, housing, new Vec3d(item.posX, item.posY, item.posZ));
 	}
 
-	public static ItemStack addStack(ItemStack stack, IBeeHousing housing, Vec3d fallback) {
+	public static ItemStack addStack(@Nonnull ItemStack stack, @Nonnull IBeeHousing housing, Vec3d fallback) {
 		if (stack.isEmpty()) return stack;
 
 		ItemStack remainder = EffectBase.tryAdd(stack, housing.getBeeInventory());
@@ -43,7 +43,7 @@ public class DelayedInsertionHelper {
 		}
 
 		if (housing instanceof TileEntity) {
-			TObjectIntHashMap<InsertEntry> entryMap = map.computeIfAbsent(housing, l -> new TObjectIntHashMap<InsertEntry>());
+			TObjectIntHashMap<InsertEntry> entryMap = map.computeIfAbsent(housing, l -> new TObjectIntHashMap<>());
 			InsertEntry insertEntry = new InsertEntry(ItemHandlerHelper.copyStackWithSize(remainder, 1), fallback, housing.getWorldObj().provider.getDimension());
 			entryMap.adjustOrPutValue(insertEntry, stack.getCount(), stack.getCount());
 		} else {
@@ -98,7 +98,7 @@ public class DelayedInsertionHelper {
 		final Vec3d fallbackpos;
 		final int dim;
 
-		InsertEntry(@Nonnull ItemStack stack, Vec3d fallbackpos, int dim) {
+		InsertEntry(@Nonnull ItemStack stack, @Nullable Vec3d fallbackpos, int dim) {
 			this.stack = stack;
 			this.fallbackpos = fallbackpos;
 			this.dim = dim;
@@ -111,9 +111,7 @@ public class DelayedInsertionHelper {
 
 			InsertEntry that = (InsertEntry) o;
 
-			if (dim != that.dim) return false;
-			if (!ItemHandlerHelper.canItemStacksStack(stack, that.stack)) return false;
-			return fallbackpos != null ? fallbackpos.equals(that.fallbackpos) : that.fallbackpos == null;
+			return dim == that.dim && ItemHandlerHelper.canItemStacksStack(stack, that.stack) && (fallbackpos != null ? fallbackpos.equals(that.fallbackpos) : that.fallbackpos == null);
 		}
 
 		@Override

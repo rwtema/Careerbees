@@ -18,8 +18,10 @@ public abstract class EffectBaseThrottled extends EffectBase {
 	public final float baseTicksBetweenProcessing;
 	public final float chanceOfProcessing;
 
-	WeakHashMap<IBeeHousing, Long> lastTickTime = BeeMod.deobf ? new WeakHashMap<>() : null;
-	TLongArrayList times = BeeMod.deobf ? new TLongArrayList() : null;
+	@Nullable
+	final WeakHashMap<IBeeHousing, Long> lastTickTime = BeeMod.deobf ? new WeakHashMap<>() : null;
+	@Nullable
+	final TLongArrayList times = BeeMod.deobf ? new TLongArrayList() : null;
 
 	public EffectBaseThrottled(String name, float baseTicksBetweenProcessing) {
 		this(name, false, false, baseTicksBetweenProcessing, 1);
@@ -89,7 +91,7 @@ public abstract class EffectBaseThrottled extends EffectBase {
 
 	public abstract void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings);
 
-	public int getCooldown(EntityPlayer playerIn, IBeeGenome genome){
+	public int getCooldown(@Nonnull EntityPlayer playerIn, @Nonnull IBeeGenome genome){
 		float speed = genome.getSpeed();
 		float base = baseTicksBetweenProcessing / speed;
 		float result = base;

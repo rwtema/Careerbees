@@ -50,7 +50,8 @@ public abstract class BaseEffectDataMap implements IEffectData {
 
 
 	public static class IntMap extends BaseEffectDataMap {
-		TIntIntHashMap map;
+		@Nonnull
+		final TIntIntHashMap map;
 
 		public IntMap() {
 			map = new TIntIntHashMap(1, 0.5F, 0, 0);
@@ -68,7 +69,7 @@ public abstract class BaseEffectDataMap implements IEffectData {
 	}
 
 	public static class IntArray extends BaseEffectDataMap {
-		int[] data;
+		final int[] data;
 
 		public IntArray(int[] data) {
 			this.data = data;

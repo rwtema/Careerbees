@@ -25,6 +25,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ public class TooltipHandler {
 
 	public void init() {
 		try {
+			//noinspection unchecked
 			guiLyzer = (Class<? extends GuiContainer>) Class.forName("forestry.core.gui.GuiAlyzer");
 		} catch (ClassNotFoundException e) {
 			return;
@@ -43,7 +45,7 @@ public class TooltipHandler {
 
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
-	public void tooltipAdd(ItemTooltipEvent event) {
+	public void tooltipAdd(@Nonnull ItemTooltipEvent event) {
 		ItemStack itemStack = event.getItemStack();
 		if (!itemStack.isEmpty()) {
 			EnumBeeType type = BeeManager.beeRoot.getType(itemStack);
@@ -61,7 +63,7 @@ public class TooltipHandler {
 	}
 
 	@SubscribeEvent
-	public void drawTooltip(GuiScreenEvent.DrawScreenEvent.Post event) {
+	public void drawTooltip(@Nonnull GuiScreenEvent.DrawScreenEvent.Post event) {
 		EntityPlayerSP player = Minecraft.getMinecraft().player;
 		if (player == null || !player.inventory.getItemStack().isEmpty()) return;
 
@@ -94,7 +96,7 @@ public class TooltipHandler {
 		}
 	}
 
-	private void addTooltip(GuiScreenEvent.DrawScreenEvent.Post event, GuiContainer container, IAllele effect, IBeeGenome genome) {
+	private void addTooltip(@Nonnull GuiScreenEvent.DrawScreenEvent.Post event, @Nonnull GuiContainer container, @Nonnull IAllele effect, @Nonnull IBeeGenome genome) {
 		String key = effect.getUnlocalizedName() + ".desc";
 
 		ImmutableList<String> list;

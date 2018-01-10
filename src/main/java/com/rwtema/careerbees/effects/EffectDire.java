@@ -23,13 +23,13 @@ public class EffectDire extends EffectBaseThrottled {
 	public final static int R = 9;
 	public final static int HEIGHT = 6;
 
-	public static EffectDire INSTANCE = new EffectDire("novabynova", 2);
+	public static final EffectDire INSTANCE = new EffectDire("novabynova", 2);
 
 	static {
 		MinecraftForge.EVENT_BUS.register(EffectDire.class);
 	}
 
-	ImmutableList<Insn> insnList = ImmutableList.<Insn>builder()
+	final ImmutableList<Insn> insnList = ImmutableList.<Insn>builder()
 			.add(new Floor())
 			.addAll(IntStream.range(0, HEIGHT).mapToObj(Sides::new).collect(Collectors.toList()))
 			.add(new Torches())
@@ -89,6 +89,7 @@ public class EffectDire extends EffectBaseThrottled {
 	private abstract static class Insn {
 		abstract int getSize();
 
+		@Nonnull
 		abstract Pair<BlockPos, IBlockState> getResult(int n);
 	}
 
@@ -98,6 +99,7 @@ public class EffectDire extends EffectBaseThrottled {
 			return R * R;
 		}
 
+		@Nonnull
 		@Override
 		Pair<BlockPos, IBlockState> getResult(int n) {
 			int x = n % R;
@@ -118,6 +120,7 @@ public class EffectDire extends EffectBaseThrottled {
 			return 4 * (R - 1);
 		}
 
+		@Nonnull
 		@Override
 		Pair<BlockPos, IBlockState> getResult(int n) {
 			int d = n % (R - 1);
@@ -169,6 +172,7 @@ public class EffectDire extends EffectBaseThrottled {
 			return 4;
 		}
 
+		@Nonnull
 		@Override
 		Pair<BlockPos, IBlockState> getResult(int n) {
 			EnumFacing dir = EnumFacing.HORIZONTALS[n];
@@ -183,6 +187,7 @@ public class EffectDire extends EffectBaseThrottled {
 			return R * R;
 		}
 
+		@Nonnull
 		@Override
 		Pair<BlockPos, IBlockState> getResult(int n) {
 			int maxW = R / 2;

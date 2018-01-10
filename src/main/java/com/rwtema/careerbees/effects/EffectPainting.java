@@ -9,8 +9,10 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
+
 public class EffectPainting extends EffectWorldInteraction {
-	public static EffectPainting INSTANCE = new EffectPainting("painting", 20 * 30);
+	public static final EffectPainting INSTANCE = new EffectPainting("painting", 20 * 30);
 
 	public EffectPainting(String name, float baseTicksBetweenProcessing) {
 		super(name, baseTicksBetweenProcessing);
@@ -25,7 +27,7 @@ public class EffectPainting extends EffectWorldInteraction {
 	}
 
 	@Override
-	protected boolean performPosEffect(World world, BlockPos blockPos, IBlockState state, IBeeGenome genome, IBeeHousing housing) {
+	protected boolean performPosEffect(@Nonnull World world, @Nonnull BlockPos blockPos, @Nonnull IBlockState state, IBeeGenome genome, IBeeHousing housing) {
 		Material material = state.getMaterial();
 		if (material != Material.ROCK && material != Material.IRON && material != Material.WOOD) return false;
 

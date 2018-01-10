@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.oredict.OreDictionary;
 
+import javax.annotation.Nonnull;
 import java.util.function.Predicate;
 
 public class EffectLumber extends EffectWorldInteraction {
@@ -22,7 +23,8 @@ public class EffectLumber extends EffectWorldInteraction {
 		super(name, baseTicksBetweenProcessing);
 	}
 
-	public static BlockPos.MutableBlockPos searchUpForNextNotEqual(World world, BlockPos startSearch, Predicate<BlockPos> isWood) {
+	@Nonnull
+	public static BlockPos.MutableBlockPos searchUpForNextNotEqual(World world, @Nonnull BlockPos startSearch, @Nonnull Predicate<BlockPos> isWood) {
 		BlockPos.MutableBlockPos lower = new BlockPos.MutableBlockPos(startSearch);
 		BlockPos.MutableBlockPos upper = new BlockPos.MutableBlockPos(startSearch).move(EnumFacing.UP, 4);
 
@@ -45,7 +47,7 @@ public class EffectLumber extends EffectWorldInteraction {
 	}
 
 	@Override
-	protected boolean performPosEffect(World world, BlockPos blockPos, IBlockState state, IBeeGenome genome, IBeeHousing housing) {
+	protected boolean performPosEffect(@Nonnull World world, @Nonnull BlockPos blockPos, @Nonnull IBlockState state, IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		if (state.getBlock().isWood(world, blockPos)) {
 			BlockPos.MutableBlockPos topBlock = searchUpForNextNotEqual(world, blockPos, s -> world.getBlockState(s).getBlock().isWood(world, s));
 

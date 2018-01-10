@@ -15,6 +15,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class TestMod {
 		CustomBeeModel.modelCreationHook = TestMod::createBeeModels;
 	}
 
-	private static void createBeeModels(String suffix, CustomBeeModel customBeeModel) {
+	private static void createBeeModels(String suffix, @Nonnull CustomBeeModel customBeeModel) {
 		for (Pair<String, ModelResourceLocation> pair : ImmutableList.of(
 				Pair.of("drone", customBeeModel.drone_location),
 				Pair.of("queen", customBeeModel.queen_location),
@@ -72,7 +73,7 @@ public class TestMod {
 		}
 	}
 
-	private static void writeJSon(File file, JsonObject model) {
+	private static void writeJSon(@Nonnull File file, JsonObject model) {
 		try (FileWriter writer = new FileWriter(file.getPath())) {
 			JsonWriter jsonWriter = new JsonWriter(writer);
 			jsonWriter.setIndent("  ");
@@ -84,7 +85,7 @@ public class TestMod {
 		}
 	}
 
-	private static void createItemBlockHook(ItemBlock block, ModelResourceLocation inventoryModelResourceLocation) {
+	private static void createItemBlockHook(ItemBlock block, @Nonnull ModelResourceLocation inventoryModelResourceLocation) {
 		String resourcePath = inventoryModelResourceLocation.getResourcePath();
 		File fileBlockStates = new File(BLOCK_STATES_DIRECTORY, resourcePath + ".json");
 		if (fileBlockStates.exists()) {
@@ -119,7 +120,7 @@ public class TestMod {
 		copySafe(new File(ITEM_TEXTURE_DIR, "debug.png"), new File(BLOCKS_TEXTURE_DIR, resourcePath + ".png"));
 	}
 
-	private static void createItemHook(ModelResourceLocation modelResourceLocation) {
+	private static void createItemHook(@Nonnull ModelResourceLocation modelResourceLocation) {
 		String resourcePath = modelResourceLocation.getResourcePath();
 		File file = new File(ITEM_MODEL_DIRECTORY, resourcePath + ".json");
 
@@ -138,7 +139,7 @@ public class TestMod {
 		copySafe(new File(ITEM_TEXTURE_DIR, "debug.png"), new File(ITEM_TEXTURE_DIR, resourcePath + ".png"));
 	}
 
-	private static void copySafe(File from, File to) {
+	private static void copySafe(@Nonnull File from, @Nonnull File to) {
 		if (to.exists()) return;
 		try {
 			Files.copy(from, to);

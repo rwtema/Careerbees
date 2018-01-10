@@ -25,7 +25,7 @@ public abstract class EffectSteal<T extends EntityLivingBase> extends EffectBase
 	}
 
 
-	public static void mergeStackIntoList(List<ItemStack> grabbed_stacks, ItemStack addedStack) {
+	public static void mergeStackIntoList(@Nonnull List<ItemStack> grabbed_stacks, @Nonnull ItemStack addedStack) {
 		for (ItemStack grabbed_stack : grabbed_stacks) {
 			if (ItemHandlerHelper.canItemStacksStack(addedStack, grabbed_stack)) {
 				grabbed_stack.grow(addedStack.getCount());
@@ -37,7 +37,7 @@ public abstract class EffectSteal<T extends EntityLivingBase> extends EffectBase
 
 
 	@Override
-	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
+	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, @Nonnull World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
 		AxisAlignedBB bb = getAABB(genome, housing);
 		List<T> entitiesWithinAABB = new ArrayList<>(world.getEntitiesWithinAABB(getEntityClazz(), bb));
 		Collections.shuffle(entitiesWithinAABB, random);
@@ -102,7 +102,7 @@ public abstract class EffectSteal<T extends EntityLivingBase> extends EffectBase
 	}
 
 	@Override
-	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean handleEntityLiving(@Nonnull EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
 		if (getEntityClazz().isInstance(livingBase)) {
 			T t = getEntityClazz().cast(livingBase);
 			if (canHandle(t)) {

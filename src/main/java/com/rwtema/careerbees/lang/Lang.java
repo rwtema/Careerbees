@@ -19,13 +19,17 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.*;
 import java.util.*;
 
 public class Lang {
+	@Nullable
 	private final static TreeMap<String, String> lang = BeeMod.deobf_folder ? new TreeMap<>() : null;
 	private final static HashMap<String, String> textKey = new HashMap<>();
+	@Nullable
 	private final static HashMap<String, String> existingMCLangMap;
+	@Nonnull
 	private final static HashMap<String, String> injectingMCLangMap;
 	private static final int MAX_KEY_LEN = 32;
 	private static final TObjectIntHashMap<String> numRandomEntries = new TObjectIntHashMap<>();
@@ -83,11 +87,11 @@ public class Lang {
 	}
 
 	public static void init() {
-
+		BeeMod.logger.info("Lang Initialized");
 	}
 
 
-	public static void readStream(InputStream stream, boolean safe) {
+	public static void readStream(@Nonnull InputStream stream, boolean safe) {
 		Map<String, String> langMap = LanguageMap.parseLangFile(stream);
 		if (safe) {
 			for (Map.Entry<String, String> entry : langMap.entrySet()) {
@@ -103,16 +107,18 @@ public class Lang {
 		}
 	}
 
-	public static String translate(String text) {
+	@Nonnull
+	public static String translate(@Nonnull String text) {
 		return translatePrefix(text);
 	}
 
-	public static String translatePrefix(String text) {
+	@Nonnull
+	public static String translatePrefix(@Nonnull String text) {
 		String key = getKey(text);
 		return translate(key, text);
 	}
 
-	public static String getKey(String text) {
+	public static String getKey(@Nonnull String text) {
 		String key = textKey.get(text);
 		if (key == null) {
 			key = makeKey(text);
@@ -124,7 +130,7 @@ public class Lang {
 		return key;
 	}
 
-	private static String makeKey(String text) {
+	private static String makeKey(@Nonnull String text) {
 		String key;
 		String t = stripText(text);
 		key = "BeeMod.text." + t;
@@ -132,7 +138,7 @@ public class Lang {
 	}
 
 	@Nonnull
-	public static String stripText(String text) {
+	public static String stripText(@Nonnull String text) {
 		String t = text.replaceAll("([^A-Za-z\\s])", "").trim();
 		t = t.replaceAll("\\s+", ".").toLowerCase();
 		if (t.length() > MAX_KEY_LEN) {
@@ -143,12 +149,9 @@ public class Lang {
 		return t;
 	}
 
-	public static String translate(String key, String _default) {
+	@Nonnull
+	public static String translate(@Nonnull String key, @Nonnull String _default) {
 		if (BeeMod.deobf_folder && FMLLaunchHandler.side() == Side.CLIENT) {
-			if (!key.equals(key.toLowerCase())) {
-//				LogHelper.oneTimeInfo("Lang: " + key + " is not lowercased");
-			}
-
 			if (size != existingMCLangMap.size()) {
 				existingMCLangMap.putAll(injectingMCLangMap);
 				size = existingMCLangMap.size();
@@ -161,7 +164,7 @@ public class Lang {
 		return _default;
 	}
 
-	public static String initKey(String key, String _default) {
+	public static String initKey(String key, @Nonnull String _default) {
 		if (BeeMod.deobf_folder && FMLLaunchHandler.side() == Side.CLIENT) {
 			if (!_default.equals(lang.get(key))) {
 				lang.put(key, _default);
@@ -260,15 +263,18 @@ public class Lang {
 	}
 
 
+	@Nonnull
 	private static File getMissedEntriesFile() {
 		return new File(new File(new File("."), "debug_text"), "missed_en_US.lang");
 	}
 
+	@Nonnull
 	private static File getNonTrivialFile() {
 		return new File(new File(new File("."), "debug_text"), "non_trivial_en_US.lang");
 	}
 
-	public static TextComponentTranslation chat(String message, Object... args) {
+	@Nonnull
+	public static TextComponentTranslation chat(@Nonnull String message, Object... args) {
 		String key = getKey(message);
 		if (I18n.canTranslate(key))
 			return new TextComponentTranslation(key, args);
@@ -276,12 +282,13 @@ public class Lang {
 		return new TextComponentTranslation(message, args);
 	}
 
-	public static TextComponentTranslation chat(boolean dummy, String key, String _default, Object... args) {
+	@Nonnull
+	public static TextComponentTranslation chat(boolean dummy, @Nonnull String key, @Nonnull String _default, Object... args) {
 		return new TextComponentTranslation(translate(key, _default), args);
 	}
 
 
-	public static String translateArgs(boolean dummy, String key, String _default, Object... args) {
+	public static String translateArgs(boolean dummy, @Nonnull String key, @Nonnull String _default, Object... args) {
 		String translate = translate(key, _default);
 		try {
 			return String.format(translate, args);
@@ -290,7 +297,7 @@ public class Lang {
 		}
 	}
 
-	public static String translateArgs(String message, Object... args) {
+	public static String translateArgs(@Nonnull String message, Object... args) {
 		String translate = Lang.translate(message);
 		try {
 			return String.format(translate, args);
@@ -299,23 +306,23 @@ public class Lang {
 		}
 	}
 
-	public static String getItemName(Block block) {
+	public static String getItemName(@Nonnull Block block) {
 		return getItemName(new ItemStack(block));
 	}
 
-	public static String getItemName(Item item) {
+	public static String getItemName(@Nonnull Item item) {
 		return getItemName(new ItemStack(item));
 	}
 
-	public static String getItemName(ItemStack stack) {
+	public static String getItemName(@Nonnull ItemStack stack) {
 		return stack.getDisplayName();
 	}
 
-	public static String random(String key) {
+	public static String random(@Nonnull String key) {
 		return random(key, BeeMod.RANDOM);
 	}
 
-	public static String random(String key, Random rand) {
+	public static String random(@Nonnull String key, @Nonnull Random rand) {
 		int n = getNumSelections(key);
 		if (n == 0) {
 			return I18n.translateToLocal(key);

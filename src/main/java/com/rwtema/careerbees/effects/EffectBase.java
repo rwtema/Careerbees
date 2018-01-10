@@ -38,26 +38,27 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class EffectBase implements IAlleleBeeEffect {
-	public static HashMap<IAlleleBeeSpecies, EffectBase> registeredEffectSpecies = new HashMap<>();
-	protected static WeakHashMap<IBeeHousing, Iterable<BlockPos>> adjacentPosCache = new WeakHashMap<>();
+	public static final HashMap<IAlleleBeeSpecies, EffectBase> registeredEffectSpecies = new HashMap<>();
+	protected static final WeakHashMap<IBeeHousing, Iterable<BlockPos>> adjacentPosCache = new WeakHashMap<>();
 	static int n = 0;
 
 	static {
 		MinecraftForge.EVENT_BUS.register(EffectBase.class);
 	}
 
+	@Nonnull
 	private final String uuid, rawname, unlocalizedName;
 	private final boolean isDominant;
 	private final boolean isCombinable;
 	@Nonnull
 	public Set<IAlleleBeeSpecies> validSpecies = ImmutableSet.of();
-	public List<Setting<?, ?>> settings = new ArrayList<>();
+	public final List<Setting<?, ?>> settings = new ArrayList<>();
 
 	public EffectBase(String rawname) {
 		this(rawname, false, false);
 	}
 
-	public EffectBase(String rawname, boolean isDominant, boolean isCombinable) {
+	public EffectBase(@Nonnull String rawname, boolean isDominant, boolean isCombinable) {
 		this.rawname = rawname;
 		this.unlocalizedName = BeeMod.MODID + ".allele.effect." + rawname;
 		if (BeeMod.deobf_folder) {
@@ -71,7 +72,7 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		AlleleManager.alleleRegistry.registerAllele(this, EnumBeeChromosome.EFFECT);
 	}
 
-	public static float getSpeed(IBeeGenome genome, IBeeHousing housing) {
+	public static float getSpeed(@Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		ItemEternalFrame.checkProduction.set(true);
 		float speed = genome.getSpeed() * getModifier(genome, housing, (m, g) -> m.getProductionModifier(g, 1));
 		ItemEternalFrame.checkProduction.set(false);
@@ -82,7 +83,7 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		return speed;
 	}
 
-	public static float getModifier(IBeeGenome genome, IBeeHousing housing, BiFunction<IBeeModifier, IBeeGenome, Float> function) {
+	public static float getModifier(IBeeGenome genome, @Nonnull IBeeHousing housing, @Nonnull BiFunction<IBeeModifier, IBeeGenome, Float> function) {
 		World world = housing.getWorldObj();
 		IBeekeepingMode mode = BeeManager.beeRoot.getBeekeepingMode(world);
 
@@ -91,18 +92,19 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		return function.apply(beeHousingModifier, genome) * function.apply(beeModeModifier, genome);
 	}
 
-	public static AxisAlignedBB getAABB(IBeeGenome genome, IBeeHousing housing) {
+	public static AxisAlignedBB getAABB(@Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		Vec3d territory = getTerritory(genome, housing);
 		return new AxisAlignedBB(housing.getCoordinates()).grow(territory.x, territory.y, territory.z);
 	}
 
-	public static Vec3d getTerritory(IBeeGenome genome, IBeeHousing housing) {
+	@Nonnull
+	public static Vec3d getTerritory(@Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		Vec3i territory = genome.getTerritory();
 		float modifier = getModifier(genome, housing, (iBeeModifier, genome1) -> iBeeModifier.getTerritoryModifier(genome1, 1));
 		return new Vec3d(territory.getX() * modifier, territory.getY() * modifier, territory.getZ() * modifier);
 	}
 
-	public static ItemStack tryAdd(ItemStack stack, IBeeHousingInventory inventory) {
+	public static ItemStack tryAdd(@Nonnull ItemStack stack, @Nonnull IBeeHousingInventory inventory) {
 		if (stack.isEmpty() || inventory.addProduct(stack, true)) {
 			return ItemStack.EMPTY;
 		}
@@ -128,7 +130,7 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 	}
 
 	@SubscribeEvent
-	public static void tickCleanup(TickEvent.ServerTickEvent event) {
+	public static void tickCleanup(@Nonnull TickEvent.ServerTickEvent event) {
 		if (event.phase == TickEvent.Phase.END) {
 			n++;
 			if (n > 20 * 20) {
@@ -138,7 +140,7 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		}
 	}
 
-	public static int getRand(int a, int b, Random random) {
+	public static int getRand(int a, int b, @Nonnull Random random) {
 		if (a == b) return a;
 		else if (a < b) {
 			return a + random.nextInt(b - a);
@@ -147,7 +149,7 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		}
 	}
 
-	public IEffectSettingsHolder getSettings(IBeeHousing housing) {
+	public IEffectSettingsHolder getSettings(@Nonnull IBeeHousing housing) {
 		if (!settings.isEmpty()) {
 			for (IBeeModifier iBeeModifier : housing.getBeeModifiers()) {
 				if (iBeeModifier instanceof IEffectSettingsHolder)
@@ -222,14 +224,14 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		return net.minecraft.util.text.translation.I18n.translateToLocal(getUnlocalizedName());
 	}
 
-	public void addSpecies(IAlleleBeeSpecies species) {
+	public void addSpecies(@Nonnull IAlleleBeeSpecies species) {
 		validSpecies = ImmutableSet.<IAlleleBeeSpecies>builder().addAll(validSpecies).add(species).build();
 		if (registeredEffectSpecies.put(species, this) != null) {
 			throw new IllegalStateException();
 		}
 	}
 
-	public boolean isValidSpecies(IBeeGenome genome) {
+	public boolean isValidSpecies(@Nonnull IBeeGenome genome) {
 		return isValidSpecies(genome.getPrimary()) || isValidSpecies(genome.getSecondary());
 	}
 
@@ -249,7 +251,7 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		settings.add(vnbtSetting);
 	}
 
-	public <T extends TileEntity> List<T> getTiles(World world, Class<T> clazz, AxisAlignedBB bounds) {
+	public <T extends TileEntity> List<T> getTiles(@Nonnull World world, @Nonnull Class<T> clazz, @Nonnull AxisAlignedBB bounds) {
 		int x_min = MathHelper.floor(bounds.minX);
 		int y_min = MathHelper.floor(bounds.minY);
 		int z_min = MathHelper.floor(bounds.minZ);
@@ -281,7 +283,7 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		return builder.build();
 	}
 
-	protected Iterable<BlockPos> getAdjacentTiles(IBeeHousing h) {
+	protected Iterable<BlockPos> getAdjacentTiles(@Nonnull IBeeHousing h) {
 
 		BlockPos pos = h.getCoordinates();
 		World world = h.getWorldObj();
@@ -296,7 +298,8 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		return adjacentPosCache.computeIfAbsent(h, this::getBlockPos);
 	}
 
-	private Iterable<BlockPos> getBlockPos(IBeeHousing h) {
+	@Nonnull
+	private Iterable<BlockPos> getBlockPos(@Nonnull IBeeHousing h) {
 		World world = h.getWorldObj();
 		Random rand = world.rand;
 		BlockPos pos = h.getCoordinates();
@@ -324,11 +327,11 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		return adjToHousing;
 	}
 
-	public <C> List<C> getAdjacentCapabilities(IBeeHousing housing, Capability<C> capability) {
+	public <C> List<C> getAdjacentCapabilities(@Nonnull IBeeHousing housing, @Nonnull Capability<C> capability) {
 		return getAdjacentCapabilities(housing, capability, t -> true);
 	}
 
-	public <C> List<C> getAdjacentCapabilities(IBeeHousing housing, Capability<C> capability, Predicate<TileEntity> tileEntityFilter) {
+	public <C> List<C> getAdjacentCapabilities(@Nonnull IBeeHousing housing, @Nonnull Capability<C> capability, Predicate<TileEntity> tileEntityFilter) {
 		return Streams.stream(getAdjacentTiles(housing)).map(housing.getWorldObj()::getTileEntity).filter(Objects::nonNull).filter(tileEntityFilter).map(t -> t.getCapability(capability, null)).filter(Objects::nonNull).distinct().collect(Collectors.toList());
 	}
 

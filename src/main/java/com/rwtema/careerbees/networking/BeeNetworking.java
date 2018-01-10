@@ -17,6 +17,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 
 public class BeeNetworking {
@@ -47,18 +49,19 @@ public class BeeNetworking {
 	public abstract static class MessageClientToServer extends MessageBase {
 
 		@Override
-		public void onReceived(MessageContext ctx) {
+		public void onReceived(@Nonnull MessageContext ctx) {
 			EntityPlayerMP player = ctx.getServerHandler().player;
 			FMLCommonHandler.instance().getMinecraftServerInstance().addScheduledTask(() -> runServer(ctx, player));
 		}
 
 		protected abstract void runServer(MessageContext ctx, EntityPlayerMP player);
 
-		public void writeNBT(NBTTagCompound tag, ByteBuf buf){
+		public void writeNBT(NBTTagCompound tag, @Nonnull ByteBuf buf){
 			new PacketBuffer(buf).writeCompoundTag(tag);
 		}
 
-		public NBTTagCompound readNBT(ByteBuf bf){
+		@Nullable
+		public NBTTagCompound readNBT(@Nonnull ByteBuf bf){
 			try {
 				return new PacketBuffer(bf).readCompoundTag();
 			} catch (IOException e) {

@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.items.ItemHandlerHelper;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +32,10 @@ import java.util.List;
 public class EffectStealMob extends EffectSteal<EntityLiving> {
 	public static final EffectSteal MOB = new EffectStealMob();
 
+	 @Nullable
 	 Pair<EntityLiving, IBeeHousing> housingInventoryPair = null;
-	DamageSource bee_player = new DamageSource(BeeMod.MODID + ".damage.police") {
+	@Nullable
+	final DamageSource bee_player = new DamageSource(BeeMod.MODID + ".damage.police") {
 		@Nullable
 		@Override
 		public Entity getTrueSource() {
@@ -46,7 +49,7 @@ public class EffectStealMob extends EffectSteal<EntityLiving> {
 			return null;
 		}
 	};
-	DamageSource bee = new DamageSource(BeeMod.MODID + ".damage.police");
+	final DamageSource bee = new DamageSource(BeeMod.MODID + ".damage.police");
 
 	{
 		MinecraftForge.EVENT_BUS.register(this);
@@ -58,7 +61,7 @@ public class EffectStealMob extends EffectSteal<EntityLiving> {
 
 
 	@SubscribeEvent
-	public void getDrops(LivingDropsEvent event) {
+	public void getDrops(@Nonnull LivingDropsEvent event) {
 		Pair<EntityLiving, IBeeHousing> housingInventoryPair = this.housingInventoryPair;
 		if (housingInventoryPair == null || event.getEntityLiving() != housingInventoryPair.getLeft())
 			return;
@@ -76,7 +79,7 @@ public class EffectStealMob extends EffectSteal<EntityLiving> {
 		addAdditionalProducts(entityLiving, grabbed_stacks, housing, housingInv);
 	}
 
-	protected void addAdditionalProducts(EntityLiving entityLiving, List<ItemStack> grabbed_stacks, IBeeHousing housing, IBeeHousingInventory housingInv) {
+	protected void addAdditionalProducts(@Nonnull EntityLiving entityLiving, @Nonnull List<ItemStack> grabbed_stacks, IBeeHousing housing, @Nonnull IBeeHousingInventory housingInv) {
 		NBTTagCompound tag = new NBTTagCompound();
 
 		if (entityLiving.hasCustomName()) {
@@ -106,7 +109,7 @@ public class EffectStealMob extends EffectSteal<EntityLiving> {
 		housingInv.addProduct(product, true);
 	}
 
-	private boolean addStacks(List<ItemStack> grabbed_stacks, IBeeHousing housing, EntityItem item) {
+	private boolean addStacks(@Nonnull List<ItemStack> grabbed_stacks, @Nonnull IBeeHousing housing, @Nonnull EntityItem item) {
 		ItemStack stack = item.getItem().copy();
 		ItemStack newItemStack = DelayedInsertionHelper.addEntityStack(stack, housing, item);
 		if (newItemStack == stack || newItemStack.getCount() == stack.getCount()) {
@@ -130,13 +133,14 @@ public class EffectStealMob extends EffectSteal<EntityLiving> {
 		return livingBase instanceof IMob;
 	}
 
+	@Nonnull
 	@Override
 	protected Class<EntityLiving> getEntityClazz() {
 		return EntityLiving.class;
 	}
 
 	@Override
-	public boolean steal(EntityLiving livingBase, IBeeHousing housing, EffectSteal effect) {
+	public boolean steal(@Nonnull EntityLiving livingBase, IBeeHousing housing, EffectSteal effect) {
 		if (livingBase.attackEntityFrom(bee, Math.min(2, livingBase.getHealth() - 0.005F))) {
 			if (livingBase.getHealth() < 0.01F) {
 				try {

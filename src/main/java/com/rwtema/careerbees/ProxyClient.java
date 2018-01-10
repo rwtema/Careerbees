@@ -45,7 +45,7 @@ import java.util.*;
 @SuppressWarnings("unused")
 @SideOnly(Side.CLIENT)
 public class ProxyClient extends Proxy {
-	static HashMap<TextureAtlasSprite, ModelBark> models = new HashMap<>();
+	static final HashMap<TextureAtlasSprite, ModelBark> models = new HashMap<>();
 
 	public static TextureAtlasSprite exclamation_sprite;
 
@@ -53,7 +53,7 @@ public class ProxyClient extends Proxy {
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
-	private static String wrap(Object k) {
+	private static String wrap(@Nonnull Object k) {
 		String s = k.toString();
 		return s.toLowerCase().replaceAll("[\\s\\.]+", "_");
 	}
@@ -98,21 +98,22 @@ public class ProxyClient extends Proxy {
 	}
 
 	@SubscribeEvent
-	public void registerTexture(TextureStitchEvent.Pre event){
+	public void registerTexture(@Nonnull TextureStitchEvent.Pre event){
 		exclamation_sprite = event.getMap().registerSprite(new ResourceLocation(BeeMod.MODID, "items/exclamation"));
 	}
 
 	@SuppressWarnings("unchecked")
 	@SubscribeEvent
-	public void registerModels(ModelBakeEvent event) {
+	public void registerModels(@Nonnull ModelBakeEvent event) {
 
 		IRegistry<ModelResourceLocation, IBakedModel> modelRegistry = event.getModelRegistry();
 		models.clear();
 		IBakedModel base = modelRegistry.getObject(ItemIngredients.IngredientType.BARK.mrl);
 		if (base != null && !(base instanceof ModelWithOverrides)) {
 			modelRegistry.putObject(ItemIngredients.IngredientType.BARK.mrl, new ModelWithOverrides(base) {
+				@Nullable
 				@Override
-				public IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, World world, EntityLivingBase entity) {
+				public IBakedModel handleItemState(IBakedModel originalModel, @Nonnull ItemStack stack, World world, EntityLivingBase entity) {
 					NBTTagCompound tagCompound = stack.getTagCompound();
 					if (tagCompound == null) return null;
 					ItemStack itemStack = new ItemStack(tagCompound.getCompoundTag("bark"));
@@ -126,7 +127,7 @@ public class ProxyClient extends Proxy {
 		}
 	}
 
-	private void registerBlockModel(final ItemBlock item) {
+	private void registerBlockModel(@Nonnull final ItemBlock item) {
 		ModelResourceLocation modelResourceLocation = new ModelResourceLocation(wrap(item.getRegistryName()), "inventory");
 		ModelLoader.setCustomModelResourceLocation(item, 0, modelResourceLocation);
 		ModelBakery.registerItemVariants(item, modelResourceLocation);
@@ -135,7 +136,7 @@ public class ProxyClient extends Proxy {
 			Proxy.itemBlockModelHook.accept(item, modelResourceLocation);
 	}
 
-	private void registerModel(final Item item) {
+	private void registerModel(@Nonnull final Item item) {
 		ModelResourceLocation modelResourceLocation = new ModelResourceLocation(wrap(item.getRegistryName()), "inventory");
 		ModelLoader.setCustomModelResourceLocation(item, 0, modelResourceLocation);
 		ModelBakery.registerItemVariants(item, modelResourceLocation);
@@ -156,13 +157,13 @@ public class ProxyClient extends Proxy {
 	}
 
 	@Override
-	public void run(ClientRunnable runnable) {
+	public void run(@Nonnull ClientRunnable runnable) {
 		runnable.run();
 	}
 
 	public static class ModelBark extends ModelDelegate {
 		final TextureAtlasSprite sprite;
-		HashMap<EnumFacing, List<BakedQuad>> transformedQuads = new HashMap<>();
+		final HashMap<EnumFacing, List<BakedQuad>> transformedQuads = new HashMap<>();
 
 		public ModelBark(IBakedModel base, TextureAtlasSprite sprite) {
 			super(base);
@@ -251,6 +252,7 @@ public class ProxyClient extends Proxy {
 			};
 		}
 
+		@Nullable
 		public abstract IBakedModel handleItemState(IBakedModel originalModel, ItemStack stack, World world, EntityLivingBase entity);
 
 		@Nonnull

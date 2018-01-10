@@ -22,6 +22,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,77 +31,77 @@ import static com.rwtema.careerbees.effects.EffectBase.registeredEffectSpecies;
 public class CareerBeeSpecies {
 	public final static int BEE_YELLOW = 0xffdc16;
 	public static final Set<IAlleleBeeSpecies> registeredSpecies = new HashSet<>();
-	public static HashMap<String, IClassification> classificationHashMap = new HashMap<>();
+	public static final HashMap<String, IClassification> classificationHashMap = new HashMap<>();
 
 	//	public static CustomBeeEntry CRAFTING = new CustomBeeEntry("crafting", false, "crafting:crafticus", col(188, 150, 98), col(180, 119, 75))
 //			.setTemplateEffect(() -> EffectCrafting.INSTANCE)
 //			.setTemplateAllelleBool(EnumBeeChromosome.NEVER_SLEEPS, true)
 //			.setCustomBeeModelProvider(new CustomBeeModel("crafting"));
-	public static CareerBeeEntry STUDENT = new CareerBeeEntry("student", false, ":discipulus", col(90, 43, 25))
+	public static final CareerBeeEntry STUDENT = new CareerBeeEntry("student", false, ":discipulus", col(90, 43, 25))
 			.setCustomBeeModelProvider(new CustomBeeModel("student"))
 //			.setTemplateEffect(() -> EffectResearcher.INSTANCE)
 			;
-	public static CareerBeeEntry VOCATIONAL = new CareerBeeEntry("graduate", false, "consilium:graduati", col(60, 60, 80))
+	public static final CareerBeeEntry VOCATIONAL = new CareerBeeEntry("graduate", false, "consilium:graduati", col(60, 60, 80))
 			.setTemplateEffect(() -> EffectEffection.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("graduate"));
-	public static CareerBeeEntry ARTIST = new CareerBeeEntry("artist", false, "artifex", col(40, 40, 40))
+	public static final CareerBeeEntry ARTIST = new CareerBeeEntry("artist", false, "artifex", col(40, 40, 40))
 			.setTemplateEffect(() -> EffectPainting.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("artist"));
-	public static CareerBeeEntry BUISNESS = new CareerBeeEntry("buisnessman", false, "negotiator", col(40, 40, 40), col(80, 80, 80))
+	public static final CareerBeeEntry BUISNESS = new CareerBeeEntry("buisnessman", false, "negotiator", col(40, 40, 40), col(80, 80, 80))
 			.setCustomBeeModelProvider(new CustomBeeModel("tophat"));
-	public static CareerBeeEntry DIGGING_BASE = new CareerBeeEntry("digging", false, "digging:diggicus", col(222, 122, 20))
+	public static final CareerBeeEntry DIGGING_BASE = new CareerBeeEntry("digging", false, "digging:diggicus", col(222, 122, 20))
 			.setTemplateAllelleBool(EnumBeeChromosome.CAVE_DWELLING, true)
 			.setTemplateEffect(() -> EffectDigging.INSTANCE_NORMAL)
 			.setCustomBeeModelProvider(new CustomBeeModel("mining"));
-	public static CareerBeeEntry DIGGING_FORTUNE = new CareerBeeEntry("digging.fortune", false, "digging:diggicus", col(175, 50, 20))
+	public static final CareerBeeEntry DIGGING_FORTUNE = new CareerBeeEntry("digging.fortune", false, "digging:diggicus", col(175, 50, 20))
 			.setTemplateAllelleBool(EnumBeeChromosome.CAVE_DWELLING, true)
 			.setTemplateEffect(() -> EffectDigging.INSTANCE_FORTUNE)
 			.setCustomBeeModelProvider(new CustomBeeModel("mining"));
-	public static CareerBeeEntry DIGGING_SILKY = new CareerBeeEntry("digging.silky", false, "digging:diggicus", col(122, 102, 200))
+	public static final CareerBeeEntry DIGGING_SILKY = new CareerBeeEntry("digging.silky", false, "digging:diggicus", col(122, 102, 200))
 			.setTemplateAllelleBool(EnumBeeChromosome.CAVE_DWELLING, true)
 			.setTemplateEffect(() -> EffectDigging.INSTANCE_SILKY)
 			.setCustomBeeModelProvider(new CustomBeeModel("mining"));
-	public static CareerBeeEntry THIEF = new CareerBeeEntry("thief", false, "thief:cleptus", col(23, 23, 23), col(100, 100, 100))
+	public static final CareerBeeEntry THIEF = new CareerBeeEntry("thief", false, "thief:cleptus", col(23, 23, 23), col(100, 100, 100))
 			.setNocturnal()
 			.setTemplateEffect(() -> EffectStealPlayer.PLAYER)
 			.setCustomBeeModelProvider(new CustomBeeModel("thief"));
-	public static CareerBeeEntry POLICE = new CareerBeeEntry("police", false, "thief:cleptus", col(100, 140, 150), col(22, 67, 165))
+	public static final CareerBeeEntry POLICE = new CareerBeeEntry("police", false, "thief:cleptus", col(100, 140, 150), col(22, 67, 165))
 			.setTemplateEffect(() -> EffectStealMob.MOB)
 			.setCustomBeeModelProvider(new CustomBeeModel("police"));
-	public static CareerBeeEntry TAXCOLLECTOR = new CareerBeeEntry("taxcollector", false, "thief:cleptus", col(110, 110, 119), col(200, 200, 200))
+	public static final CareerBeeEntry TAXCOLLECTOR = new CareerBeeEntry("taxcollector", false, "thief:cleptus", col(110, 110, 119), col(200, 200, 200))
 			.setTemplateEffect(() -> EffectStealMobTaxation.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("tax_collector"));
-	public static CareerBeeEntry ACCELERATION = new CareerBeeEntry("acceleration", false, "tempus:fugit", col(140, 50, 40))
+	public static final CareerBeeEntry ACCELERATION = new CareerBeeEntry("acceleration", false, "tempus:fugit", col(140, 50, 40))
 			.setTemplateEffect(() -> EffectAcceleration.INSTANCE)
 			.setTemplate(EnumBeeChromosome.LIFESPAN, () -> SpecialProperties.ETERNAL)
 			.setCustomBeeModelProvider(new CustomBeeModel("acceleration"));
-	public static CareerBeeEntry REPAIR = new CareerBeeEntry("repair", false, "smithing:faber", col(122, 122, 190), col(224, 210, 255))
+	public static final CareerBeeEntry REPAIR = new CareerBeeEntry("repair", false, "smithing:faber", col(122, 122, 190), col(224, 210, 255))
 			.setTemplateEffect(() -> EffectRepair.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("hammer"));
-	public static CareerBeeEntry SHARPENER = new CareerBeeEntry("sharpening", false, "smithing:faber", col(200, 200, 200), col(120, 120, 120))
+	public static final CareerBeeEntry SHARPENER = new CareerBeeEntry("sharpening", false, "smithing:faber", col(200, 200, 200), col(120, 120, 120))
 			.setTemplateEffect(() -> EffectSharpen.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("hammer"));
-	public static CareerBeeEntry ARMORER = new CareerBeeEntry("armorer", false, "smithing:faber", col(100, 200, 200), col(100, 120, 120))
+	public static final CareerBeeEntry ARMORER = new CareerBeeEntry("armorer", false, "smithing:faber", col(100, 200, 200), col(100, 120, 120))
 			.setTemplateEffect(() -> EffectArmorer.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("hammer"));
-	public static CareerBeeEntry LUMBER = new CareerBeeEntry("lumber", false, "ligna:choppicus", col(96, 71, 0))
+	public static final CareerBeeEntry LUMBER = new CareerBeeEntry("lumber", false, "ligna:choppicus", col(96, 71, 0))
 			.setTemplateEffect(() -> EffectLumber.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("axe"));
-	public static CareerBeeEntry HUSBANDRYIST = new CareerBeeEntry("husbandry", false, "medicus:easpariunt", col(122, 122, 190), col(224, 210, 255))
+	public static final CareerBeeEntry HUSBANDRYIST = new CareerBeeEntry("husbandry", false, "medicus:easpariunt", col(122, 122, 190), col(224, 210, 255))
 			.setTemplateEffect(() -> EffectHusbandry.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("midwife"));
-	public static CareerBeeEntry BUTCHER = new CareerBeeEntry("butcher", false, "macello:caedes", col(250, 150, 150))
+	public static final CareerBeeEntry BUTCHER = new CareerBeeEntry("butcher", false, "macello:caedes", col(250, 150, 150))
 			.setTemplateEffect(() -> EffectButcher.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("butcher"));
-	public static CareerBeeEntry WOMBLING = new CareerBeeEntry("collectors", false, "lectica:coactore", col(197, 60, 60))
+	public static final CareerBeeEntry WOMBLING = new CareerBeeEntry("collectors", false, "lectica:coactore", col(197, 60, 60))
 			.setCustomBeeModelProvider(new CustomBeeModel("wombling"))
 			.setTemplateEffect(() -> EffectPickup.INSTANCE);
-	public static CareerBeeEntry COOK = new CareerBeeEntry("cook", false, "cook:cookus", col(255, 255, 255))
+	public static final CareerBeeEntry COOK = new CareerBeeEntry("cook", false, "cook:cookus", col(255, 255, 255))
 			.setCustomBeeModelProvider(new CustomBeeModel("chef"))
 			.setTemplateEffect(() -> EffectHoneyGlaze.INSTANCE);
-	public static CareerBeeEntry YENTE = new CareerBeeEntry("yente", false, "matchmaker", col(44, 44, 51))
+	public static final CareerBeeEntry YENTE = new CareerBeeEntry("yente", false, "matchmaker", col(44, 44, 51))
 			.setCustomBeeModelProvider(new CustomBeeModel("yente"));
-	public static CareerBeeEntry RAINBOW = new CareerBeeEntry("rainbow", false, "rain:eritque.arcus", col(255, 255, 255), col(255, 255, 255)) {
+	public static final CareerBeeEntry RAINBOW = new CareerBeeEntry("rainbow", false, "rain:eritque.arcus", col(255, 255, 255), col(255, 255, 255)) {
 		{
 			LinkedHashMultimap<EnumDyeColor, EnumDyeColor> dyeRecipes = LinkedHashMultimap.create();
 			dyeRecipes.putAll(EnumDyeColor.ORANGE, ImmutableList.of(EnumDyeColor.RED, EnumDyeColor.YELLOW));
@@ -133,6 +134,7 @@ public class CareerBeeSpecies {
 			}
 			double sum = probabilities.values().stream().mapToDouble(Double::doubleValue).sum();
 			double sum2 = probabilities.values().stream().mapToDouble(Double::doubleValue).map(t -> t * t).sum();
+			@SuppressWarnings("UnnecessaryLocalVariable")
 			double a = sum2 / 2, b = sum, c = -Math.log(0.5);
 			double k = (b - Math.sqrt(b * b - 4 * a * c)) / (2 * a);
 			for (EnumDyeColor enumDyeColor : EnumDyeColor.values()) {
@@ -142,41 +144,41 @@ public class CareerBeeSpecies {
 		}
 	}
 			.setCustomBeeSpriteColourProvider(new RainbowBeeColors());
-	public static CareerBeeEntry DIRE = new CareerBeeEntry("dire", false, "dire", 0x00AFAF, 0xff463AA5)
+	public static final CareerBeeEntry DIRE = new CareerBeeEntry("dire", false, "dire", 0x00AFAF, 0xff463AA5)
 			.setTemplateEffect(() -> EffectDire.INSTANCE)
 			.setIsSecret();
-	public static CareerBeeEntry SOARYN = new CareerBeeEntry("soaring", false, "soaryn", col(0, 0, 16), col(80, 68, 99))
+	public static final CareerBeeEntry SOARYN = new CareerBeeEntry("soaring", false, "soaryn", col(0, 0, 16), col(80, 68, 99))
 			.setTemplateEffect(() -> EffectSoaring.INSTANCE)
 			.setIsSecret();
-	public static CareerBeeEntry MASON = new CareerBeeEntry("mason", false, "mason:mason", col(120, 120, 120))
+	public static final CareerBeeEntry MASON = new CareerBeeEntry("mason", false, "mason:mason", col(120, 120, 120))
 			.setTemplateEffect(() -> EffectMason.INSTANCE);
-	public static CareerBeeEntry SMELTER = new CareerBeeEntry("smelter", false, "smelter:smelter", col(81, 72, 64), col(109, 81, 53))
+	public static final CareerBeeEntry SMELTER = new CareerBeeEntry("smelter", false, "smelter:smelter", col(81, 72, 64), col(109, 81, 53))
 			.setCustomBeeModelProvider(new CustomBeeModel("smelter"))
 			.setTemplateEffect(() -> EffectSmelt.INSTANCE);
-	public static CareerBeeEntry ORE_CRUSHER = new CareerBeeEntry("crusher", false, "crusher:crusher", col(120, 120, 120), col(80, 80, 80))
+	public static final CareerBeeEntry ORE_CRUSHER = new CareerBeeEntry("crusher", false, "crusher:crusher", col(120, 120, 120), col(80, 80, 80))
 			.setCustomBeeModelProvider(new CustomBeeModel("saw"))
 			.setTemplateEffect(() -> EffectOreCrushing.INSTANCE);
-	public static CareerBeeEntry SCIENTIST = new CareerBeeEntry("science", false, "science", col(158, 154, 159))
+	public static final CareerBeeEntry SCIENTIST = new CareerBeeEntry("science", false, "science", col(158, 154, 159))
 			.setCustomBeeModelProvider(new CustomBeeModel("einstein"));
-	public static CareerBeeEntry DOCTOR = new CareerBeeEntry("doctor", false, "science", col(255, 255, 255))
+	public static final CareerBeeEntry DOCTOR = new CareerBeeEntry("doctor", false, "science", col(255, 255, 255))
 			.setTemplateEffect(() -> EffectHeal.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("white_on_pinkish_cross"));
-	public static CareerBeeEntry PLAGUE_DOCTOR = new CareerBeeEntry("plaguedoctor", false, "medicine", col(25, 25, 25), col(140, 140, 140))
+	public static final CareerBeeEntry PLAGUE_DOCTOR = new CareerBeeEntry("plaguedoctor", false, "medicine", col(25, 25, 25), col(140, 140, 140))
 			.setTemplateEffect(() -> EffectCurative.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("plague_doctor"));
-	public static CareerBeeEntry PHD = new CareerBeeEntry("phd", false, "consilium:graduati", col(160, 60, 80))
+	public static final CareerBeeEntry PHD = new CareerBeeEntry("phd", false, "consilium:graduati", col(160, 60, 80))
 			.setTemplateEffect(() -> EffectEffection.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("graduate"));
-	public static CareerBeeEntry CLOCKWORK = new CareerBeeEntry("clock", false, "clockwork", col(188, 181, 128), col(78, 70, 57))
+	public static final CareerBeeEntry CLOCKWORK = new CareerBeeEntry("clock", false, "clockwork", col(188, 181, 128), col(78, 70, 57))
 			.setCustomBeeModelProvider(new CustomBeeModel("clockwork"))
 			.setTemplateEffect(() -> EffectClockwork.INSTANCE);
-	public static CareerBeeEntry ENERGY = new CareerBeeEntry("energy", false, "redstoneflux", col(255, 0, 0), col(143, 0, 0))
+	public static final CareerBeeEntry ENERGY = new CareerBeeEntry("energy", false, "redstoneflux", col(255, 0, 0), col(143, 0, 0))
 			.setCustomBeeModelProvider(new CustomBeeModel("energy"))
 			.setTemplateEffect(() -> EffectPower.INSTANCE);
-	public static CareerBeeEntry ENGINEER = new CareerBeeEntry("engineer", false, "engineer", col(48, 35, 188))
+	public static final CareerBeeEntry ENGINEER = new CareerBeeEntry("engineer", false, "engineer", col(48, 35, 188))
 			.setCustomBeeModelProvider(new CustomBeeModel("engineer"));
 
-	public static CareerBeeEntry QUANTUM_CHARM = new CareerBeeEntry("quantum_charm", false, "science", col(255, 255, 255), col(0, 0, 0))
+	public static final CareerBeeEntry QUANTUM_CHARM = new CareerBeeEntry("quantum_charm", false, "science", col(255, 255, 255), col(0, 0, 0))
 			.setCustomBeeSpriteColourProvider(new QuantumBeeColors(0, 0.666F, 0.5F))
 			.setTemplateEffect(() -> EffectRandomSwap.INSTANCE)
 			.setTemplateAllelleString(EnumBeeChromosome.SPEED, "forestry.speedFast")
@@ -190,7 +192,7 @@ public class CareerBeeSpecies {
 			.setTemplateAllelleString(EnumBeeChromosome.TERRITORY, "forestry.territoryAverage")
 			.setTemplateAllelleString(EnumBeeChromosome.SPEED, "forestry.speedFast");
 
-	public static CareerBeeEntry QUANTUM_STRANGE = new CareerBeeEntry("quantum_strange", false, "science", col(0, 0, 0), col(255, 255, 255))
+	public static final CareerBeeEntry QUANTUM_STRANGE = new CareerBeeEntry("quantum_strange", false, "science", col(0, 0, 0), col(255, 255, 255))
 			.setCustomBeeSpriteColourProvider(new QuantumBeeColors(3.141F, 0F, 0.5F))
 			.setTemplateEffect(() -> EffectRandomSwap.INSTANCE)
 			.setTemplateAllelleString(EnumBeeChromosome.SPEED, "forestry.speedSlow")
@@ -204,12 +206,12 @@ public class CareerBeeSpecies {
 			.setTemplateAllelleString(EnumBeeChromosome.TERRITORY, "forestry.territoryAverage")
 			.setTemplateAllelleString(EnumBeeChromosome.SPEED, "forestry.speedSlow");
 
-	public static CareerBeeEntry MAD_SCIENTIST = new CareerBeeEntry("mad_scientist", false, "science", col(84, 121, 132))
+	public static final CareerBeeEntry MAD_SCIENTIST = new CareerBeeEntry("mad_scientist", false, "science", col(84, 121, 132))
 			.setCustomBeeModelProvider(new CustomBeeModel("mad_scientist"))
 			.setTemplateEffect(() -> EffectExplosion.INSTANCE);
 
 
-	static BeeMutationTree tree = new BeeMutationTree();
+	static final BeeMutationTree tree = new BeeMutationTree();
 	public static ArrayList<CareerBeeEntry> sorted_bee_entries;
 
 	public static void register() {
@@ -244,6 +246,7 @@ public class CareerBeeSpecies {
 			}
 			List<IAllele> registeredAlleles = Lists.newArrayList(AlleleManager.alleleRegistry.getRegisteredAlleles(EnumBeeChromosome.SPECIES));
 			registeredAlleles.sort(Comparator.comparing(IAllele::getModID).thenComparing(IAllele::getUID));
+			//noinspection unchecked
 			for (IAlleleBeeSpecies iAllele : (Collection<IAlleleBeeSpecies>) ((Collection) registeredAlleles)) {
 				IAllele[] template = BeeManager.beeRoot.getTemplate(iAllele);
 				for (int i = 0; i < EnumBeeChromosome.values().length; i++) {
@@ -373,15 +376,17 @@ public class CareerBeeSpecies {
 		}
 	}
 
+	@Nonnull
 	private static BeeMutationTree.SpeciesEntry getFSpecies(String uuid) {
 		return getSpecies("forestry.species" + uuid);
 	}
 
+	@Nonnull
 	private static BeeMutationTree.SpeciesEntry getSpecies(String uuid) {
 		return new BeeMutationTree.VanillaEntry(uuid);
 	}
 
-	public static IMutationBuilder register(IAlleleBeeSpecies inA, IAlleleBeeSpecies inB, IAlleleBeeSpecies out, int chance) {
+	public static IMutationBuilder register(@Nonnull IAlleleBeeSpecies inA, @Nonnull IAlleleBeeSpecies inB, @Nonnull IAlleleBeeSpecies out, int chance) {
 		return BeeManager.beeMutationFactory.createMutation(inA, inB, BeeManager.beeRoot.getTemplate(out), chance);
 	}
 

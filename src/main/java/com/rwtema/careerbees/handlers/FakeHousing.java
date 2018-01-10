@@ -9,7 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 
 import javax.annotation.Nonnull;
@@ -191,7 +190,7 @@ public abstract class FakeHousing implements IBeeHousing {
 		return EnumHumidity.getFromValue(humidity);
 	}
 
-	IErrorLogic logic =  ForestryAPI.errorStateRegistry.createErrorLogic();
+	final IErrorLogic logic =  ForestryAPI.errorStateRegistry.createErrorLogic();
 
 	@Nonnull
 	@Override

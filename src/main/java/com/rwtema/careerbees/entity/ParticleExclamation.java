@@ -4,8 +4,10 @@ import com.rwtema.careerbees.ProxyClient;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
+
 public class ParticleExclamation extends Particle {
-	public ParticleExclamation(World worldIn, double x, double y, double z) {
+	public ParticleExclamation(@Nonnull World worldIn, double x, double y, double z) {
 		super(worldIn, x, y, z);
 		setParticleTexture(ProxyClient.exclamation_sprite);
 		this.particleGravity = -0.05F;

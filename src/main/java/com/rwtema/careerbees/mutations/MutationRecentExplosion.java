@@ -15,6 +15,7 @@ import net.minecraftforge.event.world.ExplosionEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
+import javax.annotation.Nonnull;
 import java.util.WeakHashMap;
 
 public class MutationRecentExplosion extends CareerBeesMutationBooleanCondition {
@@ -31,7 +32,7 @@ public class MutationRecentExplosion extends CareerBeesMutationBooleanCondition 
 	}
 
 	@SubscribeEvent
-	public static void explosion(ExplosionEvent event) {
+	public static void explosion(@Nonnull ExplosionEvent event) {
 		Explosion explosion = event.getExplosion();
 		if (!damagesTerrain.get(explosion)) {
 			return;
@@ -42,7 +43,7 @@ public class MutationRecentExplosion extends CareerBeesMutationBooleanCondition 
 	}
 
 	@SubscribeEvent
-	public static void worldTick(TickEvent.WorldTickEvent event) {
+	public static void worldTick(@Nonnull TickEvent.WorldTickEvent event) {
 		if (event.phase == TickEvent.Phase.END) {
 			return;
 		}
@@ -65,14 +66,14 @@ public class MutationRecentExplosion extends CareerBeesMutationBooleanCondition 
 		}
 	}
 
-	public static int getManhattenDist(Vec3i a, Vec3i b) {
+	public static int getManhattenDist(@Nonnull Vec3i a, @Nonnull Vec3i b) {
 		return Math.abs(a.getX() - b.getX())
 				+ Math.abs(a.getY() - b.getY())
 				+ Math.abs(a.getZ() - b.getZ());
 	}
 
 	@Override
-	protected boolean isAcceptable(World world, BlockPos pos, IAllele allele0, IAllele allele1, IGenome genome0, IGenome genome1, IClimateProvider climate) {
+	protected boolean isAcceptable(World world, @Nonnull BlockPos pos, IAllele allele0, IAllele allele1, IGenome genome0, IGenome genome1, IClimateProvider climate) {
 		TObjectIntHashMap<BlockPos> positions = map.get(world);
 		if (positions == null) return false;
 		for (BlockPos blockPos : positions.keySet()) {

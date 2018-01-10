@@ -27,7 +27,7 @@ public class YenteBeeManager extends PlacedBeeManager<BeeEntry.YentaBeeEntry> {
 	}
 
 	@Override
-	protected void onPlaced(EntityPlayer entityPlayer) {
+	protected void onPlaced(@Nonnull EntityPlayer entityPlayer) {
 		entityPlayer.sendMessage(new TextComponentTranslation("careerbees.message.placed.yente.bee"));
 	}
 
@@ -50,7 +50,7 @@ public class YenteBeeManager extends PlacedBeeManager<BeeEntry.YentaBeeEntry> {
 	}
 
 	@Override
-	protected boolean updateTile(Chunk chunk, Map.Entry<BlockPos, BeeEntry.YentaBeeEntry> k, IBeeHousing hou, TileEntity tileEntity) {
+	protected boolean updateTile(Chunk chunk, Map.Entry<BlockPos, BeeEntry.YentaBeeEntry> k, @Nonnull IBeeHousing hou, @Nonnull TileEntity tileEntity) {
 
 		IBeeHousingInventory beeInventory = hou.getBeeInventory();
 		IItemHandler capability = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
@@ -130,7 +130,7 @@ public class YenteBeeManager extends PlacedBeeManager<BeeEntry.YentaBeeEntry> {
 		return false;
 	}
 
-	public int evaluate(EnumBeeChromosome chromosome, IAllele a) {
+	public int evaluate(@Nonnull EnumBeeChromosome chromosome, @Nonnull IAllele a) {
 		int score = 0;
 		switch (chromosome) {
 			case SPECIES:

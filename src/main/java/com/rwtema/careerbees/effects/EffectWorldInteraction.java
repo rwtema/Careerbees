@@ -1,7 +1,6 @@
 package com.rwtema.careerbees.effects;
 
 import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
-import forestry.api.apiculture.BeeManager;
 import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeModifier;
@@ -36,7 +35,7 @@ public abstract class EffectWorldInteraction extends EffectBaseThrottled {
 
 
 	@Override
-	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
+	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, @Nonnull World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
 		AxisAlignedBB aabb = getAABB(genome, housing);
 
 		for (int i = 0; i < 40; i++)
@@ -55,7 +54,7 @@ public abstract class EffectWorldInteraction extends EffectBaseThrottled {
 
 
 	@Override
-	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
 		IBlockState blockState = world.getBlockState(pos);
 		return performPosEffect(world, pos, blockState, genome, housing);
 	}

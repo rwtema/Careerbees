@@ -6,6 +6,8 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
+
 public class MCTimer {
 	public static int clientTimer;
 	public static int frameTimer;
@@ -21,7 +23,7 @@ public class MCTimer {
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void serverTick(TickEvent.ServerTickEvent event) {
+	public void serverTick(@Nonnull TickEvent.ServerTickEvent event) {
 		if (event.phase != TickEvent.Phase.START) {
 			return;
 		}
@@ -35,13 +37,13 @@ public class MCTimer {
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void clientTick(TickEvent.ClientTickEvent event) {
+	public void clientTick(@Nonnull TickEvent.ClientTickEvent event) {
 		if (event.phase == TickEvent.Phase.START) clientTimer++;
 	}
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void renderTick(TickEvent.RenderTickEvent event) {
+	public void renderTick(@Nonnull TickEvent.RenderTickEvent event) {
 		renderPartialTickTime = event.renderTickTime;
 		renderTimer = clientTimer + renderPartialTickTime;
 		if (event.phase == TickEvent.Phase.START) {

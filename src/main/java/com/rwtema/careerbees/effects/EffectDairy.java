@@ -18,6 +18,7 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -28,7 +29,7 @@ public class EffectDairy extends EffectBaseEntity<EntityCow> {
 	}
 
 	@Override
-	protected void workOnEntities(List<EntityCow> entities, IBeeGenome genome, IBeeHousing housing, Random random, IEffectSettingsHolder settings) {
+	protected void workOnEntities(@Nonnull List<EntityCow> entities, IBeeGenome genome, @Nonnull IBeeHousing housing, Random random, IEffectSettingsHolder settings) {
 		Fluid milk = FluidRegistry.getFluid("milk");
 		if (milk == null) return;
 		WorldServer worldObj = (WorldServer) housing.getWorldObj();

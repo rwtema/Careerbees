@@ -7,6 +7,7 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,17 +25,17 @@ public class EffectSharpen extends EffectAttributeBoost {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, @Nonnull ItemStack stack, IBeeHousing housing) {
 		return modifyStack(stack);
 	}
 
 	@Override
-	public boolean acceptItemStack(ItemStack stack) {
+	public boolean acceptItemStack(@Nonnull ItemStack stack) {
 		ItemStack stack1 = modifyStack(stack);
 		return stack1 != null && (!stack1.isItemEqual(stack) || !Objects.equals(stack.getTagCompound(), stack1.getTagCompound()));
 	}
 
-	private ItemStack modifyStack(ItemStack stack) {
+	private ItemStack modifyStack(@Nonnull ItemStack stack) {
 		if (stack.getItem() instanceof ItemSword || stack.getAttributeModifiers(EntityEquipmentSlot.MAINHAND).containsKey(SharedMonsterAttributes.ATTACK_DAMAGE.getName())) {
 			return boostStat(
 					stack,

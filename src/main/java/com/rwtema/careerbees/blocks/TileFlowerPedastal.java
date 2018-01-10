@@ -29,7 +29,8 @@ public class TileFlowerPedastal extends TileEntity {
 	boolean canExtract = false;
 	String speciesType = "";
 
-	ItemStackHandler stackHandler = new ItemStackHandler(1) {
+	@Nullable
+	final ItemStackHandler stackHandler = new ItemStackHandler(1) {
 		@Override
 		public int getSlotLimit(int slot) {
 			return 1;
@@ -86,7 +87,7 @@ public class TileFlowerPedastal extends TileEntity {
 		return stackHandler.getStackInSlot(0);
 	}
 
-	public void setStack(ItemStack stack) {
+	public void setStack(@Nonnull ItemStack stack) {
 		stackHandler.setStackInSlot(0, stack);
 	}
 
@@ -151,7 +152,7 @@ public class TileFlowerPedastal extends TileEntity {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+	public void onDataPacket(NetworkManager net, @Nonnull SPacketUpdateTileEntity pkt) {
 		super.onDataPacket(net, pkt);
 		NBTTagCompound nbt = pkt.getNbtCompound();
 		handleUpdateTag(nbt);
@@ -161,7 +162,7 @@ public class TileFlowerPedastal extends TileEntity {
 		canExtract = true;
 	}
 
-	public boolean accepts(IBeeGenome genome) {
+	public boolean accepts(@Nonnull IBeeGenome genome) {
 		return speciesType.isEmpty() || speciesType.equals(genome.getPrimary().getUID());
 	}
 }

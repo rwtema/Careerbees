@@ -9,16 +9,23 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.oredict.OreDictionary;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class Filter {
+	@Nonnull
 	final Setting.Choice<FilterType> filterType;
+	@Nonnull
 	final Setting.Stack stack;
+	@Nonnull
 	final Setting.YesNo ignoreMeta;
+	@Nonnull
 	final Setting.YesNo ignoreNBT;
+	@Nonnull
 	final Setting.OreDicText oreDicText;
 
 	public Filter(EffectBase parent) {
@@ -34,8 +41,9 @@ public class Filter {
 				return filterType.getValue(settingsHolder) == FilterType.ITEMSTACK;
 			}
 
+			@Nonnull
 			@Override
-			public ItemStack overrideInput(ItemStack input) {
+			public ItemStack overrideInput(@Nonnull ItemStack input) {
 				if(input.getCount() > 1){
 					ItemStack copy = input.copy();
 					copy.setCount(1);
@@ -65,7 +73,7 @@ public class Filter {
 		};
 	}
 
-	public boolean matches(IBeeHousing housing, ItemStack stack) {
+	public boolean matches(@Nonnull IBeeHousing housing, @Nonnull ItemStack stack) {
 		for (IBeeModifier modifier : housing.getBeeModifiers()) {
 			if (modifier instanceof IEffectSettingsHolder) {
 				return matches((IEffectSettingsHolder) modifier, stack);
@@ -74,7 +82,7 @@ public class Filter {
 		return matches(IEffectSettingsHolder.DEFAULT_INSTANCE, stack);
 	}
 
-	public boolean matches(IEffectSettingsHolder settings, ItemStack stack) {
+	public boolean matches(IEffectSettingsHolder settings, @Nonnull ItemStack stack) {
 		if (stack.isEmpty()) return false;
 		FilterType value = filterType.getValue(settings);
 		switch (value) {
@@ -96,6 +104,7 @@ public class Filter {
 		return true;
 	}
 
+	@Nullable
 	public Predicate<ItemStack> getMatcher(IEffectSettingsHolder settings) {
 		if (settings == IEffectSettingsHolder.DEFAULT_INSTANCE) return s -> true;
 
@@ -136,7 +145,7 @@ public class Filter {
 		return s -> false;
 	}
 
-	private Predicate<ItemStack> createSingleStackPredicate(ItemStack target, boolean ignoreMetaValue, boolean ignoreNBTValue) {
+	private Predicate<ItemStack> createSingleStackPredicate(@Nonnull ItemStack target, boolean ignoreMetaValue, boolean ignoreNBTValue) {
 		if (target.isEmpty()) return s -> true;
 		Item item = target.getItem();
 		Predicate<ItemStack> predicate = stack -> stack.getItem() == item;

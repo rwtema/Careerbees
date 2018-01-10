@@ -31,9 +31,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+@SuppressWarnings("unchecked")
 public class EntityChunkData extends Entity implements IEntityAdditionalSpawnData {
 
-	public static HashBiMap<String, ChunkDataModuleManager> managers;
+	@Nonnull
+	public static final HashBiMap<String, ChunkDataModuleManager> managers;
 
 	static {
 		managers = HashBiMap.create();
@@ -45,7 +47,7 @@ public class EntityChunkData extends Entity implements IEntityAdditionalSpawnDat
 	public Map<ChunkDataModuleManager, Object> objectHashMap = new HashMap<>();
 	ChunkPos pos;
 	private boolean dirty;
-	public EntityChunkData(World worldIn) {
+	public EntityChunkData(@Nonnull World worldIn) {
 		super(worldIn);
 		noClip = true;
 		isImmuneToFire = true;
@@ -54,7 +56,7 @@ public class EntityChunkData extends Entity implements IEntityAdditionalSpawnDat
 		setInvisible(true);
 	}
 
-	public EntityChunkData(World world, ChunkPos chunkPos) {
+	public EntityChunkData(@Nonnull World world, ChunkPos chunkPos) {
 		this(world);
 		this.pos = chunkPos;
 		this.prevPosX = this.posX = (pos.x << 4) + 8;
@@ -66,14 +68,14 @@ public class EntityChunkData extends Entity implements IEntityAdditionalSpawnDat
 		EntityRegistry.registerModEntity(new ResourceLocation(BeeMod.MODID, "entitychunkdata"), EntityChunkData.class, "entitychunkdata", 0, BeeMod.instance, 64, Integer.MAX_VALUE, false);
 	}
 
-	public static void markChunkDirty(Chunk chunk) {
+	public static void markChunkDirty(@Nonnull Chunk chunk) {
 		EntityChunkData dataEntity = getChunkDataEntity(chunk);
 		if (dataEntity != null) {
 			dataEntity.dirty = true;
 		}
 	}
 
-	public static <T> T getChunkData(Chunk chunk, ChunkDataModuleManager<T> manager, boolean create) {
+	public static <T> T getChunkData(@Nonnull Chunk chunk, @Nonnull ChunkDataModuleManager<T> manager, boolean create) {
 		EntityChunkData dataEntity = getChunkDataEntity(chunk);
 		if (dataEntity == null) {
 			if (create) {
@@ -102,7 +104,7 @@ public class EntityChunkData extends Entity implements IEntityAdditionalSpawnDat
 	}
 
 	@Nullable
-	public static EntityChunkData getChunkDataEntity(Chunk chunk) {
+	public static EntityChunkData getChunkDataEntity(@Nonnull Chunk chunk) {
 		ClassInheritanceMultiMap<Entity>[] entityLists = chunk.getEntityLists();
 		for (int i = entityLists.length - 1; i >= 0; i--) {
 			ClassInheritanceMultiMap<Entity> entities = entityLists[i];
@@ -117,7 +119,7 @@ public class EntityChunkData extends Entity implements IEntityAdditionalSpawnDat
 		return null;
 	}
 
-	public static void writeData(ByteBuf buffer, Map<ChunkDataModuleManager, Object> objectHashMap) {
+	public static void writeData(@Nonnull ByteBuf buffer, @Nonnull Map<ChunkDataModuleManager, Object> objectHashMap) {
 		PacketBuffer packetBuffer = new PacketBuffer(buffer);
 		packetBuffer.writeInt(objectHashMap.size());
 		for (Map.Entry<ChunkDataModuleManager, Object> entry : objectHashMap.entrySet()) {
@@ -127,7 +129,7 @@ public class EntityChunkData extends Entity implements IEntityAdditionalSpawnDat
 		}
 	}
 
-	public static void readSpawnData(ByteBuf additionalData, Map<ChunkDataModuleManager, Object> objectHashMap) {
+	public static void readSpawnData(@Nonnull ByteBuf additionalData, @Nonnull Map<ChunkDataModuleManager, Object> objectHashMap) {
 		objectHashMap.clear();
 		PacketBuffer buffer = new PacketBuffer(additionalData);
 		int n = buffer.readInt();
@@ -148,6 +150,7 @@ public class EntityChunkData extends Entity implements IEntityAdditionalSpawnDat
 		return objectHashMap.containsKey(manager);
 	}
 
+	@Nonnull
 	public <T> T getData(ChunkDataModuleManager<T> manager) {
 		return (T) objectHashMap.get(manager);
 	}
@@ -308,12 +311,12 @@ public class EntityChunkData extends Entity implements IEntityAdditionalSpawnDat
 	}
 
 	@Override
-	public void writeSpawnData(ByteBuf buffer) {
+	public void writeSpawnData(@Nonnull ByteBuf buffer) {
 		writeData(buffer, objectHashMap);
 	}
 
 	@Override
-	public void readSpawnData(ByteBuf additionalData) {
+	public void readSpawnData(@Nonnull ByteBuf additionalData) {
 		readSpawnData(additionalData, objectHashMap);
 	}
 
@@ -341,14 +344,14 @@ public class EntityChunkData extends Entity implements IEntityAdditionalSpawnDat
 		}
 
 		@Override
-		public void fromBytes(ByteBuf buf) {
+		public void fromBytes(@Nonnull ByteBuf buf) {
 			entityId = buf.readInt();
 			objectHashMap = new HashMap<>();
 			EntityChunkData.readSpawnData(buf, objectHashMap);
 		}
 
 		@Override
-		public void toBytes(ByteBuf buf) {
+		public void toBytes(@Nonnull ByteBuf buf) {
 			buf.writeInt(entityId);
 			EntityChunkData.writeData(buf, objectHashMap);
 		}

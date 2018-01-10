@@ -16,7 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class EffectPower extends EffectBase {
-	public static EffectPower INSTANCE = new EffectPower("rf");
+	public static final EffectPower INSTANCE = new EffectPower("rf");
 
 	public EffectPower(String rawname) {
 		super(rawname);
@@ -64,7 +64,7 @@ public class EffectPower extends EffectBase {
 	}
 
 	@Override
-	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
 		TileEntity tile = world.getTileEntity(pos);
 		if (tile == null || !tile.hasCapability(CapabilityEnergy.ENERGY, null)) return false;
 		int rfRate = getRFRate(genome, housing);

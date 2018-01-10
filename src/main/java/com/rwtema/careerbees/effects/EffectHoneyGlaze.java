@@ -14,6 +14,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.text.NumberFormat;
 import java.util.List;
@@ -34,13 +35,13 @@ public class EffectHoneyGlaze extends EffectFoodModify {
 
 
 	@Override
-	protected boolean shouldBeginEattingOverride(EntityPlayer entityPlayer, ItemStack itemStack, NBTTagCompound compoundTag) {
+	protected boolean shouldBeginEattingOverride(@Nonnull EntityPlayer entityPlayer, ItemStack itemStack, @Nonnull NBTTagCompound compoundTag) {
 		return compoundTag.getFloat("current") > entityPlayer.getAbsorptionAmount();
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	protected void addTooltip(ItemStack itemStack, NBTTagCompound tag, List<String> toolTip) {
+	protected void addTooltip(ItemStack itemStack, @Nonnull NBTTagCompound tag, @Nonnull List<String> toolTip) {
 		float current = tag.getFloat("current");
 		if (current > 0) {
 			toolTip.add(ChatFormatting.YELLOW + Lang.translateArgs("Honey Glazing: %s Absorbtion Hearts", NumberFormat.getInstance(Locale.UK).format(current / 2)));
@@ -48,7 +49,7 @@ public class EffectHoneyGlaze extends EffectFoodModify {
 	}
 
 	@Override
-	public void callback(EntityPlayer player, NBTTagCompound tag, ItemStack item) {
+	public void callback(@Nonnull EntityPlayer player, @Nonnull NBTTagCompound tag, ItemStack item) {
 		float max = tag.getFloat("current");
 		float absorptionAmount = player.getAbsorptionAmount();
 		if (absorptionAmount < max) {
@@ -57,13 +58,13 @@ public class EffectHoneyGlaze extends EffectFoodModify {
 	}
 
 	@Override
-	protected boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, NBTTagCompound curTag) {
+	protected boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, @Nonnull NBTTagCompound curTag) {
 		return curTag.getFloat("current") >= curTag.getFloat("max");
 	}
 
 	@Nullable
 	@Override
-	protected NBTTagCompound addData(IBeeGenome genome, ItemStack stack, @Nullable NBTTagCompound prevTag) {
+	protected NBTTagCompound addData(IBeeGenome genome, @Nonnull ItemStack stack, @Nullable NBTTagCompound prevTag) {
 		float current = prevTag != null ? prevTag.getFloat("current") : 0;
 		ItemFood food = (ItemFood) stack.getItem();
 		float max = Math.min(getMax(genome), calcMaxUnbound(stack, food));
@@ -91,7 +92,7 @@ public class EffectHoneyGlaze extends EffectFoodModify {
 
 	}
 
-	private static float calcMaxUnbound(ItemStack stack, ItemFood food) {
+	private static float calcMaxUnbound(ItemStack stack, @Nonnull ItemFood food) {
 		return Math.round(25F * food.getHealAmount(stack) * food.getSaturationModifier(stack) / 2F) / 4F;
 	}
 

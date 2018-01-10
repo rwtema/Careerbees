@@ -3,6 +3,7 @@ package com.rwtema.careerbees.helpers;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -15,7 +16,8 @@ public class PrivateHelper {
 
 	public static final HashMap<Class<? extends EntityLiving>, Method> methods = new HashMap<>();
 
-	public static ResourceLocation getLootTable(EntityLiving entityLiving) {
+	@Nonnull
+	public static ResourceLocation getLootTable(@Nonnull EntityLiving entityLiving) {
 		Class<? extends EntityLiving> aClass = entityLiving.getClass();
 		Method method = methods.computeIfAbsent(aClass, clazz -> {
 			Method declaredMethod = getMethod(aClass);
@@ -24,12 +26,12 @@ public class PrivateHelper {
 		});
 		try {
 			return (ResourceLocation) method.invoke(entityLiving);
-		} catch (IllegalAccessException | InvocationTargetException e) {
+		} catch (@Nonnull IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public static Field getField(Class clazz, String... fields){
+	public static Field getField(@Nonnull Class clazz, @Nonnull String... fields){
 		for (String fieldName : fields) {
 			if (Stream.of(clazz.getDeclaredFields()).map(Field::getName).noneMatch(fieldName::equals)) {
 				continue;
@@ -51,8 +53,9 @@ public class PrivateHelper {
 		return getField(clazz.getSuperclass());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Nullable
-	private static Method getMethod(Class<? extends EntityLiving> aClass) {
+	private static Method getMethod(@Nonnull Class<? extends EntityLiving> aClass) {
 		for (String methodName : new String[]{"getLootTable", "func_184276_b", "func_184647_J"}) {
 			if (Stream.of(aClass.getDeclaredMethods()).map(Method::getName).noneMatch(methodName::equals)) {
 				continue;

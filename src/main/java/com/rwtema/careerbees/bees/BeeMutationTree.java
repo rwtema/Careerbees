@@ -10,6 +10,7 @@ import forestry.api.genetics.AlleleManager;
 import forestry.api.genetics.IMutationBuilder;
 import org.apache.commons.lang3.Validate;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -17,8 +18,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class BeeMutationTree {
-	List<Entry> entries = new ArrayList<>();
-	HashMultimap<SpeciesEntry, Entry> recipes = HashMultimap.create();
+	final List<Entry> entries = new ArrayList<>();
+	final HashMultimap<SpeciesEntry, Entry> recipes = HashMultimap.create();
 
 	public void add(SpeciesEntry a, SpeciesEntry b, SpeciesEntry result, double chance) {
 		add(a, b, result, chance, null);
@@ -30,6 +31,7 @@ public class BeeMutationTree {
 		recipes.put(result, entry);
 	}
 
+	@Nonnull
 	public List<SpeciesEntry> getVanillaParents(SpeciesEntry entry) {
 		HashSet<SpeciesEntry> checked = new HashSet<>();
 		LinkedList<SpeciesEntry> toCheck = new LinkedList<>();
@@ -72,11 +74,13 @@ public class BeeMutationTree {
 		return getLeastParents(spc).stream().mapToInt(HashSet::size).min().orElse(0);
 	}
 
+	@Nonnull
 	public Set<HashSet<SpeciesEntry>> getLeastParents(SpeciesEntry spc) {
 		return getLeastParents(spc, new HashSet<>());
 	}
 
-	public Set<HashSet<SpeciesEntry>> getLeastParents(SpeciesEntry spc, Set<SpeciesEntry> visited) {
+	@Nonnull
+	public Set<HashSet<SpeciesEntry>> getLeastParents(SpeciesEntry spc, @Nonnull Set<SpeciesEntry> visited) {
 		Set<HashSet<SpeciesEntry>> entries = new HashSet<>();
 		if (!recipes.containsKey(spc)) return ImmutableSet.of(Sets.newHashSet(spc));
 
@@ -165,6 +169,7 @@ public class BeeMutationTree {
 			return name != null ? name.hashCode() : 0;
 		}
 
+		@Nonnull
 		@Override
 		public String toString() {
 			return "VanillaEntry{" +

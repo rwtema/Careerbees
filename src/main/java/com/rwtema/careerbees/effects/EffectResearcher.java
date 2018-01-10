@@ -7,6 +7,7 @@ import forestry.api.genetics.AlleleManager;
 import forestry.api.genetics.IMutation;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Random;
 
@@ -23,7 +24,7 @@ public class EffectResearcher extends EffectItemModification {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, @Nonnull ItemStack stack, @Nullable IBeeHousing housing) {
 		if (housing != null && housing.getOwner() != null) {
 			EnumBeeType type = BeeManager.beeRoot.getType(stack);
 			if(type == null) return null;
@@ -71,12 +72,12 @@ public class EffectResearcher extends EffectItemModification {
 	}
 
 	@Override
-	public boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, ItemStack oldStack, ItemStack newStack, IBeeHousing housing) {
+	public boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, ItemStack oldStack, @Nonnull ItemStack newStack, IBeeHousing housing) {
 		return true;
 	}
 
 	@Override
-	public boolean acceptItemStack(ItemStack stack) {
+	public boolean acceptItemStack(@Nonnull ItemStack stack) {
 		IBee member = BeeManager.beeRoot.getMember(stack);
 		return member != null && member.isAnalyzed();
 	}

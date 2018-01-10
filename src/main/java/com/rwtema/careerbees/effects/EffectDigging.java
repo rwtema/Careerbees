@@ -36,14 +36,14 @@ public class EffectDigging extends EffectBaseThrottled {
 	public final static EffectDigging INSTANCE_SILKY = new EffectDigging(DigType.SILKY, "miner.silky");
 	public final static EffectDigging INSTANCE_FORTUNE = new EffectDigging(DigType.FORTUNE, "miner.fortune");
 
-	public static ThreadLocal<List<ItemStack>> captureStacks = new ThreadLocal<>();
+	public static final ThreadLocal<List<ItemStack>> captureStacks = new ThreadLocal<>();
 
 	static {
 		MinecraftForge.EVENT_BUS.register(EffectDigging.class);
 	}
 
 	final DigType digType;
-	TIntByteHashMap oreIDs = new TIntByteHashMap();
+	final TIntByteHashMap oreIDs = new TIntByteHashMap();
 
 	public EffectDigging(DigType digType, String miner) {
 		super(miner, 40);
@@ -51,7 +51,7 @@ public class EffectDigging extends EffectBaseThrottled {
 	}
 
 	@SubscribeEvent
-	public static void captureStacks(EntityJoinWorldEvent event) {
+	public static void captureStacks(@Nonnull EntityJoinWorldEvent event) {
 		if (event.getEntity() instanceof EntityItem) {
 			List<ItemStack> stacks = captureStacks.get();
 			if (stacks == null) return;
@@ -61,7 +61,7 @@ public class EffectDigging extends EffectBaseThrottled {
 	}
 
 	@Override
-	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random rand, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
+	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random rand, @Nonnull World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
 		AxisAlignedBB aabb = getAABB(genome, housing);
 		int x0 = MathHelper.floor(aabb.minX);
 		int x1 = MathHelper.ceil(aabb.maxX);
@@ -84,7 +84,7 @@ public class EffectDigging extends EffectBaseThrottled {
 		}
 	}
 
-	public boolean processPosition(@Nonnull IBeeHousing housing, World world, BlockPos pooledBlockPos) {
+	public boolean processPosition(@Nonnull IBeeHousing housing, @Nonnull World world, @Nonnull BlockPos pooledBlockPos) {
 		IBlockState blockState = world.getBlockState(pooledBlockPos);
 		Block block = blockState.getBlock();
 		if (blockState.getBlock().isAir(blockState, world, pooledBlockPos)) {
@@ -148,7 +148,7 @@ public class EffectDigging extends EffectBaseThrottled {
 		return true;
 	}
 
-	private boolean isOre(ItemStack item) {
+	private boolean isOre(@Nonnull ItemStack item) {
 		for (int oreID : OreDictionary.getOreIDs(item)) {
 			byte b = oreIDs.get(oreID);
 
@@ -166,12 +166,12 @@ public class EffectDigging extends EffectBaseThrottled {
 		return false;
 	}
 
-	private boolean hasOrePrefix(String oreName, String prefix) {
+	private boolean hasOrePrefix(@Nonnull String oreName, @Nonnull String prefix) {
 		return oreName.length() > prefix.length() && oreName.startsWith(prefix) && Character.isUpperCase(oreName.charAt(prefix.length()));
 	}
 
 	@Override
-	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
 		return processPosition(housing, world, pos);
 	}
 

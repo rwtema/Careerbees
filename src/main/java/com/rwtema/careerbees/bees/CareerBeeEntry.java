@@ -32,7 +32,7 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 	private final int primaryColor;
 	private final int secondaryColor;
 	public IAlleleBeeSpecies species;
-	List<Consumer<CustomBeeFactory>> speciesInstructions = new ArrayList<>();
+	final List<Consumer<CustomBeeFactory>> speciesInstructions = new ArrayList<>();
 	public String modelName;
 
 	@Override
@@ -50,6 +50,7 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 		return name.hashCode();
 	}
 
+	@Nonnull
 	@Override
 	public String toString() {
 		return "CareerBeeEntry{" +
@@ -72,21 +73,25 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 		this.modelName = name;
 	}
 
-	public final CareerBeeEntry setTemperature(EnumTemperature temperature) {
+	@Nonnull
+	public final CareerBeeEntry setTemperature(@Nonnull EnumTemperature temperature) {
 		speciesInstructions.add(c -> c.setTemperature(temperature));
 		return this;
 	}
 
-	public final CareerBeeEntry setHumidity(EnumHumidity humidity) {
+	@Nonnull
+	public final CareerBeeEntry setHumidity(@Nonnull EnumHumidity humidity) {
 		speciesInstructions.add(c -> c.setHumidity(humidity));
 		return this;
 	}
 
+	@Nonnull
 	public final CareerBeeEntry setHasEffect() {
 		speciesInstructions.add(IAlleleSpeciesBuilder::setHasEffect);
 		return this;
 	}
 
+	@Nonnull
 	public final CareerBeeEntry setIsSecret() {
 		speciesInstructions.add(IAlleleSpeciesBuilder::setIsSecret);
 		isSecret = true;
@@ -99,36 +104,43 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 
 	private boolean isSecret;
 
+	@Nonnull
 	public final CareerBeeEntry setIsNotCounted() {
 		speciesInstructions.add(CustomBeeFactory::setIsNotCounted);
 		return this;
 	}
 
+	@Nonnull
 	public final CareerBeeEntry setComplexity(int complexity) {
 		speciesInstructions.add(c -> c.setComplexity(complexity));
 		return this;
 	}
 
-	public final CareerBeeEntry addProduct(ItemStack product, Float chance) {
+	@Nonnull
+	public final CareerBeeEntry addProduct(@Nonnull ItemStack product, @Nonnull Float chance) {
 		speciesInstructions.add(c -> c.addProduct(product, chance));
 		return this;
 	}
 
-	public final CareerBeeEntry addSpecialty(ItemStack specialty, Float chance) {
+	@Nonnull
+	public final CareerBeeEntry addSpecialty(@Nonnull ItemStack specialty, @Nonnull Float chance) {
 		speciesInstructions.add(c -> c.addSpecialty(specialty, chance));
 		return this;
 	}
 
-	public final CareerBeeEntry setJubilanceProvider(IJubilanceProvider provider) {
+	@Nonnull
+	public final CareerBeeEntry setJubilanceProvider(@Nonnull IJubilanceProvider provider) {
 		speciesInstructions.add(c -> c.setJubilanceProvider(provider));
 		return this;
 	}
 
+	@Nonnull
 	public final CareerBeeEntry setNocturnal() {
 		speciesInstructions.add(IAlleleBeeSpeciesBuilder::setNocturnal);
 		return this;
 	}
 
+	@Nonnull
 	public final CareerBeeEntry setCustomBeeModelProvider(IBeeModelProvider beeIconProvider) {
 		if(beeIconProvider instanceof CustomBeeModel){
 			modelName = ((CustomBeeModel) beeIconProvider).suffix;
@@ -137,25 +149,30 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 		return this;
 	}
 
-	public final CareerBeeEntry setCustomBeeSpriteColourProvider(IBeeSpriteColourProvider beeIconColourProvider) {
+	@Nonnull
+	public final CareerBeeEntry setCustomBeeSpriteColourProvider(@Nonnull IBeeSpriteColourProvider beeIconColourProvider) {
 		speciesInstructions.add(c -> c.setCustomBeeSpriteColourProvider(beeIconColourProvider));
 		return this;
 	}
 
-	public final CareerBeeEntry setTemplateAllelleBool(EnumBeeChromosome effect, boolean val) {
+	@Nonnull
+	public final CareerBeeEntry setTemplateAllelleBool(@Nonnull EnumBeeChromosome effect, boolean val) {
 		return setTemplateAllelleString(effect, val ? "forestry.boolTrue" : "forestry.boolFalse");
 	}
 
-	public final CareerBeeEntry setTemplateAllelleString(EnumBeeChromosome effect, String value) {
+	@Nonnull
+	public final CareerBeeEntry setTemplateAllelleString(@Nonnull EnumBeeChromosome effect, String value) {
 		speciesInstructions.add(c -> c.setTemplateAllelle(effect, value));
 		return this;
 	}
 
-	public final CareerBeeEntry setTemplateEffect(Supplier<? extends EffectBase> supplier) {
+	@Nonnull
+	public final CareerBeeEntry setTemplateEffect(@Nonnull Supplier<? extends EffectBase> supplier) {
 		return setTemplate(EnumBeeChromosome.EFFECT, supplier);
 	}
 
-	public final CareerBeeEntry setTemplate(EnumBeeChromosome effect, Supplier<? extends IAllele> supplier) {
+	@Nonnull
+	public final CareerBeeEntry setTemplate(@Nonnull EnumBeeChromosome effect, @Nonnull Supplier<? extends IAllele> supplier) {
 		speciesInstructions.add(c -> c.setTemplateAllelle(effect, supplier.get()));
 		return this;
 	}
@@ -167,7 +184,7 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 		species = beeFactory.build();
 	}
 
-	private void addVanillaProducts(CustomBeeFactory beeFactory) {
+	private void addVanillaProducts(@Nonnull CustomBeeFactory beeFactory) {
 		List<BeeMutationTree.SpeciesEntry> vanillaParents = CareerBeeSpecies.tree.getVanillaParents(this);
 		HashMap<ItemStack, Pair<Float, Float>> sumMap = new HashMap<>();
 		for (BeeMutationTree.SpeciesEntry entry : vanillaParents) {
@@ -218,6 +235,7 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 		return false;
 	}
 
+	@Nonnull
 	public String getAlleleName() {
 		return species.getAlleleName();
 	}
@@ -226,16 +244,18 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 	public static class CustomBeeFactory implements IAlleleBeeSpeciesBuilder {
 		public static final HashMap<IAlleleBeeSpecies, IAlleleBeeEffect> SPECIES_EFFECT_MAP = new HashMap<>();
 		public static final HashMap<String, IAlleleBeeSpecies> STRING_SPECIES_MAP = new HashMap<>();
-		static HashSet<String> assignedUUIDs = new HashSet<>();
+		static final HashSet<String> assignedUUIDs = new HashSet<>();
 		final IAlleleBeeSpeciesBuilder species;
+		@Nonnull
 		final AlleleTemplate template;
-		List<Pair<ItemStack, Float>> products = new ArrayList<>();
+		final List<Pair<ItemStack, Float>> products = new ArrayList<>();
 
 		public CustomBeeFactory(IAlleleBeeSpeciesBuilder species) {
 			this.species = species;
 			template = AlleleTemplate.createAlleleTemplate(null);
 		}
 
+		@Nonnull
 		public static CustomBeeFactory factory(String name,
 											   boolean dominant,
 											   String branchName,
@@ -243,6 +263,7 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 			return factory(name, dominant, branchName, primaryColor, BEE_YELLOW);
 		}
 
+		@Nonnull
 		public static CustomBeeFactory factory(String name,
 											   boolean dominant,
 											   String branchName,
@@ -278,7 +299,8 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 			return new CustomBeeFactory(species);
 		}
 
-		public CustomBeeFactory setTemplateAllelle(EnumBeeChromosome chromosome, Object value) {
+		@Nonnull
+		public CustomBeeFactory setTemplateAllelle(@Nonnull EnumBeeChromosome chromosome, Object value) {
 			template.setTemplateAllelle(chromosome, value);
 			return this;
 		}
@@ -366,9 +388,7 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 		@Nonnull
 		@Override
 		public CustomBeeFactory setIsSecret() {
-			if (!BeeMod.deobf_folder || true) {
-				species.setIsSecret();
-			}
+			species.setIsSecret();
 			setIsNotCounted();
 			return this;
 		}
@@ -385,11 +405,13 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 			species.setComplexity(complexity);
 		}
 
+		@Nonnull
 		public CustomBeeFactory setComplexityRet(int complexity) {
 			setComplexity(complexity);
 			return this;
 		}
 
+		@Nonnull
 		public CustomBeeFactory clearDefaultProducts() {
 			products.clear();
 			return this;

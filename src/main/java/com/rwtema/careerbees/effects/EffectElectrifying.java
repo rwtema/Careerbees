@@ -12,12 +12,16 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 
 public class EffectElectrifying extends EffectBaseEntity<EntityLivingBase> {
+	@Nonnull
 	public static EffectElectrifying INSTANCE = new EffectElectrifying();
 
+	@Nullable
 	EntityLivingBase currentEntity = null;
 
 	public EffectElectrifying() {
@@ -26,14 +30,14 @@ public class EffectElectrifying extends EffectBaseEntity<EntityLivingBase> {
 	}
 
 	@SubscribeEvent
-	public void lowerDamage(LivingHurtEvent event) {
+	public void lowerDamage(@Nonnull LivingHurtEvent event) {
 		if (event.getEntityLiving() == currentEntity) {
 			event.setAmount(event.getAmount() / 20);
 		}
 	}
 
 	@Override
-	protected void workOnEntities(List<EntityLivingBase> entities, IBeeGenome genome, IBeeHousing housing, Random random, IEffectSettingsHolder settings) {
+	protected void workOnEntities(@Nonnull List<EntityLivingBase> entities, IBeeGenome genome, @Nonnull IBeeHousing housing, @Nonnull Random random, IEffectSettingsHolder settings) {
 		World world = housing.getWorldObj();
 		BlockPos pos = housing.getCoordinates();
 		EntityLightningBolt bolt = new EntityLightningBolt(world, pos.getX() + 0.5F, pos.getY() + 0.5, pos.getZ() + 0.5, true);

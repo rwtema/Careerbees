@@ -1,5 +1,6 @@
 package com.rwtema.careerbees.helpers;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Field;
 
 public class FieldAccessor<T, O> {
@@ -13,6 +14,7 @@ public class FieldAccessor<T, O> {
 		this.field = field;
 	}
 
+	@Nonnull
 	@SuppressWarnings("unchecked")
 	public T get(O owner) {
 		try {

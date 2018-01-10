@@ -3,11 +3,11 @@ package com.rwtema.careerbees.items;
 import com.rwtema.careerbees.lang.Lang;
 import forestry.api.apiculture.DefaultBeeModifier;
 import forestry.api.apiculture.IBeeGenome;
-import forestry.core.utils.Translator;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -29,7 +29,7 @@ public class ItemEternalFrame extends ItemBaseFrame {
 	}
 
 	@Override
-	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+	public void addInformation(ItemStack stack, @Nullable World worldIn, @Nonnull List<String> tooltip, ITooltipFlag flagIn) {
 		super.addInformation(stack, worldIn, tooltip, flagIn);
 		tooltip.add(Lang.translateArgs("Production: x%s", 0));
 		tooltip.add(Lang.translateArgs("Lifespan: x%s", 1000000));

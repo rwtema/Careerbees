@@ -5,8 +5,6 @@ import com.rwtema.careerbees.ClientRunnable;
 import forestry.api.apiculture.IBeeHousing;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.IReloadableResourceManager;
-import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.IResourceManagerReloadListener;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.translation.I18n;
@@ -17,7 +15,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nonnull;
 
 public class NameHelper {
-	public static NameHelper QUEEN_NAMES = new NameHelper("carrerbees.queen.names.");
+	public static final NameHelper QUEEN_NAMES = new NameHelper("carrerbees.queen.names.");
+	@Nonnull
 	public static NameHelper TAXES = new NameHelper("beemod.text.taxpayer.tax.");
 	private final String prefix;
 	int numNames = -1;
@@ -41,7 +40,7 @@ public class NameHelper {
 	}
 
 
-	public static short getQueenNameSeed(IBeeHousing housing) {
+	public static short getQueenNameSeed(@Nonnull IBeeHousing housing) {
 		ItemStack queen = housing.getBeeInventory().getQueen();
 		if (queen.isEmpty()) return newSeed(housing);
 
@@ -57,10 +56,11 @@ public class NameHelper {
 		return value;
 	}
 
-	private static short newSeed(IBeeHousing housing) {
+	private static short newSeed(@Nonnull IBeeHousing housing) {
 		return (short) housing.getWorldObj().rand.nextInt(16384);
 	}
 
+	@Nonnull
 	public String getName(int seed) {
 		if (numNames == -1) {
 			int i = 0;

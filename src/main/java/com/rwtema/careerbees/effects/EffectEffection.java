@@ -8,11 +8,12 @@ import forestry.api.genetics.IChromosome;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class EffectEffection extends EffectItemModification {
 
-	public static EffectEffection INSTANCE = new EffectEffection("effect.restore", 16);
+	public static final EffectEffection INSTANCE = new EffectEffection("effect.restore", 16);
 
 	public EffectEffection(String name, float baseTicksBetweenProcessing) {
 		super(name, baseTicksBetweenProcessing);
@@ -20,11 +21,11 @@ public class EffectEffection extends EffectItemModification {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, @Nonnull ItemStack stack, IBeeHousing housing) {
 		return modifyStack(stack);
 	}
 
-	private ItemStack modifyStack(ItemStack stack) {
+	private ItemStack modifyStack(@Nonnull ItemStack stack) {
 		NBTTagCompound tagCompound = stack.getTagCompound();
 		if (tagCompound == null) return null;
 
@@ -64,7 +65,7 @@ public class EffectEffection extends EffectItemModification {
 		return newStack;
 	}
 
-	private IAlleleBeeEffect getiAlleleBeeEffect(IAlleleBeeSpecies species) {
+	private IAlleleBeeEffect getiAlleleBeeEffect(@Nonnull IAlleleBeeSpecies species) {
 		IAlleleBeeEffect iAlleleBeeEffect = CareerBeeEntry.CustomBeeFactory.SPECIES_EFFECT_MAP.get(species);
 		if (iAlleleBeeEffect != null)
 			return iAlleleBeeEffect;
@@ -78,7 +79,7 @@ public class EffectEffection extends EffectItemModification {
 	}
 
 	@Override
-	public boolean acceptItemStack(ItemStack stack) {
+	public boolean acceptItemStack(@Nonnull ItemStack stack) {
 		NBTTagCompound tagCompound = stack.getTagCompound();
 		if (tagCompound == null) return false;
 
@@ -100,7 +101,7 @@ public class EffectEffection extends EffectItemModification {
 	}
 
 	@Override
-	public boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, ItemStack oldStack, ItemStack newStack, IBeeHousing housing) {
+	public boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, ItemStack oldStack, @Nonnull ItemStack newStack, IBeeHousing housing) {
 		return true;
 	}
 }

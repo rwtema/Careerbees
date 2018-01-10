@@ -7,10 +7,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class ParticleHelper {
 
+	@Nullable
 	public static final BeeHiveFX BEE_HIVE_FX;
 
 	static {

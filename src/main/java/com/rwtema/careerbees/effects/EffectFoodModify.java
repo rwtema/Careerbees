@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +43,7 @@ public abstract class EffectFoodModify extends EffectItemModification {
 	}
 
 	@SubscribeEvent
-	public static void onStartEat(PlayerInteractEvent.RightClickItem event) {
+	public static void onStartEat(@Nonnull PlayerInteractEvent.RightClickItem event) {
 		ItemStack itemStack = event.getItemStack();
 		if (!itemStack.isEmpty() && itemStack.hasTagCompound() && itemStack.getItem() instanceof ItemFood) {
 			EntityPlayer entityPlayer = event.getEntityPlayer();
@@ -67,7 +68,7 @@ public abstract class EffectFoodModify extends EffectItemModification {
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public static void onTooltip(ItemTooltipEvent event) {
+	public static void onTooltip(@Nonnull ItemTooltipEvent event) {
 		ItemStack item = event.getItemStack();
 		NBTTagCompound tagCompound;
 		if ((tagCompound = item.getTagCompound()) != null && item.getItem() instanceof ItemFood && tagCompound.hasKey(BEE_FOOD_NBT, Constants.NBT.TAG_COMPOUND) && event.getEntity() instanceof EntityPlayer) {
@@ -82,7 +83,7 @@ public abstract class EffectFoodModify extends EffectItemModification {
 	}
 
 	@SubscribeEvent
-	public static void onFoodEat(LivingEntityUseItemEvent.Finish event) {
+	public static void onFoodEat(@Nonnull LivingEntityUseItemEvent.Finish event) {
 		ItemStack item = event.getItem();
 		NBTTagCompound tagCompound;
 		if ((tagCompound = item.getTagCompound()) != null && tagCompound.hasKey(BEE_FOOD_NBT, Constants.NBT.TAG_COMPOUND) && event.getEntity() instanceof EntityPlayer) {
@@ -110,7 +111,7 @@ public abstract class EffectFoodModify extends EffectItemModification {
 
 	@Nullable
 	@Override
-	public ItemStack modifyStack(IBeeGenome genome, ItemStack stack, IBeeHousing housing) {
+	public ItemStack modifyStack(IBeeGenome genome, @Nonnull ItemStack stack, IBeeHousing housing) {
 		if (stack.getItem() instanceof ItemFood) {
 			NBTTagCompound prevTag = stack.getTagCompound() != null && stack.getTagCompound().hasKey(BEE_FOOD_NBT, Constants.NBT.TAG_COMPOUND) && stack.getTagCompound().getCompoundTag(BEE_FOOD_NBT).hasKey(getName(), Constants.NBT.TAG_COMPOUND) ? stack.getTagCompound().getCompoundTag(BEE_FOOD_NBT).getCompoundTag(getName()) : null;
 
@@ -132,7 +133,7 @@ public abstract class EffectFoodModify extends EffectItemModification {
 	}
 
 	@Override
-	public boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, ItemStack oldStack, ItemStack newStack, IBeeHousing housing) {
+	public boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, ItemStack oldStack, @Nonnull ItemStack newStack, IBeeHousing housing) {
 		NBTTagCompound curTag = newStack.getTagCompound().getCompoundTag(BEE_FOOD_NBT).getCompoundTag(getName());
 		return shouldRelease(genome, frame, curTag);
 	}
@@ -143,7 +144,7 @@ public abstract class EffectFoodModify extends EffectItemModification {
 	protected abstract NBTTagCompound addData(IBeeGenome genome, ItemStack stack, @Nullable NBTTagCompound prevTag);
 
 	@Override
-	public boolean acceptItemStack(ItemStack stack) {
+	public boolean acceptItemStack(@Nonnull ItemStack stack) {
 		if (!(stack.getItem() instanceof ItemFood)) return false;
 
 		NBTTagCompound tagCompound;

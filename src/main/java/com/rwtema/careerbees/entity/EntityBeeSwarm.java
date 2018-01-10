@@ -16,7 +16,7 @@ import javax.annotation.Nonnull;
 public class EntityBeeSwarm extends Entity implements IProjectile {
 	private static final DataParameter<ItemStack> ITEM = EntityDataManager.createKey(EntityItem.class, DataSerializers.ITEM_STACK);
 
-	public EntityBeeSwarm(World worldIn) {
+	public EntityBeeSwarm(@Nonnull World worldIn) {
 		super(worldIn);
 		this.setSize(0.5F, 0.5F);
 		noClip = true;
@@ -27,12 +27,13 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 		this.getDataManager().register(ITEM, ItemStack.EMPTY);
 	}
 
+	@Nonnull
 	public ItemStack getItem()
 	{
 		return this.getDataManager().get(ITEM);
 	}
 
-	public void setItem(ItemStack stack)
+	public void setItem(@Nonnull ItemStack stack)
 	{
 		this.getDataManager().set(ITEM, stack);
 		this.getDataManager().setDirty(ITEM);

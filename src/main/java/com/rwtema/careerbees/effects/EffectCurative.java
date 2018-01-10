@@ -9,6 +9,7 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Random;
 
@@ -19,7 +20,7 @@ public class EffectCurative extends EffectBaseEntity<EntityLivingBase> {
 	}
 
 	@Override
-	protected void workOnEntities(List<EntityLivingBase> entities, IBeeGenome genome, IBeeHousing housing, Random random, IEffectSettingsHolder settings) {
+	protected void workOnEntities(@Nonnull List<EntityLivingBase> entities, IBeeGenome genome, IBeeHousing housing, Random random, IEffectSettingsHolder settings) {
 		for (EntityLivingBase entity : entities) {
 			if(entity.isEntityUndead()){
 				entity.addPotionEffect(new PotionEffect(MobEffects.POISON, 80));

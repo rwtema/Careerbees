@@ -1,9 +1,12 @@
 package com.rwtema.careerbees.helpers;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
 
 public class RandomSelector<E> {
 	private final Random random;
+	@Nullable
 	private E value = null;
 	private int n = 0;
 
@@ -11,18 +14,21 @@ public class RandomSelector<E> {
 		this.random = random;
 	}
 
+	@Nonnull
 	public RandomSelector<E> select(E newValue) {
 		n++;
 		if (n == 1 || random.nextInt(n) == 0) value = newValue;
 		return this;
 	}
 
-	public RandomSelector<E> selectAny(Iterable<? extends E> iterables) {
+	@Nonnull
+	public RandomSelector<E> selectAny(@Nonnull Iterable<? extends E> iterables) {
 		iterables.forEach(this::select);
 		return this;
 	}
 
-	public RandomSelector<E> selectAny(Collection<? extends E> collection) {
+	@Nonnull
+	public RandomSelector<E> selectAny(@Nonnull Collection<? extends E> collection) {
 		int s = collection.size();
 		if (s == 0) return this;
 		int k = random.nextInt(s + n);
@@ -38,7 +44,8 @@ public class RandomSelector<E> {
 		return this;
 	}
 
-	public RandomSelector<E> selectAny(List<? extends E> list) {
+	@Nonnull
+	public RandomSelector<E> selectAny(@Nonnull List<? extends E> list) {
 		int s = list.size();
 		if (s == 0) return this;
 		int k = random.nextInt(s + n);
@@ -49,6 +56,7 @@ public class RandomSelector<E> {
 		return this;
 	}
 
+	@Nullable
 	public E get() {
 		return value;
 	}

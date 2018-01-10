@@ -23,15 +23,15 @@ import java.util.function.Predicate;
 
 public class EffectPickup extends EffectBaseThrottled {
 	public static final EffectPickup INSTANCE = new EffectPickup("pickup", 20 * 10 / 10);
-	Filter filter = new Filter(this);
-	Setting.YesNo voidExcess = new Setting.YesNo(this, "voidExcess", false);
+	final Filter filter = new Filter(this);
+	final Setting.YesNo voidExcess = new Setting.YesNo(this, "voidExcess", false);
 
 	public EffectPickup(String name, float baseTicksBetweenProcessing) {
 		super(name, baseTicksBetweenProcessing);
 	}
 
 	@Override
-	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
+	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, @Nonnull World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, @Nonnull IEffectSettingsHolder settings) {
 		AxisAlignedBB aabb = getAABB(genome, housing);
 		Predicate<ItemStack> matcher = filter.getMatcher(settings);
 		List<EntityItem> list = world.getEntitiesWithinAABB(EntityItem.class, aabb, t -> t != null && !t.isDead && !t.getItem().isEmpty() && matcher.test(t.getItem()));

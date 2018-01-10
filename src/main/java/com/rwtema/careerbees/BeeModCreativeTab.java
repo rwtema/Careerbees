@@ -7,7 +7,7 @@ import net.minecraft.util.NonNullList;
 import javax.annotation.Nonnull;
 
 public class BeeModCreativeTab extends CreativeTabs {
-	public BeeModCreativeTab(String label) {
+	public BeeModCreativeTab(@Nonnull String label) {
 		super(label);
 	}
 

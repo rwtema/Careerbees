@@ -8,9 +8,7 @@ import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeekeepingLogic;
 import forestry.api.genetics.IEffectData;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -26,8 +24,9 @@ import java.util.Comparator;
 import java.util.List;
 
 public class EffectClockwork extends EffectBase {
-	public static EffectBase INSTANCE = new EffectClockwork("clockwinding");
+	public static final EffectBase INSTANCE = new EffectClockwork("clockwinding");
 
+	@Nullable
 	public Class<? extends TileEntity> tile;
 
 	public EffectClockwork(String rawname) {
@@ -59,7 +58,7 @@ public class EffectClockwork extends EffectBase {
 		return storedData;
 	}
 
-	public void processTile(@Nonnull IBeeGenome genome, World worldObj, TileEntity tileEntity) {
+	public void processTile(@Nonnull IBeeGenome genome, @Nonnull World worldObj, @Nonnull TileEntity tileEntity) {
 		NBTTagCompound nbtTagCompound = tileEntity.writeToNBT(new NBTTagCompound());
 		if (nbtTagCompound.hasKey("Wound", Constants.NBT.TAG_FLOAT)) {
 			float min = Math.min(2 + genome.getSpeed() * 4, 8);
@@ -87,7 +86,7 @@ public class EffectClockwork extends EffectBase {
 	}
 
 	@Override
-	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
 		if(tile == null) return false;
 
 		TileEntity tileEntity = world.getTileEntity(pos);

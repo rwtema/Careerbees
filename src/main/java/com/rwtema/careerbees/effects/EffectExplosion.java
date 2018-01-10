@@ -27,13 +27,13 @@ public class EffectExplosion extends EffectBaseThrottled {
 	}
 
 	@Override
-	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
+	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, @Nonnull World world, @Nonnull BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
 
 		tryCreateSplosion(random, world, pos);
 
 	}
 
-	public void tryCreateSplosion(@Nonnull Random random, World world, BlockPos pos) {
+	public void tryCreateSplosion(@Nonnull Random random, @Nonnull World world, @Nonnull BlockPos pos) {
 		Explosion explosion = new Explosion(world, null, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 2 + random.nextFloat() * 2, false, true);
 		if (net.minecraftforge.event.ForgeEventFactory.onExplosionStart(world, explosion)) return;
 		explosion.doExplosionA();
@@ -63,7 +63,7 @@ public class EffectExplosion extends EffectBaseThrottled {
 	}
 
 	@Override
-	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
 		tryCreateSplosion(world.rand, world, pos);
 		return true;
 	}

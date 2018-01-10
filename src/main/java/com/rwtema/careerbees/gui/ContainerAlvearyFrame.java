@@ -9,8 +9,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
+import javax.annotation.Nonnull;
+
 public class ContainerAlvearyFrame extends Container {
-	public ContainerAlvearyFrame(TileAlvearyHiveFrameHolder frameHolder, EntityPlayer player) {
+	public ContainerAlvearyFrame(@Nonnull TileAlvearyHiveFrameHolder frameHolder, @Nonnull EntityPlayer player) {
 		InventoryPlayer inventoryPlayer = player.inventory;
 
 		addSlotToContainer(new SlotItemHandler(
@@ -35,10 +37,11 @@ public class ContainerAlvearyFrame extends Container {
 	}
 
 	@Override
-	public boolean canInteractWith(EntityPlayer playerIn) {
+	public boolean canInteractWith(@Nonnull EntityPlayer playerIn) {
 		return true;
 	}
 
+	@Nonnull
 	public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
 	{
 		ItemStack itemstack = ItemStack.EMPTY;

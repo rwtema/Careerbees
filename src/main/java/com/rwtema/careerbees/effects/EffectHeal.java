@@ -7,6 +7,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Random;
 
@@ -17,7 +18,7 @@ public class EffectHeal extends EffectBaseEntity<EntityLivingBase> {
 	}
 
 	@Override
-	protected void workOnEntities(List<EntityLivingBase> entities, IBeeGenome genome, IBeeHousing housing, Random random, IEffectSettingsHolder settings) {
+	protected void workOnEntities(@Nonnull List<EntityLivingBase> entities, IBeeGenome genome, IBeeHousing housing, Random random, IEffectSettingsHolder settings) {
 		for (EntityLivingBase entity : entities) {
 			entity.heal(0.5F);
 			entity.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 80));

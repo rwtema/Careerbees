@@ -27,7 +27,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -49,44 +48,44 @@ public abstract class PlacedBeeManager<B extends BeeEntry> extends ChunkDataModu
 	private final Set<EntityPlayer> playerClient = Collections.newSetFromMap(new WeakHashMap<>());
 
 	@SubscribeEvent
-	public void onRightClick(PlayerInteractEvent.RightClickBlock event) {
+	public void onRightClick(@Nonnull PlayerInteractEvent.RightClickBlock event) {
 		if (!event.getEntityPlayer().isSneaking()) return;
 
 		ItemStack itemStack = event.getItemStack();
 
 		BlockPos pos = event.getPos();
-		if (false && itemStack.isEmpty()) {
-
-			Chunk chunk = event.getWorld().getChunkFromBlockCoords(pos);
-			Map<BlockPos, B> chunkData = EntityChunkData.getChunkData(chunk, this, false);
-
-			if (chunkData.get(pos) != null) {
-				if (hasPlayerRightClickedAlready(event)) return;
-
-				event.setCanceled(true);
-
-
-				if (!event.getWorld().isRemote) {
-					B k = chunkData.remove(pos);
-					NBTTagCompound tag = k.tag;
-					if (tag != null) {
-						World world = chunk.getWorld();
-						double d0 = (world.rand.nextFloat() * 0.5F) + 0.25D;
-						double d1 = (world.rand.nextFloat() * 0.5F) + 0.25D;
-						double d2 = (world.rand.nextFloat() * 0.5F) + 0.25D;
-						EntityItem entityitem = new EntityItem(
-								world,
-								pos.getX() + d0, pos.getY() + d1, pos.getZ() + d2,
-								new ItemStack(tag));
-						entityitem.setDefaultPickupDelay();
-						world.spawnEntity(entityitem);
-						EntityChunkData.markChunkDirty(chunk);
-					}
-					return;
-				}
-			}
-			return;
-		}
+//		if (false && itemStack.isEmpty()) {
+//
+//			Chunk chunk = event.getWorld().getChunkFromBlockCoords(pos);
+//			Map<BlockPos, B> chunkData = EntityChunkData.getChunkData(chunk, this, false);
+//
+//			if (chunkData.get(pos) != null) {
+//				if (hasPlayerRightClickedAlready(event)) return;
+//
+//				event.setCanceled(true);
+//
+//
+//				if (!event.getWorld().isRemote) {
+//					B k = chunkData.remove(pos);
+//					NBTTagCompound tag = k.tag;
+//					if (tag != null) {
+//						World world = chunk.getWorld();
+//						double d0 = (world.rand.nextFloat() * 0.5F) + 0.25D;
+//						double d1 = (world.rand.nextFloat() * 0.5F) + 0.25D;
+//						double d2 = (world.rand.nextFloat() * 0.5F) + 0.25D;
+//						EntityItem entityitem = new EntityItem(
+//								world,
+//								pos.getX() + d0, pos.getY() + d1, pos.getZ() + d2,
+//								new ItemStack(tag));
+//						entityitem.setDefaultPickupDelay();
+//						world.spawnEntity(entityitem);
+//						EntityChunkData.markChunkDirty(chunk);
+//					}
+//					return;
+//				}
+//			}
+//			return;
+//		}
 
 
 		IBee bee = BeeManager.beeRoot.getMember(itemStack);
@@ -121,7 +120,7 @@ public abstract class PlacedBeeManager<B extends BeeEntry> extends ChunkDataModu
 		}
 	}
 
-	protected boolean hasPlayerRightClickedAlready(PlayerInteractEvent.RightClickBlock event) {
+	protected boolean hasPlayerRightClickedAlready(@Nonnull PlayerInteractEvent.RightClickBlock event) {
 		return !(event.getWorld().isRemote ? playerClient : playerServer).add(event.getEntityPlayer());
 	}
 
@@ -137,13 +136,14 @@ public abstract class PlacedBeeManager<B extends BeeEntry> extends ChunkDataModu
 		return ImmutableMap.of();
 	}
 
+	@Nonnull
 	@Override
 	public Map<BlockPos, B> createBlank() {
 		return new HashMap<>();
 	}
 
 	@Override
-	public void writeToNBT(NBTTagCompound base, Map<BlockPos, B> blockPosBeeEntryMap) {
+	public void writeToNBT(@Nonnull NBTTagCompound base, @Nonnull Map<BlockPos, B> blockPosBeeEntryMap) {
 		NBTTagList list = blockPosBeeEntryMap.entrySet().stream()
 				.map(e -> NBTHelper.builder().setLong("pos", e.getKey().toLong()).setTag("genome", e.getValue().tag).build())
 				.collect(NBTHelper.toNBTTagList());
@@ -152,7 +152,7 @@ public abstract class PlacedBeeManager<B extends BeeEntry> extends ChunkDataModu
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void clientTick(Chunk chunk, Map<BlockPos, B> blockPosStudentBeeEntryMap) {
+	public void clientTick(@Nonnull Chunk chunk, @Nonnull Map<BlockPos, B> blockPosStudentBeeEntryMap) {
 		playerClient.clear();
 
 		Random rand = chunk.getWorld().rand;
@@ -186,8 +186,9 @@ public abstract class PlacedBeeManager<B extends BeeEntry> extends ChunkDataModu
 	}
 
 
+	@Nonnull
 	@Override
-	public Map<BlockPos, B> readFromNBT(NBTTagCompound tag) {
+	public Map<BlockPos, B> readFromNBT(@Nonnull NBTTagCompound tag) {
 		Map<BlockPos, B> objectObjectHashMap = createBlank();
 		NBTHelper.<NBTTagCompound>wrapList(tag.getTagList("list", Constants.NBT.TAG_COMPOUND))
 				.stream().filter(Objects::nonNull)
@@ -204,7 +205,7 @@ public abstract class PlacedBeeManager<B extends BeeEntry> extends ChunkDataModu
 	protected abstract B recreateBeeEntry(NBTTagCompound genome);
 
 	@Override
-	public void writeData(Map<BlockPos, B> value, PacketBuffer buffer) {
+	public void writeData(@Nonnull Map<BlockPos, B> value, @Nonnull PacketBuffer buffer) {
 		buffer.writeVarInt(value.size());
 		value.entrySet().forEach(
 				t -> {
@@ -216,7 +217,7 @@ public abstract class PlacedBeeManager<B extends BeeEntry> extends ChunkDataModu
 	}
 
 	@Override
-	public boolean onUpdate(Chunk chunk, Map<BlockPos, B> blockPosBeeEntryMap) {
+	public boolean onUpdate(@Nonnull Chunk chunk, @Nonnull Map<BlockPos, B> blockPosBeeEntryMap) {
 		playerServer.clear();
 
 		blockPosBeeEntryMap.entrySet().removeIf(
@@ -249,7 +250,7 @@ public abstract class PlacedBeeManager<B extends BeeEntry> extends ChunkDataModu
 	protected abstract boolean updateTile(Chunk chunk, Map.Entry<BlockPos, B> k, IBeeHousing hou, TileEntity tileEntity);
 
 	@Override
-	public void readData(Map<BlockPos, B> value, PacketBuffer buffer) {
+	public void readData(@Nonnull Map<BlockPos, B> value, @Nonnull PacketBuffer buffer) {
 		value.clear();
 		try {
 			int n = buffer.readVarInt();

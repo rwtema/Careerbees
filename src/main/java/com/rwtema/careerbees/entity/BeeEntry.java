@@ -3,10 +3,12 @@ package com.rwtema.careerbees.entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public abstract class BeeEntry {
 	@Nullable
+	final
 	NBTTagCompound tag;
 
 	public BeeEntry(@Nullable NBTTagCompound tag) {
@@ -43,12 +45,12 @@ public abstract class BeeEntry {
 		}
 
 		@Override
-		public void write(PacketBuffer buffer) {
+		public void write(@Nonnull PacketBuffer buffer) {
 			buffer.writeByte(active);
 		}
 
 		@Override
-		public void read(PacketBuffer buffer) {
+		public void read(@Nonnull PacketBuffer buffer) {
 			active = buffer.readByte();
 		}
 	}

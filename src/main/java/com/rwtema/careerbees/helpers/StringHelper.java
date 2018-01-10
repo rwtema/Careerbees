@@ -4,6 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
@@ -12,11 +13,12 @@ import java.util.stream.Collectors;
 
 public class StringHelper {
 
-	public static String capFirstMulti(String s) {
+	public static String capFirstMulti(@Nonnull String s) {
 		return Arrays.stream(s.split(" ")).map(StringHelper::capFirst).collect(Collectors.joining(" "));
 	}
 
-	public static String capFirst(String s) {
+	@Nonnull
+	public static String capFirst(@Nonnull String s) {
 		switch (s.length()) {
 			case 0:
 				return s;
@@ -30,11 +32,13 @@ public class StringHelper {
 		}
 	}
 
-	public static HashMap<String, String> abbreviate(Iterable<String> strings) {
+	@Nonnull
+	public static HashMap<String, String> abbreviate(@Nonnull Iterable<String> strings) {
 		return abbreviate(Sets.newHashSet(strings), 0);
 	}
 
-	private static HashMap<String, String> abbreviate(Iterable<String> strings, int i) {
+	@Nonnull
+	private static HashMap<String, String> abbreviate(@Nonnull Iterable<String> strings, int i) {
 		HashMultimap<Character, String> stringMap = HashMultimap.create();
 		HashMap<String, String> result = Maps.newHashMap();
 		for (String string : strings) {

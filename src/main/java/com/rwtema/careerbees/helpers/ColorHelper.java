@@ -2,6 +2,8 @@ package com.rwtema.careerbees.helpers;
 
 import net.minecraft.util.math.MathHelper;
 
+import javax.annotation.Nonnull;
+
 public class ColorHelper {
 	public static int getA(int col) {
 		return (col & 0xff000000) >>> 24;
@@ -45,6 +47,7 @@ public class ColorHelper {
 		return ((a & 0xff) << 24) | ((r & 0xff) << 16) | ((g & 0xff) << 8) | (b & 0xff);
 	}
 
+	@Nonnull
 	public static float[] colToFloat(int rgb) {
 		return new float[]{
 				ColorHelper.getA(rgb) / 255F,

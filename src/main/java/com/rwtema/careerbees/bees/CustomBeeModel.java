@@ -33,7 +33,7 @@ public class CustomBeeModel implements IBeeModelProvider {
 	@SideOnly(Side.CLIENT)
 	public ModelResourceLocation princess_location;
 	public final String suffix;
-	public boolean background;
+	public final boolean background;
 
 	public CustomBeeModel(final String suffix) {
 		this(suffix, false);
@@ -68,12 +68,13 @@ public class CustomBeeModel implements IBeeModelProvider {
 		doRegister(suffix, "drone", "bee_drone_ge");
 	}
 
-	private static void doRegister(String suffix, String queen, String bee_queen_ge) {
+	private static void doRegister(String suffix, String queen, @Nonnull String bee_queen_ge) {
 		ModelBakery.registerItemVariants(
 				Validate.notNull(Item.REGISTRY.getObject(new ResourceLocation("forestry", bee_queen_ge))),
 				CustomBeeModel.resourceLocation(queen, suffix));
 	}
 
+	@Nonnull
 	@SideOnly(Side.CLIENT)
 	private static ResourceLocation resourceLocation(String name, String mining) {
 		return new ResourceLocation(BeeMod.MODID + ":bees/" + name + "_" + mining);

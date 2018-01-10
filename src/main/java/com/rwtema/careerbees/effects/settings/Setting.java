@@ -14,13 +14,14 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class Setting<V, NBT extends NBTBase> {
-	static ImmutableBiMap<Class<? extends NBTBase>, Integer> classIds = ImmutableBiMap.<Class<? extends NBTBase>, Integer>builder()
+	static final ImmutableBiMap<Class<? extends NBTBase>, Integer> classIds = ImmutableBiMap.<Class<? extends NBTBase>, Integer>builder()
 			.put(NBTTagByte.class, Constants.NBT.TAG_BYTE)
 			.put(NBTTagShort.class, Constants.NBT.TAG_SHORT)
 			.put(NBTTagInt.class, Constants.NBT.TAG_INT)
@@ -39,7 +40,7 @@ public abstract class Setting<V, NBT extends NBTBase> {
 	final String keyname;
 	final int expectedType;
 
-	public Setting(EffectBase parent, String keyname, V _default, Class<NBT> clazz) {
+	public Setting(@Nonnull EffectBase parent, String keyname, V _default, Class<NBT> clazz) {
 		this._default = _default;
 		this.keyname = keyname;
 		this.expectedType = classIds.get(clazz);
@@ -58,7 +59,7 @@ public abstract class Setting<V, NBT extends NBTBase> {
 		return _default;
 	}
 
-	public V getValue(IBeeHousing housing) {
+	public V getValue(@Nonnull IBeeHousing housing) {
 		for (IBeeModifier iBeeModifier : housing.getBeeModifiers()) {
 			if (iBeeModifier instanceof IEffectSettingsHolder) {
 				return getValue((IEffectSettingsHolder) iBeeModifier);
@@ -67,7 +68,7 @@ public abstract class Setting<V, NBT extends NBTBase> {
 		return _default;
 	}
 
-	public V getValue(IEffectSettingsHolder settingsHolder) {
+	public V getValue(@Nonnull IEffectSettingsHolder settingsHolder) {
 		return settingsHolder.getValue(this);
 	}
 
@@ -91,6 +92,7 @@ public abstract class Setting<V, NBT extends NBTBase> {
 		return true;
 	}
 
+	@Nullable
 	public List<V> getEntries() {
 		if (getType() != Entry_Type.BUTTON)
 			return ImmutableList.of();
@@ -109,6 +111,7 @@ public abstract class Setting<V, NBT extends NBTBase> {
 		return entries.get(0);
 	}
 
+	@Nonnull
 	public abstract Entry_Type getType();
 
 	public V overrideInput(V input) {
@@ -152,7 +155,7 @@ public abstract class Setting<V, NBT extends NBTBase> {
 		final Function<V, NBT> toNBT;
 		final Function<NBT, V> fromNBT;
 
-		public SettingFunc(EffectBase parent, String keyname, V _default, Function<V, NBT> toNBT, Function<NBT, V> fromNBT, Class<NBT> clazz) {
+		public SettingFunc(@Nonnull EffectBase parent, String keyname, V _default, Function<V, NBT> toNBT, Function<NBT, V> fromNBT, Class<NBT> clazz) {
 			super(parent, keyname, _default, clazz);
 			this.toNBT = toNBT;
 			this.fromNBT = fromNBT;
@@ -171,18 +174,21 @@ public abstract class Setting<V, NBT extends NBTBase> {
 
 	public static class ChoiceOptional<E extends Enum<E>> extends SettingFunc<E, NBTTagByte> {
 
-		private Class<E> clazz;
+		@Nonnull
+		private final Class<E> clazz;
 
-		public ChoiceOptional(EffectBase parent, String keyname, Class<E> clazz) {
+		public ChoiceOptional(@Nonnull EffectBase parent, String keyname, @Nonnull Class<E> clazz) {
 			super(parent, keyname, null, t -> new NBTTagByte(t == null ? (byte) 255 : (byte) t.ordinal()), t -> t.getByte() == (byte) 255 ? null : clazz.getEnumConstants()[t.getInt()], NBTTagByte.class);
 			this.clazz = clazz;
 		}
 
+		@Nonnull
 		@Override
 		public Entry_Type getType() {
 			return Entry_Type.BUTTON;
 		}
 
+		@Nonnull
 		@Override
 		public List<E> getEntries() {
 			ArrayList<E> list = Lists.newArrayList((E) null);
@@ -193,10 +199,11 @@ public abstract class Setting<V, NBT extends NBTBase> {
 
 	public static class Choice<E extends Enum<E>> extends SettingFunc<E, NBTTagByte> {
 
-		public Choice(EffectBase parent, String keyname, E _default) {
+		public Choice(@Nonnull EffectBase parent, String keyname, @Nonnull E _default) {
 			super(parent, keyname, _default, t -> new NBTTagByte((byte) t.ordinal()), t -> _default.getDeclaringClass().getEnumConstants()[t.getInt()], NBTTagByte.class);
 		}
 
+		@Nonnull
 		@Override
 		public Entry_Type getType() {
 			return Entry_Type.BUTTON;
@@ -211,26 +218,28 @@ public abstract class Setting<V, NBT extends NBTBase> {
 	public static class Stack extends SettingFunc<ItemStack, NBTTagCompound> {
 		final Predicate<ItemStack> isValid;
 
-		public Stack(EffectBase parent, String keyname) {
+		public Stack(@Nonnull EffectBase parent, String keyname) {
 			this(parent, keyname, ItemStack.EMPTY);
 		}
 
-		public Stack(EffectBase parent, String keyname, ItemStack _default) {
+		public Stack(@Nonnull EffectBase parent, String keyname, ItemStack _default) {
 			this(parent, keyname, _default, t -> true);
 		}
 
-		public Stack(EffectBase parent, String keyname, ItemStack _default, Predicate<ItemStack> isValid) {
+		public Stack(@Nonnull EffectBase parent, String keyname, ItemStack _default, Predicate<ItemStack> isValid) {
 			super(parent, keyname, _default, t -> t.writeToNBT(new NBTTagCompound()), ItemStack::new, NBTTagCompound.class);
 			this.isValid = isValid;
 		}
 
+		@Nonnull
 		@Override
-		public ItemStack onClickWithItemStack(ItemStack currentValue, ItemStack stack, IEffectSettingsHolder holder) {
+		public ItemStack onClickWithItemStack(ItemStack currentValue, @Nonnull ItemStack stack, IEffectSettingsHolder holder) {
 			return stack.copy();
 		}
 
+		@Nonnull
 		@Override
-		public String format(ItemStack value) {
+		public String format(@Nonnull ItemStack value) {
 			if (value.isEmpty()) return "";
 			return value.getDisplayName();
 		}
@@ -240,6 +249,7 @@ public abstract class Setting<V, NBT extends NBTBase> {
 			return isValid.test(value);
 		}
 
+		@Nonnull
 		@Override
 		public Entry_Type getType() {
 			return Entry_Type.ITEMSTACK;
@@ -247,7 +257,7 @@ public abstract class Setting<V, NBT extends NBTBase> {
 	}
 
 	public static class YesNo extends SettingFunc<Boolean, NBTTagByte> {
-		public YesNo(EffectBase parent, String keyname, boolean _default) {
+		public YesNo(@Nonnull EffectBase parent, String keyname, boolean _default) {
 			super(parent, keyname, _default, t -> new NBTTagByte(t ? (byte) 1 : (byte) 0), t -> t.getInt() != 0, NBTTagByte.class);
 		}
 
@@ -256,6 +266,7 @@ public abstract class Setting<V, NBT extends NBTBase> {
 			return ImmutableList.of(Boolean.TRUE, Boolean.FALSE);
 		}
 
+		@Nonnull
 		@Override
 		public Entry_Type getType() {
 			return Entry_Type.BUTTON;
@@ -267,12 +278,13 @@ public abstract class Setting<V, NBT extends NBTBase> {
 		private final float minValue;
 		private final float maxValue;
 
-		public Slider(EffectBase parent, String keyname, float _default, float minValue, float maxValue) {
+		public Slider(@Nonnull EffectBase parent, String keyname, float _default, float minValue, float maxValue) {
 			super(parent, keyname, _default, NBTTagFloat::new, NBTTagFloat::getFloat, NBTTagFloat.class);
 			this.minValue = minValue;
 			this.maxValue = maxValue;
 		}
 
+		@Nonnull
 		@Override
 		public Entry_Type getType() {
 			return Entry_Type.SCROLL_BAR;
@@ -293,10 +305,11 @@ public abstract class Setting<V, NBT extends NBTBase> {
 	}
 
 	public static class Text extends SettingFunc<String, NBTTagString> {
-		public Text(EffectBase parent, String keyname) {
+		public Text(@Nonnull EffectBase parent, String keyname) {
 			super(parent, keyname, "", NBTTagString::new, NBTTagString::getString, NBTTagString.class);
 		}
 
+		@Nonnull
 		@Override
 		public Entry_Type getType() {
 			return Entry_Type.TEXT;
@@ -304,20 +317,21 @@ public abstract class Setting<V, NBT extends NBTBase> {
 	}
 
 	public abstract static class TextRestricted extends Text {
-		public TextRestricted(EffectBase parent, String keyname) {
+		public TextRestricted(@Nonnull EffectBase parent, String keyname) {
 			super(parent, keyname);
 		}
 
 		@Override
-		public boolean isAcceptable(String value) {
+		public boolean isAcceptable(@Nonnull String value) {
 			return value.isEmpty() || getEntries().parallelStream().map(s -> s.toLowerCase(Locale.ENGLISH)).anyMatch(s -> s.startsWith(value));
 		}
 
+		@Nullable
 		@Override
 		public abstract ArrayList<String> getEntries();
 
 		@Override
-		public String overrideInput(String input) {
+		public String overrideInput(@Nonnull String input) {
 			if (input.isEmpty()) return input;
 			String toLowerCase = input.toLowerCase(Locale.ENGLISH);
 			return getEntries().parallelStream()
@@ -331,13 +345,15 @@ public abstract class Setting<V, NBT extends NBTBase> {
 	}
 
 	public static class OreDicText extends TextRestricted {
+		@Nullable
 		ArrayList<String> ores = null;
 
-		public OreDicText(EffectBase parent, String keyname) {
+		public OreDicText(@Nonnull EffectBase parent, String keyname) {
 			super(parent, keyname);
 			MinecraftForge.EVENT_BUS.register(this);
 		}
 
+		@Nullable
 		@Override
 		public ArrayList<String> getEntries() {
 			ArrayList<String> ores = this.ores;
@@ -353,7 +369,7 @@ public abstract class Setting<V, NBT extends NBTBase> {
 		}
 
 		@Override
-		public String onClickWithItemStack(String currentValue, ItemStack stack, IEffectSettingsHolder holder) {
+		public String onClickWithItemStack(String currentValue, @Nonnull ItemStack stack, IEffectSettingsHolder holder) {
 			int[] oreIDs = OreDictionary.getOreIDs(stack);
 			if (oreIDs.length == 0) return currentValue;
 			for (int i = 0; i < (oreIDs.length - 1); i++) {

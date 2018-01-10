@@ -19,17 +19,17 @@ import net.minecraftforge.common.crafting.JsonContext;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public class PotionIngredient extends Ingredient {
+	@Nonnull
 	final Potion potion;
 	final int minLevel;
 
-	public PotionIngredient(Potion potion, int minLevel) {
+	public PotionIngredient(@Nonnull Potion potion, int minLevel) {
 		super(getValidPotions(potion, minLevel));
 		this.potion = potion;
 		this.minLevel = minLevel;
@@ -39,7 +39,7 @@ public class PotionIngredient extends Ingredient {
 		return Stream.of(Items.POTIONITEM, Items.LINGERING_POTION, Items.SPLASH_POTION);
 	}
 
-	public static ItemStack[] getValidPotions(Potion potion, int level) {
+	public static ItemStack[] getValidPotions(@Nonnull Potion potion, int level) {
 		boolean foundExact = false;
 		List<PotionType> potiontypes = Streams.stream(PotionType.REGISTRY)
 				.filter(s -> {
@@ -80,7 +80,7 @@ public class PotionIngredient extends Ingredient {
 	public static class Factory implements IIngredientFactory {
 		@Nonnull
 		@Override
-		public Ingredient parse(JsonContext context, JsonObject json) {
+		public Ingredient parse(JsonContext context, @Nonnull JsonObject json) {
 			String potionName = JsonUtils.getString(json, "potion");
 			Potion potion = Potion.REGISTRY.getObject(new ResourceLocation(potionName));
 			if (potion == null) {

@@ -27,7 +27,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public abstract class EffectItemModification extends EffectBaseThrottled {
-	Filter filter = new Filter(this);
+	final Filter filter = new Filter(this);
 
 	public EffectItemModification(String name, float baseTicksBetweenProcessing) {
 		this(name, false, false, baseTicksBetweenProcessing, 1);
@@ -43,7 +43,7 @@ public abstract class EffectItemModification extends EffectBaseThrottled {
 	}
 
 	@Override
-	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
+	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, @Nonnull World world, @Nonnull BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
 		List<TileFlowerPedastal> frameList = getPlantFrames(genome, housing, world, pos, settings);
 		Collections.shuffle(frameList);
 		for (TileFlowerPedastal plantFrame : frameList) {
@@ -61,7 +61,8 @@ public abstract class EffectItemModification extends EffectBaseThrottled {
 		}
 	}
 
-	private List<TileFlowerPedastal> getPlantFrames(@Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, World world, BlockPos pos, IEffectSettingsHolder settings) {
+	@Nonnull
+	private List<TileFlowerPedastal> getPlantFrames(@Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nonnull World world, @Nonnull BlockPos pos, IEffectSettingsHolder settings) {
 		Vec3d territory = getTerritory(genome, housing);
 
 		int x_min = MathHelper.floor(pos.getX() - territory.x);
@@ -117,6 +118,7 @@ public abstract class EffectItemModification extends EffectBaseThrottled {
 		return false;
 	}
 
+	@Nonnull
 	protected BlockFlowerPedastal.ParticleType getParticleType(IBeeGenome genome, TileFlowerPedastal plantFrame, ItemStack stack, ItemStack itemStack) {
 		return BlockFlowerPedastal.ParticleType.YELLOW;
 	}
@@ -125,7 +127,7 @@ public abstract class EffectItemModification extends EffectBaseThrottled {
 	@Nullable
 	public abstract ItemStack modifyStack(IBeeGenome genome, ItemStack stack, @Nullable IBeeHousing housing);
 
-	public boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, ItemStack oldStack, ItemStack newStack, IBeeHousing housing) {
+	public boolean shouldRelease(IBeeGenome genome, TileFlowerPedastal frame, ItemStack oldStack, @Nonnull ItemStack newStack, IBeeHousing housing) {
 		if (!acceptItemStack(newStack)) return true;
 
 		ItemStack stack = modifyStack(genome, newStack.copy(), housing);

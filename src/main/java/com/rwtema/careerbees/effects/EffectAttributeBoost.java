@@ -23,6 +23,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.DoubleUnaryOperator;
@@ -31,20 +32,21 @@ public abstract class EffectAttributeBoost extends EffectItemModification {
 	protected static final UUID ATTACK_DAMAGE_MODIFIER = UUID.fromString("CB3F55D3-645C-4F38-A497-9C13A33DB5CF");
 	protected static final UUID ATTACK_SPEED_MODIFIER = UUID.fromString("FA233E1C-4180-4865-B01B-BCCE9785ACA3");
 	private final static String attributeModifiersCustom = "AttributeModifiersCustom";
-	static HashSet<UUID> instances = new HashSet<>();
+	static final HashSet<UUID> instances = new HashSet<>();
 
 	static {
 		MinecraftForge.EVENT_BUS.register(EffectAttributeBoost.class);
 	}
 
+	@Nonnull
 	final UUID uuid;
 	final HashMap<EntityEquipmentSlot, UUID> map = new HashMap<>();
 
-	public EffectAttributeBoost(String name, float baseTicksBetweenProcessing, UUID uuid) {
+	public EffectAttributeBoost(String name, float baseTicksBetweenProcessing, @Nonnull UUID uuid) {
 		this(name, false, false, baseTicksBetweenProcessing, 1, uuid);
 	}
 
-	public EffectAttributeBoost(String name, boolean isDominant, boolean isCombinable, float baseTicksBetweenProcessing, float chanceOfProcessing, UUID uuid) {
+	public EffectAttributeBoost(String name, boolean isDominant, boolean isCombinable, float baseTicksBetweenProcessing, float chanceOfProcessing, @Nonnull UUID uuid) {
 		super(name, isDominant, isCombinable, baseTicksBetweenProcessing, chanceOfProcessing);
 		this.uuid = uuid;
 
@@ -58,23 +60,23 @@ public abstract class EffectAttributeBoost extends EffectItemModification {
 	}
 
 	@SubscribeEvent
-	public static void onSpawn(PlayerEvent.PlayerRespawnEvent event) {
+	public static void onSpawn(@Nonnull PlayerEvent.PlayerRespawnEvent event) {
 		recheckAttributes(event.player);
 	}
 
 	@SubscribeEvent
-	public static void onSpawn(PlayerEvent.PlayerLoggedInEvent event) {
+	public static void onSpawn(@Nonnull PlayerEvent.PlayerLoggedInEvent event) {
 		recheckAttributes(event.player);
 	}
 
 	@SubscribeEvent
-	public static void onInvChange(LivingEquipmentChangeEvent event) {
+	public static void onInvChange(@Nonnull LivingEquipmentChangeEvent event) {
 		recheckAttributes(event.getEntityLiving());
 	}
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public static void addTooltips(ItemTooltipEvent event) {
+	public static void addTooltips(@Nonnull ItemTooltipEvent event) {
 		ItemStack itemStack = event.getItemStack();
 		NBTTagCompound tagCompound = itemStack.getTagCompound();
 		if (tagCompound == null || !tagCompound.hasKey(attributeModifiersCustom, 9) || tagCompound.getTagList(attributeModifiersCustom, 10).tagCount() <= 0)
@@ -112,7 +114,7 @@ public abstract class EffectAttributeBoost extends EffectItemModification {
 		}
 	}
 
-	public static void recheckAttributes(EntityLivingBase entityLivingBase) {
+	public static void recheckAttributes(@Nonnull EntityLivingBase entityLivingBase) {
 		for (IAttributeInstance instance : entityLivingBase.getAttributeMap().getAllAttributes()) {
 			for (UUID uuid1 : instances) {
 				instance.removeModifier(uuid1);
@@ -128,7 +130,7 @@ public abstract class EffectAttributeBoost extends EffectItemModification {
 		}
 	}
 
-	private static HashMultimap<String, AttributeModifier> getModifiers(ItemStack stack, @Nullable EntityEquipmentSlot equipmentSlot) {
+	private static HashMultimap<String, AttributeModifier> getModifiers(@Nonnull ItemStack stack, @Nullable EntityEquipmentSlot equipmentSlot) {
 		NBTTagCompound tagCompound = stack.getTagCompound();
 		if (tagCompound != null && tagCompound.hasKey(attributeModifiersCustom, 9)) {
 			HashMultimap<String, AttributeModifier> multimap = HashMultimap.create();
@@ -150,7 +152,8 @@ public abstract class EffectAttributeBoost extends EffectItemModification {
 		return null;
 	}
 
-	public ItemStack boostStat(ItemStack stack, IAttribute attribute, @Nullable EntityEquipmentSlot slot, int operation, DoubleUnaryOperator unaryOperator, double initialMissingValue) {
+	@Nullable
+	public ItemStack boostStat(@Nonnull ItemStack stack, @Nonnull IAttribute attribute, @Nullable EntityEquipmentSlot slot, int operation, @Nonnull DoubleUnaryOperator unaryOperator, double initialMissingValue) {
 		NBTTagCompound tagCompound = stack.getTagCompound();
 		UUID uuid = map.get(slot);
 		if (tagCompound == null) {
@@ -189,7 +192,8 @@ public abstract class EffectAttributeBoost extends EffectItemModification {
 		}
 	}
 
-	private NBTTagCompound getAttributeModifierNBT(IAttribute attribute, EntityEquipmentSlot slot, AttributeModifier modifier) {
+	@Nonnull
+	private NBTTagCompound getAttributeModifierNBT(@Nonnull IAttribute attribute, @Nullable EntityEquipmentSlot slot, @Nonnull AttributeModifier modifier) {
 		NBTTagCompound nbt = SharedMonsterAttributes.writeAttributeModifierToNBT(modifier);
 		nbt.setString("AttributeName", attribute.getName());
 		if (slot != null)
@@ -201,7 +205,7 @@ public abstract class EffectAttributeBoost extends EffectItemModification {
 		return t -> t > max ? max : Math.ceil(t * granularity + mult * (max - t)) / granularity;
 	}
 
-	public static void test(DoubleUnaryOperator unaryOperator, double initialMissingValue){
+	public static void test(@Nonnull DoubleUnaryOperator unaryOperator, double initialMissingValue){
 
 		StringBuilder builder = new StringBuilder("\n");
 		double t = initialMissingValue;

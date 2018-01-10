@@ -27,7 +27,7 @@ import java.util.WeakHashMap;
 
 public class EffectAcceleration extends EffectBase {
 	public static final EffectAcceleration INSTANCE = new EffectAcceleration();
-	WeakHashMap<World, TObjectIntHashMap<BlockPos>> posToTick = new WeakHashMap<>();
+	final WeakHashMap<World, TObjectIntHashMap<BlockPos>> posToTick = new WeakHashMap<>();
 	boolean processing = false;
 
 	public EffectAcceleration() {
@@ -36,7 +36,7 @@ public class EffectAcceleration extends EffectBase {
 	}
 
 	@Override
-	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
 		TObjectIntHashMap<BlockPos> toTickPos = posToTick.computeIfAbsent(world, w -> new TObjectIntHashMap<>());
 		TileEntity tileEntity = world.getTileEntity(pos);
 		if (tileEntity instanceof ITickable) {
@@ -108,7 +108,7 @@ public class EffectAcceleration extends EffectBase {
 	}
 
 	@SubscribeEvent
-	public void worldTick(TickEvent.WorldTickEvent event) {
+	public void worldTick(@Nonnull TickEvent.WorldTickEvent event) {
 		if (processing) return;
 
 		TObjectIntHashMap<BlockPos> blockPosSet = posToTick.get(event.world);

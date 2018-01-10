@@ -5,6 +5,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.oredict.OreDictionary;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,7 +17,7 @@ public class BeeCraftingRecipe implements IBeeCraftingRecipe {
 	private final List<BeeCraftingInputEntry> inputs;
 	private final ItemStack output;
 
-	public BeeCraftingRecipe(ItemStack output, Object... inputObjects) {
+	public BeeCraftingRecipe(ItemStack output, @Nonnull Object... inputObjects) {
 		this.inputs = new ArrayList<>();
 		this.output = output;
 
@@ -31,6 +32,7 @@ public class BeeCraftingRecipe implements IBeeCraftingRecipe {
 					this.inputs.add(createWrapper(((ItemStack) input).getItem(), metadata));
 				}
 			} else if (input instanceof List) {
+				//noinspection unchecked
 				this.inputs.add(createWrapper((List) input));
 			} else if (input instanceof String) {
 				this.inputs.add(createWrapper((String) input));
@@ -43,13 +45,15 @@ public class BeeCraftingRecipe implements IBeeCraftingRecipe {
 		this.output = output;
 	}
 
-	public static BeeCraftingInputEntry createWrapper(Item item) {
+	@Nonnull
+	public static BeeCraftingInputEntry createWrapper(@Nonnull Item item) {
 		return new BeeCraftingInputEntry() {
 			@Override
-			public boolean test(ItemStack stack) {
+			public boolean test(@Nonnull ItemStack stack) {
 				return stack.getItem() == item;
 			}
 
+			@Nonnull
 			@Override
 			public List<ItemStack> getJEIInputs() {
 				NonNullList<ItemStack> list = NonNullList.create();
@@ -59,15 +63,17 @@ public class BeeCraftingRecipe implements IBeeCraftingRecipe {
 		};
 	}
 
+	@Nonnull
 	public static BeeCraftingInputEntry createWrapper(String oreName) {
 		return createWrapper(OreDictionary.getOres(oreName));
 	}
 
-	public static BeeCraftingInputEntry createWrapper(List<ItemStack> list) {
+	@Nonnull
+	public static BeeCraftingInputEntry createWrapper(@Nonnull List<ItemStack> list) {
 		return new BeeCraftingInputEntry() {
 
 			@Override
-			public boolean test(ItemStack stack) {
+			public boolean test(@Nonnull ItemStack stack) {
 				for (ItemStack matchStack : list) {
 					if (OreDictionary.itemMatches(matchStack, stack, false)) {
 						return true;
@@ -77,6 +83,7 @@ public class BeeCraftingRecipe implements IBeeCraftingRecipe {
 				return false;
 			}
 
+			@Nonnull
 			@Override
 			public List<ItemStack> getJEIInputs() {
 				return list;
@@ -84,13 +91,15 @@ public class BeeCraftingRecipe implements IBeeCraftingRecipe {
 		};
 	}
 
-	public static BeeCraftingInputEntry createWrapper(Item item, int meta) {
+	@Nonnull
+	public static BeeCraftingInputEntry createWrapper(@Nonnull Item item, int meta) {
 		return new BeeCraftingInputEntry() {
 			@Override
-			public boolean test(ItemStack stack) {
+			public boolean test(@Nonnull ItemStack stack) {
 				return stack.getItem() == item && stack.getMetadata() == meta;
 			}
 
+			@Nonnull
 			@Override
 			public List<ItemStack> getJEIInputs() {
 				return Collections.singletonList(new ItemStack(item, 1, meta));

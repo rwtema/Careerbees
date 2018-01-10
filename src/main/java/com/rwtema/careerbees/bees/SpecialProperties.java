@@ -4,7 +4,6 @@ import com.rwtema.careerbees.BeeMod;
 import com.rwtema.careerbees.lang.Lang;
 import forestry.api.apiculture.EnumBeeChromosome;
 import forestry.api.genetics.*;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.Vec3i;
 
 import javax.annotation.Nonnull;
@@ -30,23 +29,28 @@ public class SpecialProperties {
 	}
 
 
-	public static IAlleleInteger createInteger(String valName, int value, boolean isDominant, EnumBeeChromosome chromosome) {
+	@Nonnull
+	public static IAlleleInteger createInteger(String valName, int value, boolean isDominant, @Nonnull EnumBeeChromosome chromosome) {
 		return createType(AlleleManager.alleleFactory::createInteger, valName, chromosome, value, isDominant);
 	}
 
-	public static IAlleleFloat createFloat(String valName, float value, boolean isDominant, EnumBeeChromosome chromosome) {
+	@Nonnull
+	public static IAlleleFloat createFloat(String valName, float value, boolean isDominant, @Nonnull EnumBeeChromosome chromosome) {
 		return createType(AlleleManager.alleleFactory::createFloat, valName, chromosome, value, isDominant);
 	}
 
-	public static IAlleleBoolean createBoolean(String valName, boolean value, boolean isDominant, EnumBeeChromosome chromosome) {
+	@Nonnull
+	public static IAlleleBoolean createBoolean(String valName, boolean value, boolean isDominant, @Nonnull EnumBeeChromosome chromosome) {
 		return SpecialProperties.createType((modId, category, valueName, value1, isDominant1, type) -> AlleleManager.alleleFactory.createBoolean(modId, category, value1, isDominant1), valName, chromosome, value, isDominant);
 	}
 
-	public static IAlleleArea createArea(String valName, Vec3i value, boolean isDominant, EnumBeeChromosome chromosome) {
+	@Nonnull
+	public static IAlleleArea createArea(String valName, Vec3i value, boolean isDominant, @Nonnull EnumBeeChromosome chromosome) {
 		return createType(AlleleManager.alleleFactory::createArea, valName, chromosome, value, isDominant);
 	}
 
-	public static <V, K extends IAllele> K createType(RegisterType<V, K> t, String valName, EnumBeeChromosome chromosome, V value, boolean isDominant) {
+	@Nonnull
+	public static <V, K extends IAllele> K createType(@Nonnull RegisterType<V, K> t, String valName, @Nonnull EnumBeeChromosome chromosome, V value, boolean isDominant) {
 		K type = t.createType(BeeMod.MODID, chromosome.name().toLowerCase(Locale.ENGLISH), valName, value, isDominant, chromosome);
 		Lang.translate(type.getUnlocalizedName(), valName);
 		return type;
@@ -54,6 +58,7 @@ public class SpecialProperties {
 
 
 	public interface RegisterType<V, K extends IAllele> {
+		@Nonnull
 		K createType(String modId, String category, String valueName, V value, boolean isDominant, IChromosomeType type);
 	}
 }
