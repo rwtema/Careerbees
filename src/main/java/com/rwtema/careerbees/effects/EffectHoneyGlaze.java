@@ -87,7 +87,6 @@ public class EffectHoneyGlaze extends EffectFoodModify {
 						return list.stream();
 					})
 					.forEach(stack -> BeeMod.logger.info(stack.getDisplayName() + " " + calcMaxUnbound(stack, ((ItemFood) stack.getItem()))));
-			;
 		}
 
 	}

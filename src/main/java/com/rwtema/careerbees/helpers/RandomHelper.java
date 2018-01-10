@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class RandomHelper {
-	public final static EnumFacing[][] permutations = theHellIsThis();;
+	public final static EnumFacing[][] permutations = theHellIsThis();
 	public static final Random random = new Random();
 
 	private static EnumFacing[][] theHellIsThis() {
@@ -48,7 +48,7 @@ public class RandomHelper {
 							throw new RuntimeException();
 						}
 
-						oldValuesList.sort(Comparators.<EnumFacing, EnumFacing>lexicographical(Comparator.naturalOrder()));
+						oldValuesList.sort(Comparators.lexicographical(Comparator.naturalOrder()));
 						newValuesList.sort(Comparator.naturalOrder());
 
 						List<List<EnumFacing>> collect1 = Streams.zip(
@@ -62,7 +62,7 @@ public class RandomHelper {
 					}).collect(Collectors.toList());
 
 		}
-		collect.sort(Comparators.<EnumFacing, EnumFacing>lexicographical(Comparator.<EnumFacing>naturalOrder()));
+		collect.sort(Comparators.lexicographical(Comparator.naturalOrder()));
 		return collect.stream().map(s -> s.stream().toArray(EnumFacing[]::new)).toArray(EnumFacing[][]::new);
 	}
 

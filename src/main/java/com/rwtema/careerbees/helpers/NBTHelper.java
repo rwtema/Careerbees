@@ -16,7 +16,7 @@ import java.util.stream.Collector;
 
 public class NBTHelper {
 	public static <T extends NBTBase> Collector<T, ?, NBTTagList> toNBTTagList() {
-		return Collector.<T, NBTTagList>of((Supplier<NBTTagList>) NBTTagList::new,
+		return Collector.of((Supplier<NBTTagList>) NBTTagList::new,
 				NBTTagList::appendTag,
 				(nbtBases, nbtBases2) -> {
 					for (int i = 0; i < nbtBases2.tagCount(); i++) {

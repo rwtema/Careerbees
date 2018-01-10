@@ -32,7 +32,6 @@ import java.util.function.Predicate;
 public class ItemBeeGun extends Item {
 	int MAX_HONEY = 10000;
 	private CareerBeeEntry careerBeeEntry = CareerBeeSpecies.COOK;
-	;
 
 	public ItemBeeGun() {
 		setMaxStackSize(1);

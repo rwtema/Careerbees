@@ -185,7 +185,7 @@ public abstract class Setting<V, NBT extends NBTBase> {
 
 		@Override
 		public List<E> getEntries() {
-			ArrayList<E> list = Lists.<E>newArrayList((E) null);
+			ArrayList<E> list = Lists.newArrayList((E) null);
 			Collections.addAll(list, clazz.getEnumConstants());
 			return list;
 		}

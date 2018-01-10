@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nonnull;
 
 public class EntityBeeSwarm extends Entity implements IProjectile {
-	private static final DataParameter<ItemStack> ITEM = EntityDataManager.<ItemStack>createKey(EntityItem.class, DataSerializers.ITEM_STACK);
+	private static final DataParameter<ItemStack> ITEM = EntityDataManager.createKey(EntityItem.class, DataSerializers.ITEM_STACK);
 
 	public EntityBeeSwarm(World worldIn) {
 		super(worldIn);
@@ -29,7 +29,7 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 
 	public ItemStack getItem()
 	{
-		return (ItemStack)this.getDataManager().get(ITEM);
+		return this.getDataManager().get(ITEM);
 	}
 
 	public void setItem(ItemStack stack)
