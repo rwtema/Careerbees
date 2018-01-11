@@ -79,4 +79,15 @@ public class EffectLumber extends EffectWorldInteraction {
 		}
 		return false;
 	}
+
+	@Override
+	public boolean canHandleBlock(World world, BlockPos blockPos, @Nonnull IBeeGenome genome) {
+		if (world.getBlockState(blockPos).getBlock().isWood(world, blockPos)) {
+			BlockPos.MutableBlockPos topBlock = searchUpForNextNotEqual(world, blockPos, s -> world.getBlockState(s).getBlock().isWood(world, s));
+
+			IBlockState leafState = world.getBlockState(topBlock);
+			return leafState.getBlock().isLeaves(leafState, world, topBlock);
+		}
+		return false;
+	}
 }

@@ -5,7 +5,6 @@ import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
 import forestry.api.apiculture.*;
 import forestry.api.genetics.IEffectData;
 import gnu.trove.list.array.TLongArrayList;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -91,15 +90,15 @@ public abstract class EffectBaseThrottled extends EffectBase {
 
 	public abstract void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings);
 
-	public int getCooldown(@Nonnull EntityPlayer playerIn, @Nonnull IBeeGenome genome){
+	public float getCooldown(@Nonnull IBeeGenome genome, Random random){
 		float speed = genome.getSpeed();
 		float base = baseTicksBetweenProcessing / speed;
 		float result = base;
 		if(chanceOfProcessing < 1){
-			while (playerIn.world.rand.nextFloat() > chanceOfProcessing){
+			while (random.nextFloat() > chanceOfProcessing){
 				result += base;
 			}
 		}
-		return Math.round(result);
+		return result;
 	}
 }

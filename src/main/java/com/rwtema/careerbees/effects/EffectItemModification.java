@@ -11,7 +11,6 @@ import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeModifier;
 import forestry.api.genetics.IEffectData;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -26,7 +25,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public abstract class EffectItemModification extends EffectBaseThrottled {
+public abstract class EffectItemModification extends EffectBaseThrottled implements ISpecialBeeEffect.SpecialEffectItem {
 	final Filter filter = new Filter(this);
 
 	public EffectItemModification(String name, float baseTicksBetweenProcessing) {
@@ -106,15 +105,15 @@ public abstract class EffectItemModification extends EffectBaseThrottled {
 
 	@Nullable
 	@Override
-	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		return acceptItemStack(stack) ? modifyStack(genome, stack, housing) : null;
 	}
 
-	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner){
+	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing){
 		return false;
 	}
 
-	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner){
+	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing){
 		return false;
 	}
 
@@ -137,6 +136,10 @@ public abstract class EffectItemModification extends EffectBaseThrottled {
 	@Override
 	public abstract boolean acceptItemStack(ItemStack stack);
 
+	@Override
+	public boolean canHandleStack(ItemStack stack, @Nonnull IBeeGenome genome) {
+		return acceptItemStack(stack);
+	}
 
 	@Nonnull
 	@Override

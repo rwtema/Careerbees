@@ -8,7 +8,6 @@ import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
@@ -20,12 +19,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 
-public class EffectAcceleration extends EffectBase {
+public class EffectAcceleration extends EffectBase implements ISpecialBeeEffect.SpecialEffectBlock {
 	public static final EffectAcceleration INSTANCE = new EffectAcceleration();
 	final WeakHashMap<World, TObjectIntHashMap<BlockPos>> posToTick = new WeakHashMap<>();
 	boolean processing = false;
@@ -36,7 +34,12 @@ public class EffectAcceleration extends EffectBase {
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+		return true;
+	}
+
+	@Override
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		TObjectIntHashMap<BlockPos> toTickPos = posToTick.computeIfAbsent(world, w -> new TObjectIntHashMap<>());
 		TileEntity tileEntity = world.getTileEntity(pos);
 		if (tileEntity instanceof ITickable) {

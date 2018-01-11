@@ -5,7 +5,6 @@ import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeModifier;
 import forestry.api.genetics.IEffectData;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
@@ -13,12 +12,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class EffectExplosion extends EffectBaseThrottled {
+public class EffectExplosion extends EffectBaseThrottled implements ISpecialBeeEffect.SpecialEffectBlock {
 
 	public static final EffectExplosion INSTANCE = new EffectExplosion("exploding", 20, 0.05F);
 
@@ -63,7 +61,12 @@ public class EffectExplosion extends EffectBaseThrottled {
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+		return world.getTileEntity(pos) == null;
+	}
+
+	@Override
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		tryCreateSplosion(world.rand, world, pos);
 		return true;
 	}

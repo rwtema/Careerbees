@@ -6,6 +6,7 @@ import com.rwtema.careerbees.blocks.BlockAlvearyHiveFrameHolder;
 import com.rwtema.careerbees.blocks.BlockFlowerPedastal;
 import com.rwtema.careerbees.blocks.TileAlvearyHiveFrameHolder;
 import com.rwtema.careerbees.blocks.TileFlowerPedastal;
+import com.rwtema.careerbees.entity.EntityBeeSwarm;
 import com.rwtema.careerbees.entity.EntityChunkData;
 import com.rwtema.careerbees.gui.GuiHandler;
 import com.rwtema.careerbees.items.*;
@@ -31,6 +32,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -149,6 +151,8 @@ public class BeeMod {
 		GameRegistry.registerTileEntity(TileAlvearyHiveFrameHolder.class, BeeMod.MODID + ":alveary.frame");
 
 		EntityChunkData.init();
+
+		EntityRegistry.registerModEntity(new ResourceLocation(BeeMod.MODID, "beeswarm"), EntityBeeSwarm.class, "beeswarm", 1, BeeMod.instance, 64, 5, true);
 
 		proxy.preInit();
 

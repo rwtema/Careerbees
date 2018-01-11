@@ -9,7 +9,6 @@ import gnu.trove.map.hash.TIntByteHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Enchantments;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -25,13 +24,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-public class EffectDigging extends EffectBaseThrottled {
+public class EffectDigging extends EffectBaseThrottled implements ISpecialBeeEffect.SpecialEffectBlock {
 	public final static EffectDigging INSTANCE_NORMAL = new EffectDigging(DigType.NORMAL, "miner");
 	public final static EffectDigging INSTANCE_SILKY = new EffectDigging(DigType.SILKY, "miner.silky");
 	public final static EffectDigging INSTANCE_FORTUNE = new EffectDigging(DigType.FORTUNE, "miner.fortune");
@@ -96,8 +94,11 @@ public class EffectDigging extends EffectBaseThrottled {
 
 		boolean isOre = isOre(item);
 
-		if (!isOre) return false;
+		return isOre && digPosition(housing, world, pooledBlockPos, blockState, block);
 
+	}
+
+	public boolean digPosition(@Nonnull IBeeHousing housing, @Nonnull World world, @Nonnull BlockPos pooledBlockPos, IBlockState blockState, Block block) {
 		List<ItemStack> products = new ArrayList<>();
 
 		try {
@@ -171,8 +172,14 @@ public class EffectDigging extends EffectBaseThrottled {
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
-		return processPosition(housing, world, pos);
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+		return true;
+	}
+
+	@Override
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+		IBlockState blockState = world.getBlockState(pos);
+		return digPosition(housing, world, pos, blockState, blockState.getBlock());
 	}
 
 

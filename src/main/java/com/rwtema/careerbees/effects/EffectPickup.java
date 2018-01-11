@@ -7,21 +7,20 @@ import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeModifier;
 import forestry.api.genetics.IEffectData;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 
-public class EffectPickup extends EffectBaseThrottled {
+public class EffectPickup extends EffectBaseThrottled implements ISpecialBeeEffect.SpecialEffectEntity {
 	public static final EffectPickup INSTANCE = new EffectPickup("pickup", 20 * 10 / 10);
 	final Filter filter = new Filter(this);
 	final Setting.YesNo voidExcess = new Setting.YesNo(this, "voidExcess", false);
@@ -37,24 +36,37 @@ public class EffectPickup extends EffectBaseThrottled {
 		List<EntityItem> list = world.getEntitiesWithinAABB(EntityItem.class, aabb, t -> t != null && !t.isDead && !t.getItem().isEmpty() && matcher.test(t.getItem()));
 		Collections.shuffle(list);
 
+		Boolean value = voidExcess.getValue(settings);
 		for (EntityItem entityItem : list) {
-			ItemStack currentItem = entityItem.getItem();
-			ItemStack remainderAfterInsert = tryAdd(currentItem, housing.getBeeInventory());
-			if (voidExcess.getValue(settings)) {
+			grabItem(entityItem, housing, value);
+		}
+	}
+
+	public void grabItem(EntityItem entityItem, @Nonnull IBeeHousing housing, boolean voidExcess) {
+		ItemStack currentItem = entityItem.getItem();
+		ItemStack remainderAfterInsert = tryAdd(currentItem, housing.getBeeInventory());
+		if (voidExcess) {
+			entityItem.setDead();
+		} else if (remainderAfterInsert != currentItem) {
+			if (remainderAfterInsert.isEmpty()) {
 				entityItem.setDead();
-			} else if (remainderAfterInsert != currentItem) {
-				if (remainderAfterInsert.isEmpty()) {
-					entityItem.setDead();
-				} else {
-					entityItem.setItem(remainderAfterInsert);
-				}
+			} else {
+				entityItem.setItem(remainderAfterInsert);
 			}
 		}
 	}
 
-	@Nullable
 	@Override
-	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
-		return null;
+	public boolean canHandleEntity(Entity livingBase, @Nonnull IBeeGenome genome) {
+		return livingBase instanceof EntityItem;
+	}
+
+	@Override
+	public boolean handleEntityLiving(Entity livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+		if (livingBase instanceof EntityItem) {
+			grabItem((EntityItem) livingBase, housing, false);
+			return true;
+		}
+		return false;
 	}
 }

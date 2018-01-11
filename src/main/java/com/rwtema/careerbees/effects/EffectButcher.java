@@ -5,21 +5,19 @@ import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeModifier;
 import forestry.api.genetics.IEffectData;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-public class EffectButcher extends EffectBaseThrottled {
+public class EffectButcher extends EffectBaseThrottled implements ISpecialBeeEffect.SpecialEffectEntity {
 	public static final EffectButcher INSTANCE = new EffectButcher();
 	private static final Comparator<EntityAnimal> entityAnimalComparator = Comparator
 			.<EntityAnimal>
@@ -57,10 +55,16 @@ public class EffectButcher extends EffectBaseThrottled {
 		}
 	}
 
+
 	@Override
-	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean canHandleEntity(Entity livingBase, @Nonnull IBeeGenome genome) {
+		return livingBase instanceof EntityAnimal;
+	}
+
+	@Override
+	public boolean handleEntityLiving(Entity livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		if(livingBase instanceof EntityAnimal){
-			livingBase.attackEntityFrom(DamageSource.CACTUS, 100);
+			((EntityAnimal)livingBase).attackEntityFrom(DamageSource.CACTUS, 100);
 			return true;
 		}
 		return false;

@@ -4,8 +4,8 @@ import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
 import com.rwtema.careerbees.helpers.ParticleHelper;
 import forestry.api.apiculture.*;
 import forestry.api.genetics.IEffectData;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -15,10 +15,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.*;
 
-public abstract class EffectSteal<T extends EntityLivingBase> extends EffectBaseThrottled {
+public abstract class EffectSteal<T extends EntityLivingBase> extends EffectBaseThrottled implements ISpecialBeeEffect.SpecialEffectEntity {
 
 	public EffectSteal(String steal, int baseTicksBetweenProcessing) {
 		super(steal, true, false, baseTicksBetweenProcessing, 1);
@@ -95,29 +94,21 @@ public abstract class EffectSteal<T extends EntityLivingBase> extends EffectBase
 		return storedData;
 	}
 
-
-	@Override
-	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
-		return false;
+	public boolean canHandleEntity(Entity livingBase, @Nonnull IBeeGenome genome){
+		return getEntityClazz().isInstance(livingBase);
 	}
 
 	@Override
-	public boolean handleEntityLiving(@Nonnull EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean handleEntityLiving(@Nonnull Entity livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		if (getEntityClazz().isInstance(livingBase)) {
 			T t = getEntityClazz().cast(livingBase);
 			if (canHandle(t)) {
-				int count = BeeManager.armorApiaristHelper.wearsItems(livingBase, getUID(), true);
+				int count = BeeManager.armorApiaristHelper.wearsItems(getEntityClazz().cast(livingBase), getUID(), true);
 				if (count > 0 || steal(t, housing, this)) return true;
 			}
 			return true;
 		}
 		return false;
-	}
-
-	@Nullable
-	@Override
-	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
-		return null;
 	}
 
 }

@@ -2,21 +2,27 @@ package com.rwtema.careerbees.items;
 
 import com.rwtema.careerbees.bees.CareerBeeEntry;
 import com.rwtema.careerbees.bees.CareerBeeSpecies;
-import com.rwtema.careerbees.effects.EffectBase;
+import com.rwtema.careerbees.entity.EntityBeeSwarm;
 import com.rwtema.careerbees.handlers.FakeHousing;
-import forestry.api.apiculture.*;
+import forestry.api.apiculture.BeeManager;
+import forestry.api.apiculture.EnumBeeType;
+import forestry.api.apiculture.IBee;
 import forestry.api.genetics.IAllele;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
-import net.minecraft.util.math.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.MouseEvent;
@@ -24,7 +30,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,72 +59,101 @@ public class ItemBeeGun extends Item {
 			return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
 		}
 
-
-		IBeeGenome genome = bee.getGenome();
-		IAlleleBeeEffect effect = genome.getEffect();
-		if (!(effect instanceof EffectBase)) {
-			return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
-		}
-
-		EffectBase base = (EffectBase) effect;
-		int cooldown = base.getCooldown(playerIn, genome);
-		if (cooldown != 0) {
-			playerIn.getCooldownTracker().setCooldown(this, cooldown);
-		}
-
 		if (worldIn.isRemote) return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
-		Vec3i territory = genome.getTerritory();
-		int range = Math.max(Math.max(territory.getX(), territory.getY()), territory.getZ());
 
-		float f = playerIn.rotationPitch;
-		float f1 = playerIn.rotationYaw;
-		double posX = playerIn.posX;
-		double posY = playerIn.posY + (double) playerIn.getEyeHeight();
-		double posZ = playerIn.posZ;
-		Vec3d start = new Vec3d(posX, posY, posZ);
-		float f2 = MathHelper.cos(-f1 * 0.017453292F - (float) Math.PI);
-		float f3 = MathHelper.sin(-f1 * 0.017453292F - (float) Math.PI);
-		float f4 = -MathHelper.cos(-f * 0.017453292F);
-		float f5 = MathHelper.sin(-f * 0.017453292F);
-		float f6 = f3 * f4;
-		float f7 = f2 * f4;
-		Vec3d end = start.addVector((double) f6 * (double) range, (double) f5 * (double) range, (double) f7 * (double) range);
-		RayTraceResult rayTraceResult = worldIn.rayTraceBlocks(start, end, false, false, false);
+		EntityBeeSwarm swarm = new EntityBeeSwarm(worldIn, BeeManager.beeRoot.getMemberStack(bee, EnumBeeType.QUEEN), playerIn);
+		swarm.setAim(playerIn, playerIn.rotationPitch, playerIn.rotationYaw, 0.0F, 0.2F, 1.0F);
 
-		if (rayTraceResult != null) {
-			end = rayTraceResult.hitVec;
-		}
-
-		AxisAlignedBB axisAlignedBB = new AxisAlignedBB(start, end);
-
-		EntityLivingBase closest = getClosestEntityType(worldIn, start, end, axisAlignedBB, EntityLivingBase.class, t -> EntitySelectors.IS_ALIVE.test(t) && t != playerIn);
-
-		ItemStack queenStack = BeeManager.beeRoot.getMemberStack(bee, EnumBeeType.QUEEN);
-
-		if (closest != null) {
-			if (base.handleEntityLiving(closest, genome, new FakeHousingPlayer(playerIn, new BlockPos(closest), queenStack), playerIn)) {
-				return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
-			}
-		}
-
-		EntityItem closestItem = getClosestEntityType(worldIn, start, end, axisAlignedBB, EntityItem.class, t -> t != null && EntitySelectors.IS_ALIVE.test(t) && !t.getItem().isEmpty());
-		if (closestItem != null) {
-			ItemStack stack = base.handleStack(closestItem.getItem(), genome, new FakeHousingPlayer(playerIn, new BlockPos(closestItem), queenStack), playerIn);
-			if (stack != null) {
-				closestItem.setItem(stack);
-				return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
-			}
-		}
-
-		if (rayTraceResult != null) {
-			BlockPos blockPos = rayTraceResult.getBlockPos();
-			if (base.handleBlock(worldIn, blockPos, genome, new FakeHousingPlayer(playerIn, blockPos, queenStack), playerIn)) {
-				return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
-			}
-		}
+		worldIn.spawnEntity(swarm);
 
 		return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
 	}
+
+//
+//	@Nonnull
+//	@Override
+//	public ActionResult<ItemStack> onItemRightClick(@Nonnull World worldIn, EntityPlayer playerIn, EnumHand handIn) {
+//		ItemStack heldItem = playerIn.getHeldItem(handIn);
+//		IBee bee = getCurrentSelectedBee(heldItem);
+//		if (bee == null) {
+//			return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
+//		}
+//
+//
+//		IBeeGenome genome = bee.getGenome();
+//		IAlleleBeeEffect effect = genome.getEffect();
+//		if (!(effect instanceof ISpecialBeeEffect)) {
+//			return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
+//		}
+//
+//		ISpecialBeeEffect specialBeeEffect = (ISpecialBeeEffect) effect;
+//		int cooldown = Math.round(specialBeeEffect.getCooldown(genome, worldIn.rand));
+//		if (cooldown != 0) {
+//			playerIn.getCooldownTracker().setCooldown(this, cooldown);
+//		}
+//
+//		if (worldIn.isRemote) return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
+//		Vec3i territory = genome.getTerritory();
+//		int range = Math.max(Math.max(territory.getX(), territory.getY()), territory.getZ());
+//
+//		float f = playerIn.rotationPitch;
+//		float f1 = playerIn.rotationYaw;
+//		double posX = playerIn.posX;
+//		double posY = playerIn.posY + (double) playerIn.getEyeHeight();
+//		double posZ = playerIn.posZ;
+//		Vec3d start = new Vec3d(posX, posY, posZ);
+//		float f2 = MathHelper.cos(-f1 * 0.017453292F - (float) Math.PI);
+//		float f3 = MathHelper.sin(-f1 * 0.017453292F - (float) Math.PI);
+//		float f4 = -MathHelper.cos(-f * 0.017453292F);
+//		float f5 = MathHelper.sin(-f * 0.017453292F);
+//		float f6 = f3 * f4;
+//		float f7 = f2 * f4;
+//		Vec3d end = start.addVector((double) f6 * (double) range, (double) f5 * (double) range, (double) f7 * (double) range);
+//		RayTraceResult rayTraceResult = worldIn.rayTraceBlocks(start, end, false, false, false);
+//
+//		if (rayTraceResult != null) {
+//			end = rayTraceResult.hitVec;
+//		}
+//
+//		AxisAlignedBB axisAlignedBB = new AxisAlignedBB(start, end);
+//		ItemStack queenStack = BeeManager.beeRoot.getMemberStack(bee, EnumBeeType.QUEEN);
+//
+//		if (specialBeeEffect instanceof ISpecialBeeEffect.SpecialEffectEntity) {
+//			ISpecialBeeEffect.SpecialEffectEntity effectEntity = (ISpecialBeeEffect.SpecialEffectEntity) specialBeeEffect;
+//			Entity closest = getClosestEntityType(worldIn, start, end, axisAlignedBB, Entity.class, t -> EntitySelectors.IS_ALIVE.test(t) && t != playerIn && effectEntity.canHandleEntity(t, genome));
+//
+//
+//			if (closest != null) {
+//				if (effectEntity.handleEntityLiving(closest, genome, new FakeHousingPlayer(playerIn, new BlockPos(closest), queenStack))) {
+//					return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
+//				}
+//			}
+//		}
+//
+//		if (specialBeeEffect instanceof ISpecialBeeEffect.SpecialEffectItem) {
+//			ISpecialBeeEffect.SpecialEffectItem effectItem = (ISpecialBeeEffect.SpecialEffectItem) specialBeeEffect;
+//			EntityItem closestItem = getClosestEntityType(worldIn, start, end, axisAlignedBB, EntityItem.class, t -> t != null && EntitySelectors.IS_ALIVE.test(t) && !t.getItem().isEmpty() && effectItem.canHandleStack(t.getItem(), genome));
+//			if (closestItem != null) {
+//				ItemStack stack = effectItem.handleStack(closestItem.getItem(), genome, new FakeHousingPlayer(playerIn, new BlockPos(closestItem), queenStack));
+//				if (stack != null) {
+//					closestItem.setItem(stack);
+//					return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
+//				}
+//			}
+//		}
+//
+//		if (specialBeeEffect instanceof ISpecialBeeEffect.SpecialEffectBlock) {
+//			ISpecialBeeEffect.SpecialEffectBlock effectBlock = (ISpecialBeeEffect.SpecialEffectBlock) specialBeeEffect;
+//			if (rayTraceResult != null) {
+//				BlockPos blockPos = rayTraceResult.getBlockPos();
+//				if (effectBlock.canHandleBlock(worldIn, blockPos, genome) && effectBlock.handleBlock(worldIn, blockPos, genome, new FakeHousingPlayer(playerIn, blockPos, queenStack))) {
+//					return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
+//				}
+//			}
+//		}
+//
+//		return new ActionResult<>(EnumActionResult.SUCCESS, heldItem);
+//	}
 
 	@Nullable
 	public <T extends Entity> T getClosestEntityType(@Nonnull World worldIn, @Nonnull Vec3d start, @Nonnull Vec3d end, @Nonnull AxisAlignedBB axisAlignedBB, @Nonnull Class<T> clazz, @Nonnull Predicate<T> filter) {
@@ -182,11 +216,11 @@ public class ItemBeeGun extends Item {
 	}
 
 	public static class FakeHousingPlayer extends FakeHousing {
-		final EntityPlayer player;
+		final Entity player;
 		final BlockPos target;
 		final ItemStack queen;
 
-		public FakeHousingPlayer(EntityPlayer player, BlockPos target, ItemStack queen) {
+		public FakeHousingPlayer(Entity player, BlockPos target, ItemStack queen) {
 			this.player = player;
 			this.target = target;
 			this.queen = queen;
@@ -194,30 +228,16 @@ public class ItemBeeGun extends Item {
 
 		@Override
 		protected boolean addProduct(@Nonnull ItemStack product, boolean all) {
-			if (!all) {
-				return player.addItemStackToInventory(product.copy());
-			} else {
-				InventoryPlayer inventory = player.inventory;
-				int emptySlot = -1;
-				int storage = -1;
-				for (int i = 0; i < 36; i++) {
-					ItemStack stackInSlot = inventory.getStackInSlot(i);
-					if (stackInSlot.isEmpty()) {
-						emptySlot = i;
-						break;
-					} else if (ItemHandlerHelper.canItemStacksStackRelaxed(product, stackInSlot)) {
-						storage += stackInSlot.getMaxStackSize() - stackInSlot.getCount();
-						if (storage >= product.getCount()) break;
-					}
-				}
-				if (storage < product.getCount() && emptySlot == -1) return false;
-
-				if (!player.inventory.addItemStackToInventory(product.copy())) {
-					player.dropItem(product.copy(), false);
-				}
-
-				return true;
-			}
+			float f = 0.5F;
+			World world = getWorldObj();
+			BlockPos pos = getCoordinates();
+			double d0 = (double) (world.rand.nextFloat() * 0.5F) + 0.25D;
+			double d1 = (double) (world.rand.nextFloat() * 0.5F) + 0.25D;
+			double d2 = (double) (world.rand.nextFloat() * 0.5F) + 0.25D;
+			EntityItem entityitem = new EntityItem(world, (double) pos.getX() + d0, (double) pos.getY() + d1, (double) pos.getZ() + d2, product.copy());
+			entityitem.setDefaultPickupDelay();
+			world.spawnEntity(entityitem);
+			return true;
 		}
 
 		@Override

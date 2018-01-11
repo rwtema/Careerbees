@@ -7,22 +7,18 @@ import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeModifier;
 import forestry.api.genetics.IEffectData;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Predicate;
 
-public abstract class EffectBaseEntity<T extends Entity> extends EffectBaseThrottled {
+public abstract class EffectBaseEntity<T extends Entity> extends EffectBaseThrottled implements ISpecialBeeEffect.SpecialEffectEntity {
 
 	private final Predicate<T> entityPredicate;
 	private final Class<T> entityClazz;
@@ -59,18 +55,13 @@ public abstract class EffectBaseEntity<T extends Entity> extends EffectBaseThrot
 
 	protected abstract void workOnEntities(List<T> entities, IBeeGenome genome, IBeeHousing housing, Random random, IEffectSettingsHolder settings);
 
-
-	@Nullable
 	@Override
-	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
-		return null;
+	public boolean canHandleEntity(Entity livingBase, @Nonnull IBeeGenome genome) {
+		return entityClazz.isInstance(entityClazz) && entityPredicate.test(entityClazz.cast(livingBase)) ;
 	}
 
-	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner){
-		return false;
-	}
-
-	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner){
+	@Override
+	public boolean handleEntityLiving(Entity livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing){
 		if( entityClazz.isInstance(livingBase)){
 			T cast = entityClazz.cast(livingBase);
 			if (entityPredicate.test(cast)) {

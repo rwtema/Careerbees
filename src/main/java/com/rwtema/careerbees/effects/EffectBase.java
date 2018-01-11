@@ -14,8 +14,6 @@ import com.rwtema.careerbees.lang.Lang;
 import forestry.api.apiculture.*;
 import forestry.api.genetics.AlleleManager;
 import forestry.api.genetics.IEffectData;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.tileentity.TileEntity;
@@ -335,20 +333,7 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 		return Streams.stream(getAdjacentTiles(housing)).map(housing.getWorldObj()::getTileEntity).filter(Objects::nonNull).filter(tileEntityFilter).map(t -> t.getCapability(capability, null)).filter(Objects::nonNull).distinct().collect(Collectors.toList());
 	}
 
-	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
-		return false;
-	}
-
-	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
-		return false;
-	}
-
-	@Nullable
-	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
-		return null;
-	}
-
-	public int getCooldown(EntityPlayer playerIn, IBeeGenome genome){
+	public float getCooldown(IBeeGenome genome, Random random){
 		return 0;
 	}
 }

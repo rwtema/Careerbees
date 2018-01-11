@@ -4,7 +4,6 @@ import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
 import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.genetics.IEffectData;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -13,9 +12,8 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
-public class EffectPower extends EffectBase {
+public class EffectPower extends EffectBase implements ISpecialBeeEffect.SpecialEffectBlock {
 	public static final EffectPower INSTANCE = new EffectPower("rf");
 
 	public EffectPower(String rawname) {
@@ -64,7 +62,13 @@ public class EffectPower extends EffectBase {
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+		TileEntity tile = world.getTileEntity(pos);
+		return tile != null && tile.hasCapability(CapabilityEnergy.ENERGY, null);
+	}
+
+	@Override
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		TileEntity tile = world.getTileEntity(pos);
 		if (tile == null || !tile.hasCapability(CapabilityEnergy.ENERGY, null)) return false;
 		int rfRate = getRFRate(genome, housing);

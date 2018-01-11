@@ -8,7 +8,6 @@ import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeekeepingLogic;
 import forestry.api.genetics.IEffectData;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -23,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class EffectClockwork extends EffectBase {
+public class EffectClockwork extends EffectBase implements ISpecialBeeEffect.SpecialEffectBlock {
 	public static final EffectBase INSTANCE = new EffectClockwork("clockwinding");
 
 	@Nullable
@@ -86,7 +85,13 @@ public class EffectClockwork extends EffectBase {
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+		return tile != null && tile.isInstance(world.getTileEntity(pos));
+
+	}
+
+	@Override
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		if(tile == null) return false;
 
 		TileEntity tileEntity = world.getTileEntity(pos);

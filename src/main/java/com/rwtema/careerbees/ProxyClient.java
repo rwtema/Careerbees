@@ -7,8 +7,10 @@ import com.rwtema.careerbees.bees.CustomBeeModel;
 import com.rwtema.careerbees.blocks.TESRPlantFrame;
 import com.rwtema.careerbees.blocks.TileFlowerPedastal;
 import com.rwtema.careerbees.commands.CommandColors;
-import com.rwtema.careerbees.tooltip.TooltipHandler;
+import com.rwtema.careerbees.entity.EntityBeeSwarm;
+import com.rwtema.careerbees.entity.RenderBeeSwarm;
 import com.rwtema.careerbees.items.ItemIngredients;
+import com.rwtema.careerbees.tooltip.TooltipHandler;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemModelMesher;
@@ -32,6 +34,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -60,6 +63,7 @@ public class ProxyClient extends Proxy {
 
 	@Override
 	public void preInit() {
+		RenderingRegistry.registerEntityRenderingHandler(EntityBeeSwarm.class, RenderBeeSwarm::new);
 
 		registerBlockModel(BeeMod.instance.plantFrameItemBlock);
 		registerBlockModel(BeeMod.instance.alvearyHiveFrameHolderItemBlock);
@@ -98,7 +102,7 @@ public class ProxyClient extends Proxy {
 	}
 
 	@SubscribeEvent
-	public void registerTexture(@Nonnull TextureStitchEvent.Pre event){
+	public void registerTexture(@Nonnull TextureStitchEvent.Pre event) {
 		exclamation_sprite = event.getMap().registerSprite(new ResourceLocation(BeeMod.MODID, "items/exclamation"));
 	}
 

@@ -6,9 +6,6 @@ import forestry.api.apiculture.IBeeHousing;
 import forestry.api.genetics.IEffectData;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -16,10 +13,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Random;
 
-public class EffectRandomSwap extends EffectBase {
+public class EffectRandomSwap extends EffectBase implements ISpecialBeeEffect.SpecialEffectBlock {
 	public static final EffectRandomSwap INSTANCE = new EffectRandomSwap();
 
 	public EffectRandomSwap() {
@@ -43,19 +39,19 @@ public class EffectRandomSwap extends EffectBase {
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+
+		TileEntity tileEntity = world.getTileEntity(pos);
+		if (tileEntity != null) {
+			return false;
+		}
+		IBlockState state = world.getBlockState(pos);
+		return state.getBlockHardness(world, pos) >= 0 && isNormalCube(state);
+	}
+
+	@Override
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		return processPosition(world, world.rand, getAABB(genome, housing), pos);
-	}
-
-	@Override
-	public boolean handleEntityLiving(EntityLivingBase livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
-		return false;
-	}
-
-	@Nullable
-	@Override
-	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EntityPlayer owner) {
-		return null;
 	}
 
 
@@ -69,7 +65,7 @@ public class EffectRandomSwap extends EffectBase {
 		IBlockState state = worldObj.getBlockState(a);
 		float blockHardness = state.getBlockHardness(worldObj, a);
 		if (blockHardness < 0
-				|| isNonCube(state)
+				|| !isNormalCube(state)
 				)
 			return false;
 
@@ -83,7 +79,7 @@ public class EffectRandomSwap extends EffectBase {
 
 		IBlockState otherState = worldObj.getBlockState(b);
 		if (state == otherState
-				|| isNonCube(otherState)
+				|| !isNormalCube(otherState)
 				|| state.getMaterial() != otherState.getMaterial()
 				|| otherState.getBlockHardness(worldObj, b) != blockHardness)
 			return false;
@@ -98,8 +94,8 @@ public class EffectRandomSwap extends EffectBase {
 		return true;
 	}
 
-	public boolean isNonCube(@Nonnull IBlockState state) {
-		return !state.isNormalCube() || !state.isBlockNormalCube() || !state.isFullCube() || !state.isOpaqueCube() || state.getMobilityFlag() != EnumPushReaction.NORMAL || state.getBlock().hasTileEntity(state);
+	public boolean isNormalCube(@Nonnull IBlockState state) {
+		return state.isNormalCube() && state.isBlockNormalCube() && state.isFullCube() && state.isOpaqueCube() && state.getMobilityFlag() == EnumPushReaction.NORMAL && !state.getBlock().hasTileEntity(state);
 	}
 
 
