@@ -9,10 +9,13 @@ import forestry.api.apiculture.IBeeModifier;
 import forestry.api.genetics.IEffectData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nonnull;
 import java.util.Collections;
@@ -32,7 +35,8 @@ public class EffectPickup extends EffectBaseThrottled implements ISpecialBeeEffe
 	@Override
 	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, @Nonnull World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, @Nonnull IEffectSettingsHolder settings) {
 		AxisAlignedBB aabb = getAABB(genome, housing);
-		Predicate<ItemStack> matcher = filter.getMatcher(settings);
+
+		Predicate<ItemStack> matcher = getFilter(housing, world, settings, aabb, filter);
 		List<EntityItem> list = world.getEntitiesWithinAABB(EntityItem.class, aabb, t -> t != null && !t.isDead && !t.getItem().isEmpty() && matcher.test(t.getItem()));
 		Collections.shuffle(list);
 

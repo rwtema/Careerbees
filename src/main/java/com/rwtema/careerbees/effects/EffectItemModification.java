@@ -43,11 +43,13 @@ public abstract class EffectItemModification extends EffectBaseThrottled impleme
 
 	@Override
 	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, @Nonnull World world, @Nonnull BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
+		Predicate<ItemStack> matcher = getFilter(housing, world, settings, getAABB(genome, housing), filter);
+
 		List<TileFlowerPedastal> frameList = getPlantFrames(genome, housing, world, pos, settings);
 		Collections.shuffle(frameList);
 		for (TileFlowerPedastal plantFrame : frameList) {
 			ItemStack stack = plantFrame.getStack();
-			if (stack.isEmpty()) continue;
+			if (stack.isEmpty() || !matcher.test(stack)) continue;
 			ItemStack itemStack = modifyStack(genome, stack, housing);
 			if (itemStack != null) {
 				plantFrame.setStack(itemStack);

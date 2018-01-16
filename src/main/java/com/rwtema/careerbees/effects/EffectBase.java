@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.rwtema.careerbees.BeeMod;
+import com.rwtema.careerbees.effects.settings.Filter;
 import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
 import com.rwtema.careerbees.effects.settings.Setting;
 import com.rwtema.careerbees.helpers.ParticleHelper;
@@ -14,6 +15,7 @@ import com.rwtema.careerbees.lang.Lang;
 import forestry.api.apiculture.*;
 import forestry.api.genetics.AlleleManager;
 import forestry.api.genetics.IEffectData;
+import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.tileentity.TileEntity;
@@ -26,6 +28,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -336,4 +339,32 @@ public abstract class EffectBase implements IAlleleBeeEffect {
 	public float getCooldown(IBeeGenome genome, Random random){
 		return 0;
 	}
+
+
+	@Nonnull
+	public static Predicate<ItemStack> getFilter(@Nonnull IBeeHousing housing, @Nonnull World world, @Nonnull IEffectSettingsHolder settings, AxisAlignedBB aabb, Filter filter) {
+		Predicate<ItemStack> matcher = filter.getMatcher(settings);
+
+		if (matcher == Filter.DEFAULT_MATCHER) {
+			for (EntityItemFrame frame : world.getEntitiesWithinAABB(EntityItemFrame.class, aabb)) {
+				ItemStack stack = frame.getDisplayedItem();
+				if (stack.isEmpty()) continue;
+
+				BlockPos hangingPosition = frame.getHangingPosition().offset(frame.getHorizontalFacing().getOpposite());
+				TileEntity entity = world.getTileEntity(hangingPosition);
+				if (entity instanceof IBeeHousing) {
+					if (((IBeeHousing) entity).getBeeInventory() == housing.getBeeInventory()) {
+						if (matcher == Filter.DEFAULT_MATCHER) {
+							matcher = inStack -> OreDictionary.itemMatches(stack, inStack, false);
+						} else {
+							Predicate<ItemStack> prev = matcher;
+							matcher = inStack -> inStack != null && (prev.test(inStack) || OreDictionary.itemMatches(stack, inStack, false));
+						}
+					}
+				}
+			}
+		}
+		return matcher;
+	}
+
 }

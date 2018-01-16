@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 
 public class Filter {
 	@Nonnull
+	public static final Predicate<ItemStack> DEFAULT_MATCHER = s -> true;
+	@Nonnull
 	final Setting.Choice<FilterType> filterType;
 	@Nonnull
 	final Setting.Stack stack;
@@ -104,9 +106,9 @@ public class Filter {
 		return true;
 	}
 
-	@Nullable
+	@Nonnull
 	public Predicate<ItemStack> getMatcher(IEffectSettingsHolder settings) {
-		if (settings == IEffectSettingsHolder.DEFAULT_INSTANCE) return s -> true;
+		if (settings == IEffectSettingsHolder.DEFAULT_INSTANCE) return DEFAULT_MATCHER;
 
 		FilterType value = filterType.getValue(settings);
 		switch (value) {
