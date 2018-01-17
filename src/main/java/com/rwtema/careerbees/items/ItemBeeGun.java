@@ -64,7 +64,7 @@ import javax.annotation.Nullable;
 
 public class ItemBeeGun extends Item implements GuiHandler.ItemStackGuiContainer {
 	static int MAX_HONEY = 1000;
-	static int HONEY_PER_SHOT = 10;
+	static int HONEY_PER_SHOT = 2;
 	int selectedChamber;
 	@SideOnly(Side.CLIENT)
 	ItemStack curItem;
@@ -226,8 +226,9 @@ public class ItemBeeGun extends Item implements GuiHandler.ItemStackGuiContainer
 		int x0 = resolution.getScaledWidth() / 2;
 		int y0 = resolution.getScaledHeight() / 2;
 
+		GlStateManager.enableDepth();
+		GlStateManager.enableAlpha();
 		mc.getTextureManager().bindTexture(GuiBeeGun.BEEGUN_GUI_TEXTURE);
-
 		currentScreen.drawTexturedModalRect(x0 - 70 / 2, y0 - 72 / 2, 183, 14, 70, 72);
 
 		IItemHandler itemHandler = Validate.notNull(stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null));
