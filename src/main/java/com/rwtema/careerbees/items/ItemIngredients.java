@@ -375,7 +375,10 @@ public class ItemIngredients extends Item {
 //				}
 //			}
 //		},
-		INGOTHONEYCOLM(10, "ingotHoneyComb");
+		INGOTHONEYCOLM(10, "ingotHoneyComb"),
+		YING(11),
+		YANG(12)
+		;
 
 		public final int meta;
 		@Nullable

@@ -12,6 +12,7 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
+import java.util.Random;
 
 public class EffectPower extends EffectBase implements ISpecialBeeEffect.SpecialEffectBlock {
 	public static final EffectPower INSTANCE = new EffectPower("rf");
@@ -68,16 +69,24 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+	public float getCooldown(IBeeGenome genome, Random random) {
+		return Math.min(120, genome.getLifespan()) * 2 * 6;
+	}
+
+	@Override
+	public void processingTick(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		TileEntity tile = world.getTileEntity(pos);
-		if (tile == null || !tile.hasCapability(CapabilityEnergy.ENERGY, null)) return false;
-		int rfRate = getRFRate(genome, housing);
+		if (tile == null || !tile.hasCapability(CapabilityEnergy.ENERGY, null)) return;
 		IEnergyStorage storage = tile.getCapability(CapabilityEnergy.ENERGY, null);
 		if (storage != null) {
+			int rfRate = getRFRate(genome, housing);
 			storage.receiveEnergy(rfRate, false);
-			return true;
 		}
-		return false;
+	}
+
+	@Override
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+		return true;
 	}
 
 }

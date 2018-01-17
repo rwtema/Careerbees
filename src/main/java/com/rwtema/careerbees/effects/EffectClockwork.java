@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 
 public class EffectClockwork extends EffectBase implements ISpecialBeeEffect.SpecialEffectBlock {
 	public static final EffectBase INSTANCE = new EffectClockwork("clockwinding");
@@ -38,6 +39,23 @@ public class EffectClockwork extends EffectBase implements ISpecialBeeEffect.Spe
 		}
 	}
 
+	@Override
+	public void processingTick(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+		if (tile == null) return;
+
+		TileEntity tileEntity = world.getTileEntity(pos);
+		if (tile.isInstance(tileEntity)) {
+			processTile(genome, world, tileEntity);
+
+		}
+
+	}
+
+	@Override
+	public float getCooldown(IBeeGenome genome, Random random) {
+		return 20 * 10;
+	}
+
 	@Nonnull
 	@Override
 	public IEffectData doEffectBase(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, IEffectSettingsHolder settings) {
@@ -50,7 +68,7 @@ public class EffectClockwork extends EffectBase implements ISpecialBeeEffect.Spe
 		int n = 0;
 		for (TileEntity tileEntity : tiles) {
 			n++;
-			if(n == 3) break;
+			if (n == 3) break;
 			processTile(genome, worldObj, tileEntity);
 		}
 
@@ -92,7 +110,7 @@ public class EffectClockwork extends EffectBase implements ISpecialBeeEffect.Spe
 
 	@Override
 	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
-		if(tile == null) return false;
+		if (tile == null) return false;
 
 		TileEntity tileEntity = world.getTileEntity(pos);
 		if (tile.isInstance(tileEntity)) {
@@ -101,7 +119,6 @@ public class EffectClockwork extends EffectBase implements ISpecialBeeEffect.Spe
 		}
 		return false;
 	}
-
 
 
 }

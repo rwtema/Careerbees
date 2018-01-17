@@ -26,11 +26,28 @@ public interface ISpecialBeeEffect {
 		default boolean includeAirBlocks(){
 			return false;
 		}
+
+		default void processingTick(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing){
+
+		}
+
+		default float getCooldown(World world, BlockPos pos, IBeeGenome genome, Random rand){
+			return getCooldown(genome, rand);
+		}
+
 	}
 	interface SpecialEffectEntity extends ISpecialBeeEffect {
 		boolean canHandleEntity(Entity livingBase, @Nonnull IBeeGenome genome);
 
 		boolean handleEntityLiving(Entity livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing);
+
+		default void processingTick(Entity livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing){
+
+		}
+
+		default float getCooldown(Entity livingBase, IBeeGenome genome, Random rand){
+			return getCooldown(genome, rand);
+		}
 	}
 
 	interface SpecialEffectItem  extends ISpecialBeeEffect {

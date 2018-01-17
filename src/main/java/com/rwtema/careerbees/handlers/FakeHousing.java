@@ -50,17 +50,17 @@ public abstract class FakeHousing implements IBeeHousing {
 
 			@Override
 			public void setQueen(@Nonnull ItemStack itemstack) {
-				addProduct(itemstack, false);
+//				addProduct(itemstack, false);
 			}
 
 			@Override
 			public void setDrone(@Nonnull ItemStack itemstack) {
-				addProduct(itemstack, false);
+//				addProduct(itemstack, false);
 			}
 
 			@Override
 			public boolean addProduct(@Nonnull ItemStack product, boolean all) {
-				return FakeHousing.this.addProduct(product, all);
+				return FakeHousing.this.addProduct(product.copy(), all);
 			}
 		};
 	}

@@ -138,13 +138,13 @@ public class EffectDigging extends EffectBaseThrottled implements ISpecialBeeEff
 
 		}
 
-		if (addedSomething) {
-			world.playEvent(2001, pooledBlockPos, Block.getStateId(blockState));
-			world.setBlockToAir(pooledBlockPos);
-			for (ItemStack product : products) {
-				Block.spawnAsEntity(world, pooledBlockPos, product);
-			}
+
+		world.playEvent(2001, pooledBlockPos, Block.getStateId(blockState));
+		world.setBlockToAir(pooledBlockPos);
+		for (ItemStack product : products) {
+			Block.spawnAsEntity(world, pooledBlockPos, product);
 		}
+
 
 		return true;
 	}

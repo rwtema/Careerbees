@@ -32,21 +32,26 @@ public class EffectPainting extends EffectWorldInteraction {
 
 	@Override
 	protected boolean performPosEffect(@Nonnull World world, @Nonnull BlockPos blockPos, @Nonnull IBlockState state, IBeeGenome genome, IBeeHousing housing) {
-		if(!state.isOpaqueCube()) return false;
+		if (!state.isOpaqueCube()) return false;
 		Material material = state.getMaterial();
 		if (material != Material.ROCK && material != Material.IRON && material != Material.WOOD) return false;
 
-		EnumFacing horizontal = EnumFacing.HORIZONTALS[world.rand.nextInt(4)];
+		int i = world.rand.nextInt(4);
 
-		BlockPos offset = blockPos.offset(horizontal);
-		if( world.isAirBlock(offset)) {
-			EntityPainting painting = new EntityPainting(world, offset, horizontal.getOpposite());
-			if (painting.onValidSurface()) {
-				painting.playPlaceSound();
-				world.spawnEntity(painting);
-				return true;
+		for (int j = 0; j < 4; j++) {
+			EnumFacing horizontal = EnumFacing.HORIZONTALS[(i + j) % 4];
+
+			BlockPos offset = blockPos.offset(horizontal);
+			if (world.isAirBlock(offset)) {
+				EntityPainting painting = new EntityPainting(world, offset, horizontal);
+				if (painting.onValidSurface()) {
+					painting.playPlaceSound();
+					world.spawnEntity(painting);
+					return true;
+				}
 			}
 		}
+
 
 		return false;
 	}
@@ -54,17 +59,18 @@ public class EffectPainting extends EffectWorldInteraction {
 	@Override
 	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
 		IBlockState state = world.getBlockState(pos);
-		if(!state.isOpaqueCube()) return false;
+		if (!state.isOpaqueCube()) return false;
 		Material material = state.getMaterial();
 		if (material != Material.ROCK && material != Material.IRON && material != Material.WOOD) return false;
 
-		EnumFacing horizontal = EnumFacing.HORIZONTALS[world.rand.nextInt(4)];
+		for (EnumFacing horizontal : EnumFacing.HORIZONTALS) {
+			BlockPos offset = pos.offset(horizontal);
+			if (world.isAirBlock(offset)) {
+				EntityPainting painting = new EntityPainting(world, offset, horizontal);
+				if (painting.onValidSurface()) {
+					return true;
+				}
 
-		BlockPos offset = pos.offset(horizontal);
-		if( world.isAirBlock(offset)) {
-			EntityPainting painting = new EntityPainting(world, offset, horizontal.getOpposite());
-			if (painting.onValidSurface()) {
-				return true;
 			}
 		}
 

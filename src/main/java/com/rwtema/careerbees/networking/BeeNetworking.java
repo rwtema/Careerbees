@@ -2,6 +2,7 @@ package com.rwtema.careerbees.networking;
 
 import com.rwtema.careerbees.entity.EntityChunkData;
 import com.rwtema.careerbees.gui.ContainerSettings;
+import com.rwtema.careerbees.items.ItemBeeGun;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.client.Minecraft;
@@ -31,12 +32,7 @@ public class BeeNetworking {
 		};
 		net.registerMessage(genericHandler, EntityChunkData.PacketEntityChunkData.class, 0, Side.CLIENT);
 		net.registerMessage(genericHandler, ContainerSettings.MessageNBT.class, 1, Side.SERVER);
-//		net.registerMessage(MessageClearTile.Handler.class, MessageClearTile.class, 0, Side.SERVER);
-//		net.registerMessage(MessageClearTile.Handler.class, MessageClearTile.class, 0, Side.CLIENT);
-//		net.registerMessage(MessageObstruction.Handler.class, MessageObstruction.class, 1, Side.SERVER);
-//		net.registerMessage(MessageObstruction.Handler.class, MessageObstruction.class, 1, Side.CLIENT);
-//		net.registerMessage(MessageOneTimeChat.Handler.class, MessageOneTimeChat.class, 2, Side.SERVER);
-//		net.registerMessage(MessageOneTimeChat.Handler.class, MessageOneTimeChat.class, 2, Side.CLIENT);
+		net.registerMessage(genericHandler, ItemBeeGun.PacketSlotSelection.class, 2, Side.SERVER);
 	}
 
 	public abstract static class MessageBase implements IMessage {

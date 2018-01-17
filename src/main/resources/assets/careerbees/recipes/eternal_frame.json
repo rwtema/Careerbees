@@ -1,0 +1,30 @@
+{
+  "type":"forge:ore_shaped",
+  "group":"practicalbess:crafting",
+  "pattern":[
+    " c ",
+    "yfY",
+    " c "
+  ],
+  "key":{
+    "f": {
+      "item": "forestry:frame_proven"
+    },
+    "c": {
+      "item": "minecraft:clock"
+    },
+    "Y": {
+      "item": "careerbees:ingredients",
+      "data": 11
+    },
+    "y": {
+      "item": "careerbees:ingredients",
+      "data": 12
+    }
+  },
+  "result": {
+    "item": "careerbees:eternalframe",
+    "count": 1
+  }
+
+}

@@ -1,12 +1,13 @@
 package com.rwtema.careerbees.entity;
 
 import com.google.common.base.Optional;
+import com.rwtema.careerbees.ClientFunction;
+import com.rwtema.careerbees.ClientRunnable;
 import com.rwtema.careerbees.effects.ISpecialBeeEffect;
+import com.rwtema.careerbees.helpers.NBTHelper;
 import com.rwtema.careerbees.items.ItemBeeGun;
-import forestry.api.apiculture.BeeManager;
-import forestry.api.apiculture.IAlleleBeeEffect;
-import forestry.api.apiculture.IBee;
-import forestry.api.apiculture.IBeeGenome;
+import forestry.api.apiculture.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.item.EntityItem;
@@ -16,15 +17,18 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EntitySelectors;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Random;
 import java.util.function.Predicate;
 
+@SuppressWarnings("Guava")
 public class EntityBeeSwarm extends Entity implements IProjectile {
 	public static final ISpecialBeeEffect NONE = new ISpecialBeeEffect() {
 
@@ -36,22 +40,36 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 	private static final DataParameter<ItemStack> ITEM = EntityDataManager.createKey(EntityBeeSwarm.class, DataSerializers.ITEM_STACK);
 	private static final DataParameter<Optional<BlockPos>> POS = EntityDataManager.createKey(EntityBeeSwarm.class, DataSerializers.OPTIONAL_BLOCK_POS);
 	private static final DataParameter<Integer> ENTITY_ID = EntityDataManager.createKey(EntityBeeSwarm.class, DataSerializers.VARINT);
-
+	private static final ClientFunction.RunnableProvider<EntityBeeSwarm> tickerCreator = new ClientFunction.RunnableProvider<EntityBeeSwarm>() {
+		@Override
+		@SideOnly(Side.CLIENT)
+		public void tick(EntityBeeSwarm o) {
+			o.tickClient();
+		}
+	};
 	ISpecialBeeEffect cache;
+	IAlleleBeeSpecies cacheSpecies;
+	IBeeGenome cacheGenome;
+	ClientRunnable clientTicker = tickerCreator.apply(this);
+
 	@Nullable
 	Entity owner;
 	int buzzingTime = 0;
+	int searchingTime = 0;
+
+	@SideOnly(Side.CLIENT)
+	ParticleBeeSwarm[] particles;
 
 	public EntityBeeSwarm(@Nonnull World worldIn) {
 		super(worldIn);
-		this.setSize(0.5F, 0.5F);
+		this.setSize(0.1F, 0.1F);
 		noClip = true;
 	}
 
 	public EntityBeeSwarm(@Nonnull World worldIn, @Nonnull ItemStack stack, @Nonnull Entity owner) {
 		this(worldIn);
 		this.owner = owner;
-		this.setPosition(owner.posX, owner.posY + (double)owner.getEyeHeight() - 0.10000000149011612D, owner.posZ);
+		this.setPosition(owner.posX, owner.posY + (double) owner.getEyeHeight() - 0.10000000149011612D, owner.posZ);
 		this.setItem(stack.copy());
 	}
 
@@ -61,6 +79,16 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 		dataManager.register(ITEM, ItemStack.EMPTY);
 		dataManager.register(POS, Optional.absent());
 		dataManager.register(ENTITY_ID, -1);
+	}
+
+	public Optional<BlockPos> getTargetPos() {
+		return getDataManager().get(POS);
+	}
+
+	public Optional<Entity> getTargetEntity() {
+		int integer = getDataManager().get(ENTITY_ID);
+		if (integer == -1) return Optional.absent();
+		return Optional.fromNullable(world.getEntityByID(integer));
 	}
 
 	@Nonnull
@@ -75,6 +103,18 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 
 	@Override
 	protected void readEntityFromNBT(@Nonnull NBTTagCompound compound) {
+		buzzingTime = compound.getInteger("BuzzingTime");
+		searchingTime = compound.getInteger("SearchTime");
+
+		getDataManager().set(ENTITY_ID, compound.getInteger("Entity"));
+
+		if (compound.hasKey("Pos", Constants.NBT.TAG_COMPOUND)) {
+			NBTTagCompound p = compound.getCompoundTag("Pos");
+			getDataManager().set(POS, Optional.of(new BlockPos(p.getInteger("x"), p.getInteger("y"), p.getInteger("z"))));
+		} else {
+			getDataManager().set(POS, Optional.absent());
+		}
+
 		NBTTagCompound nbttagcompound = compound.getCompoundTag("Item");
 		this.setItem(new ItemStack(nbttagcompound));
 
@@ -85,22 +125,29 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 
 	@Override
 	protected void writeEntityToNBT(@Nonnull NBTTagCompound compound) {
+		compound.setInteger("BuzzingTime", buzzingTime);
+		compound.setInteger("SearchTime", searchingTime);
+		compound.setInteger("Entity", getDataManager().get(ENTITY_ID));
+
+		if (getTargetPos().isPresent()) {
+			BlockPos p = getTargetPos().get();
+			compound.setTag("Pos", NBTHelper.builder().setInteger("x", p.getX()).setInteger("y", p.getY()).setInteger("z", p.getZ()).build());
+		}
+
 		if (!this.getItem().isEmpty()) {
 			compound.setTag("Item", this.getItem().writeToNBT(new NBTTagCompound()));
 		}
 	}
 
-	public void setAim(Entity shooter, float pitch, float yaw, float p_184547_4_, float velocity, float inaccuracy)
-	{
+	public void setAim(Entity shooter, float pitch, float yaw, float p_184547_4_, float velocity, float inaccuracy) {
 		float f = -MathHelper.sin(yaw * 0.017453292F) * MathHelper.cos(pitch * 0.017453292F);
 		float f1 = -MathHelper.sin(pitch * 0.017453292F);
 		float f2 = MathHelper.cos(yaw * 0.017453292F) * MathHelper.cos(pitch * 0.017453292F);
-		this.setThrowableHeading((double)f, (double)f1, (double)f2, velocity, inaccuracy);
+		this.setThrowableHeading((double) f, (double) f1, (double) f2, velocity, inaccuracy);
 		this.motionX += shooter.motionX;
 		this.motionZ += shooter.motionZ;
 
-		if (!shooter.onGround)
-		{
+		if (!shooter.onGround) {
 			this.motionY += shooter.motionY;
 		}
 	}
@@ -131,7 +178,45 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 		super.notifyDataManagerChange(key);
 		if (key == ITEM) {
 			cache = null;
+			cacheSpecies = null;
+			cacheGenome = null;
 		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	private void tickClient() {
+		if (particles == null) {
+			particles = new ParticleBeeSwarm[8];
+		}
+		for (int i = 0; i < particles.length; i++) {
+			if (particles[i] == null || !particles[i].isAlive()) {
+				particles[i] = new ParticleBeeSwarm(world, this);
+				Minecraft.getMinecraft().effectRenderer.addEffect(particles[i]);
+			}
+		}
+
+		int id = getDataManager().get(ENTITY_ID);
+		if (id != -1) {
+			Entity entityByID = world.getEntityByID(id);
+			if (entityByID != null) {
+				setPosition(entityByID.posX, entityByID.posY, entityByID.posZ);
+				this.motionX = this.motionY = this.motionZ = 0;
+				return;
+			}
+		}
+
+		Optional<BlockPos> blockPosOptional = getDataManager().get(POS);
+		if (blockPosOptional.isPresent()) {
+			BlockPos pos = blockPosOptional.get();
+			setPosition(pos.getX(), pos.getY(), pos.getZ());
+			this.motionX = this.motionY = this.motionZ = 0;
+			return;
+		}
+
+		posX += motionX;
+		posY += motionY;
+		posZ += motionZ;
+		setPosition(posX, posY, posZ);
 	}
 
 	@Override
@@ -139,32 +224,15 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 		super.onUpdate();
 
 		ISpecialBeeEffect effect = getEffect();
+		if (effect == NONE) {
+			setDead();
+			return;
+		}
+
+
 		if (world.isRemote) {
-			world.spawnParticle(EnumParticleTypes.REDSTONE, posX, posY, posZ, 0, 0, 0);
-			int id = getDataManager().get(ENTITY_ID);
-			if (id != -1) {
-				Entity entityByID = world.getEntityByID(id);
-				if (entityByID != null) {
-					setPosition(entityByID.posX, entityByID.posY, entityByID.posZ);
-					this.motionX = this.motionY = this.motionZ = 0;
-					return;
-				}
-			}
-
-			Optional<BlockPos> blockPosOptional = getDataManager().get(POS);
-			if (blockPosOptional.isPresent()) {
-				BlockPos pos = blockPosOptional.get();
-				setPosition(pos.getX(), pos.getY(), pos.getZ());
-				this.motionX = this.motionY = this.motionZ = 0;
-				return;
-			}
-
-			posX += motionX;
-			posY += motionY;
-			posZ += motionZ;
-			setPosition(posX, posY, posZ);
+			clientTicker.run();
 		} else {
-
 			IBee member = BeeManager.beeRoot.getMember(getItem());
 			if (member == null) {
 				setDead();
@@ -172,11 +240,17 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 			}
 			IBeeGenome genome = member.getGenome();
 
+
 			int id = getDataManager().get(ENTITY_ID);
 			if (id != -1) {
 				buzzingTime++;
 				Entity entityByID = world.getEntityByID(id);
 				if (entityByID != null && !entityByID.isDead) {
+					if ((entityByID.isInWater() || world.isRainingAt(new BlockPos(entityByID))) && !genome.getToleratesRain()) {
+						setDead();
+						return;
+					}
+
 					setPosition(entityByID.posX, entityByID.posY, entityByID.posZ);
 					this.motionX = this.motionY = this.motionZ = 0;
 
@@ -185,14 +259,15 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 						if (!effectEntity.canHandleEntity(entityByID, genome)) {
 							setDead();
 						} else {
-							if (buzzingTime > effectEntity.getCooldown(genome, rand)) {
-								effectEntity.handleEntityLiving(entityByID, genome, new ItemBeeGun.FakeHousingPlayer(this, new BlockPos(entityByID), getItem()));
+							ItemBeeGun.FakeHousingPlayer housing = new ItemBeeGun.FakeHousingPlayer(this, new BlockPos(entityByID), getItem());
+							effectEntity.processingTick(entityByID, genome, housing);
+							if (buzzingTime > effectEntity.getCooldown(entityByID, genome, rand)) {
+								effectEntity.handleEntityLiving(entityByID, genome, housing);
 								setDead();
 								return;
 							}
 						}
-					}
-					else if (effect instanceof ISpecialBeeEffect.SpecialEffectItem && entityByID instanceof EntityItem) {
+					} else if (effect instanceof ISpecialBeeEffect.SpecialEffectItem && entityByID instanceof EntityItem) {
 						ISpecialBeeEffect.SpecialEffectItem effectItem = (ISpecialBeeEffect.SpecialEffectItem) effect;
 						ItemStack item = ((EntityItem) entityByID).getItem();
 						if (!effectItem.canHandleStack(item, genome)) {
@@ -227,8 +302,10 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 					if (!effectBlock.canHandleBlock(world, pos, genome)) {
 						setDead();
 					} else {
-						if (buzzingTime > effectBlock.getCooldown(genome, world.rand)) {
-							effectBlock.handleBlock(world, pos, genome, new ItemBeeGun.FakeHousingPlayer(this, pos, getItem()));
+						ItemBeeGun.FakeHousingPlayer housing = new ItemBeeGun.FakeHousingPlayer(this, pos, getItem());
+						effectBlock.processingTick(world, pos, genome, housing);
+						if (buzzingTime > effectBlock.getCooldown(world, pos, genome, world.rand)) {
+							effectBlock.handleBlock(world, pos, genome, housing);
 							setDead();
 							return;
 						}
@@ -242,6 +319,17 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 
 
 			// travelling
+			searchingTime++;
+			if (searchingTime > 2*genome.getLifespan() ) {
+				setDead();
+				return;
+			}
+
+			if ((isInWater() || world.isRainingAt(new BlockPos(this))) && !genome.getToleratesRain()) {
+				setDead();
+				return;
+			}
+
 			Vec3d start = new Vec3d(posX, posY, posZ);
 			Vec3d end = start.addVector(motionX, motionY, motionZ);
 
@@ -279,8 +367,8 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 				if (closest != null) {
 					getDataManager().set(ENTITY_ID, closest.getEntityId());
 					getDataManager().setDirty(ENTITY_ID);
+					return;
 				}
-				return;
 			}
 
 			if (trace != null) {
@@ -291,13 +379,16 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 					if (effectBlock.canHandleBlock(world, pos, genome)) {
 						getDataManager().set(POS, Optional.of(pos));
 						getDataManager().setDirty(POS);
+					} else {
+						setDead();
+						return;
 					}
 				} else {
 					setDead();
 					return;
 				}
 
-			}else{
+			} else {
 				posX += motionX;
 				posY += motionY;
 				posZ += motionZ;
@@ -347,4 +438,28 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 		return closest;
 	}
 
+	public IAlleleBeeSpecies getPrimary() {
+		IAlleleBeeSpecies cache = this.cacheSpecies;
+		if (cache == null) {
+			IBee member = BeeManager.beeRoot.getMember(getItem());
+			if (member != null) {
+				IAlleleBeeSpecies effect = member.getGenome().getPrimary();
+				this.cacheSpecies = cache = effect;
+			}
+		}
+		return cache;
+	}
+
+
+	public IBeeGenome getGenome() {
+		IBeeGenome cache = this.cacheGenome;
+		if (cache == null) {
+			IBee member = BeeManager.beeRoot.getMember(getItem());
+			if (member != null) {
+				cache = member.getGenome();
+				this.cacheGenome = cache;
+			}
+		}
+		return cache;
+	}
 }

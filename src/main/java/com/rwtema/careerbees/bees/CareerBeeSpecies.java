@@ -9,6 +9,7 @@ import com.rwtema.careerbees.colors.QuantumBeeColors;
 import com.rwtema.careerbees.colors.RainbowBeeColors;
 import com.rwtema.careerbees.effects.*;
 import com.rwtema.careerbees.helpers.StringHelper;
+import com.rwtema.careerbees.items.ItemIngredients;
 import com.rwtema.careerbees.mutations.MutationRecentExplosion;
 import com.rwtema.careerbees.recipes.PlayerSpawnHandler;
 import forestry.api.apiculture.BeeManager;
@@ -155,6 +156,11 @@ public class CareerBeeSpecies {
 	public static final CareerBeeEntry SMELTER = new CareerBeeEntry("smelter", false, "smelter:smelter", col(81, 72, 64), col(109, 81, 53))
 			.setCustomBeeModelProvider(new CustomBeeModel("smelter"))
 			.setTemplateEffect(() -> EffectSmelt.INSTANCE);
+
+	public static final CareerBeeEntry HONEY_SMELTER = new CareerBeeEntry("honey_smelter", false, "smelter:smelter", col(230,160, 10), col(120, 50, 0))
+			.setCustomBeeModelProvider(new CustomBeeModel("smelter"))
+			.setTemplateEffect(() -> EffectHoneyCombIngotConvert.INSTANCE);
+
 	public static final CareerBeeEntry ORE_CRUSHER = new CareerBeeEntry("crusher", false, "crusher:crusher", col(120, 120, 120), col(80, 80, 80))
 			.setCustomBeeModelProvider(new CustomBeeModel("saw"))
 			.setTemplateEffect(() -> EffectOreCrushing.INSTANCE);
@@ -190,7 +196,10 @@ public class CareerBeeSpecies {
 			.setTemplateAllelleBool(EnumBeeChromosome.CAVE_DWELLING, true)
 			.setTemplateAllelleString(EnumBeeChromosome.FLOWERING, "forestry.floweringFast")
 			.setTemplateAllelleString(EnumBeeChromosome.TERRITORY, "forestry.territoryAverage")
-			.setTemplateAllelleString(EnumBeeChromosome.SPEED, "forestry.speedFast");
+			.setTemplateAllelleString(EnumBeeChromosome.SPEED, "forestry.speedFast")
+			.removeVanillaProducts()
+			.addProduct(ItemIngredients.IngredientType.YING.get(), 0.1F)
+			;
 
 	public static final CareerBeeEntry QUANTUM_STRANGE = new CareerBeeEntry("quantum_strange", false, "science", col(0, 0, 0), col(255, 255, 255))
 			.setCustomBeeSpriteColourProvider(new QuantumBeeColors(3.141F, 0F, 0.5F))
@@ -204,7 +213,10 @@ public class CareerBeeSpecies {
 			.setTemplateAllelleBool(EnumBeeChromosome.CAVE_DWELLING, false)
 			.setTemplateAllelleString(EnumBeeChromosome.FLOWERING, "forestry.floweringSlow")
 			.setTemplateAllelleString(EnumBeeChromosome.TERRITORY, "forestry.territoryAverage")
-			.setTemplateAllelleString(EnumBeeChromosome.SPEED, "forestry.speedSlow");
+			.setTemplateAllelleString(EnumBeeChromosome.SPEED, "forestry.speedSlow")
+			.removeVanillaProducts()
+			.addProduct(ItemIngredients.IngredientType.YANG.get(), 0.1F)
+			;
 
 	public static final CareerBeeEntry MAD_SCIENTIST = new CareerBeeEntry("mad_scientist", false, "science", col(84, 121, 132))
 			.setCustomBeeModelProvider(new CustomBeeModel("mad_scientist"))
@@ -330,6 +342,8 @@ public class CareerBeeSpecies {
 
 		tree.add(VOCATIONAL, SMELTER, MASON, 0.5);
 		tree.add(SMELTER, ARTIST, COOK, 0.2);
+
+		tree.add(SMELTER, VOCATIONAL, HONEY_SMELTER, 0.2);
 
 		tree.add(VOCATIONAL, getFSpecies("Modest"), SMELTER, 0.5, v -> v.requireResource(BlockStateList.of(Blocks.FURNACE, Blocks.LIT_FURNACE)));
 

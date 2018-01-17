@@ -26,14 +26,36 @@ import static com.rwtema.careerbees.bees.CareerBeeSpecies.BEE_YELLOW;
 
 public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationTree.SpeciesEntry {
 	public static final List<CareerBeeEntry> BEE_ENTRIES = new ArrayList<>();
+	final List<Consumer<CustomBeeFactory>> speciesInstructions = new ArrayList<>();
 	private final String name;
 	private final boolean dominant;
 	private final String branchName;
 	private final int primaryColor;
 	private final int secondaryColor;
 	public IAlleleBeeSpecies species;
-	final List<Consumer<CustomBeeFactory>> speciesInstructions = new ArrayList<>();
 	public String modelName;
+	boolean shouldAddVanillaProducts = true;
+	private boolean isSecret;
+
+	public CareerBeeEntry(String name, boolean dominant, String branchName, int primaryColor) {
+		this(name, dominant, branchName, primaryColor, CareerBeeSpecies.BEE_YELLOW);
+	}
+
+	public CareerBeeEntry(String name, boolean dominant, String branchName, int primaryColor, int secondaryColor) {
+		BEE_ENTRIES.add(this);
+		this.name = name;
+		this.dominant = dominant;
+		this.branchName = branchName;
+		this.primaryColor = primaryColor;
+		this.secondaryColor = secondaryColor;
+		this.modelName = name;
+	}
+
+	public static float roundSig(float k, float n) {
+		if (k <= 0 || n <= 0) return 0;
+		if (k < 1) return roundSig(k * n, n) / n;
+		return Math.round(k);
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -56,21 +78,6 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 		return "CareerBeeEntry{" +
 				"name='" + name + '\'' +
 				'}';
-	}
-
-	public CareerBeeEntry(String name, boolean dominant, String branchName, int primaryColor) {
-		this(name, dominant, branchName, primaryColor, CareerBeeSpecies.BEE_YELLOW);
-	}
-
-
-	public CareerBeeEntry(String name, boolean dominant, String branchName, int primaryColor, int secondaryColor) {
-		BEE_ENTRIES.add(this);
-		this.name = name;
-		this.dominant = dominant;
-		this.branchName = branchName;
-		this.primaryColor = primaryColor;
-		this.secondaryColor = secondaryColor;
-		this.modelName = name;
 	}
 
 	@Nonnull
@@ -98,11 +105,9 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 		return this;
 	}
 
-	public final boolean isSecret(){
+	public final boolean isSecret() {
 		return isSecret;
 	}
-
-	private boolean isSecret;
 
 	@Nonnull
 	public final CareerBeeEntry setIsNotCounted() {
@@ -142,10 +147,15 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 
 	@Nonnull
 	public final CareerBeeEntry setCustomBeeModelProvider(IBeeModelProvider beeIconProvider) {
-		if(beeIconProvider instanceof CustomBeeModel){
+		if (beeIconProvider instanceof CustomBeeModel) {
 			modelName = ((CustomBeeModel) beeIconProvider).suffix;
 		}
 		speciesInstructions.add(c -> c.setCustomBeeModelProvider(beeIconProvider));
+		return this;
+	}
+
+	public final CareerBeeEntry removeVanillaProducts(){
+		shouldAddVanillaProducts  = false;
 		return this;
 	}
 
@@ -180,7 +190,8 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 	public final void build() {
 		CustomBeeFactory beeFactory = CustomBeeFactory.factory(name, dominant, branchName, primaryColor, secondaryColor);
 		speciesInstructions.forEach(c -> c.accept(beeFactory));
-		addVanillaProducts(beeFactory);
+		if (shouldAddVanillaProducts)
+			addVanillaProducts(beeFactory);
 		species = beeFactory.build();
 	}
 
@@ -209,12 +220,6 @@ public class CareerBeeEntry implements Supplier<IAlleleBeeSpecies>, BeeMutationT
 				beeFactory.addProduct(itemStackFloatEntry.getKey(), chance);
 			}
 		}
-	}
-
-	public static float roundSig(float k, float n) {
-		if (k <= 0 || n <= 0) return 0;
-		if (k < 1) return roundSig(k * n, n) / n;
-		return Math.round(k);
 	}
 
 	@Override

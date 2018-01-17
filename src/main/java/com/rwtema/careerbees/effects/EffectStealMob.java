@@ -4,6 +4,8 @@ import com.rwtema.careerbees.BeeMod;
 import com.rwtema.careerbees.helpers.NameHelper;
 import com.rwtema.careerbees.items.DelayedInsertionHelper;
 import com.rwtema.careerbees.items.ItemIngredients;
+import forestry.api.apiculture.BeeManager;
+import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeHousingInventory;
 import net.minecraft.entity.Entity;
@@ -28,13 +30,19 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class EffectStealMob extends EffectSteal<EntityLiving> {
 	public static final EffectSteal MOB = new EffectStealMob();
-
-	 @Nullable
-	 Pair<EntityLiving, IBeeHousing> housingInventoryPair = null;
+	final DamageSource bee = new DamageSource(BeeMod.MODID + ".damage.police");
 	@Nullable
+	Pair<EntityLiving, IBeeHousing> housingInventoryPair = null;
+
+	@Override
+	public float getCooldown(@Nonnull IBeeGenome genome, Random random) {
+		return 20 * 10;
+	}
+
 	final DamageSource bee_player = new DamageSource(BeeMod.MODID + ".damage.police") {
 		@Nullable
 		@Override
@@ -49,7 +57,6 @@ public class EffectStealMob extends EffectSteal<EntityLiving> {
 			return null;
 		}
 	};
-	final DamageSource bee = new DamageSource(BeeMod.MODID + ".damage.police");
 
 	{
 		MinecraftForge.EVENT_BUS.register(this);
@@ -130,7 +137,7 @@ public class EffectStealMob extends EffectSteal<EntityLiving> {
 
 	@Override
 	public boolean canHandle(EntityLiving livingBase) {
-		return livingBase instanceof IMob;
+		return livingBase instanceof IMob && livingBase.isEntityAlive();
 	}
 
 	@Nonnull
@@ -155,5 +162,21 @@ public class EffectStealMob extends EffectSteal<EntityLiving> {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public void processingTick(Entity livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+		if (livingBase instanceof EntityLiving) {
+			EntityLiving t = (EntityLiving) livingBase;
+			if (canHandle(t)) {
+				int count = BeeManager.armorApiaristHelper.wearsItems(getEntityClazz().cast(livingBase), getUID(), true);
+				if (count == 0) steal(t, housing, this);
+			}
+		}
+	}
+
+	@Override
+	public boolean handleEntityLiving(@Nonnull Entity livingBase, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+		return super.handleEntityLiving(livingBase, genome, housing);
 	}
 }

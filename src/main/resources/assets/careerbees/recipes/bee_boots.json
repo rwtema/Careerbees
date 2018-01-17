@@ -1,0 +1,17 @@
+{
+  "type":"forge:ore_shaped",
+  "group":"practicalbess:crafting",
+  "pattern":[
+    "s s",
+    "s s"
+  ],
+  "key": {
+    "s": {
+      "type": "forge:ore_dict",
+      "ore": "ingotHoneyComb"
+    }
+  },
+  "result": {
+    "item": "careerbees:bee.armor.feet"
+  }
+}

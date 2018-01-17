@@ -9,14 +9,15 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.util.EnumHelper;
+import org.apache.commons.lang3.Validate;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Locale;
 
 public class ItemBeeArmor extends ItemArmor implements IArmorApiarist {
-	@Nullable
-	private static final ArmorMaterial HONEY_MATERIAL = EnumHelper.addArmorMaterial("honeycomb", BeeMod.MODID + ":beearmor", 33, new int[]{4, 7, 9, 4}, 64, SoundEvents.ITEM_ARMOR_EQUIP_IRON, 2);
+	@Nonnull
+	private static final ArmorMaterial HONEY_MATERIAL = Validate.notNull(EnumHelper.addArmorMaterial("honeycomb", BeeMod.MODID + ":beearmor", 33, new int[]{4, 7, 9, 4}, 64, SoundEvents.ITEM_ARMOR_EQUIP_IRON, 2));
 
 
 	public ItemBeeArmor(@Nonnull EntityEquipmentSlot equipmentSlotIn) {
