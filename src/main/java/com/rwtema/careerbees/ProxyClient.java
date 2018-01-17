@@ -51,6 +51,8 @@ public class ProxyClient extends Proxy {
 	static final HashMap<TextureAtlasSprite, ModelBark> models = new HashMap<>();
 
 	public static TextureAtlasSprite exclamation_sprite;
+	public static TextureAtlasSprite beeSprite;
+	public static  TextureAtlasSprite blankSprite;
 
 	{
 		MinecraftForge.EVENT_BUS.register(this);
@@ -104,6 +106,8 @@ public class ProxyClient extends Proxy {
 	@SubscribeEvent
 	public void registerTexture(@Nonnull TextureStitchEvent.Pre event) {
 		exclamation_sprite = event.getMap().registerSprite(new ResourceLocation(BeeMod.MODID, "items/exclamation"));
+		blankSprite = event.getMap().registerSprite(new ResourceLocation(BeeMod.MODID, "items/blank"));
+		beeSprite = event.getMap().registerSprite(new ResourceLocation("forestry:entity/particles/swarm_bee"));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -163,6 +167,11 @@ public class ProxyClient extends Proxy {
 	@Override
 	public void run(@Nonnull ClientRunnable runnable) {
 		runnable.run();
+	}
+
+	@Override
+	public <R, T> R apply(ClientFunction<T, R> trClientFunction, T t) {
+		return trClientFunction.applyClient(t);
 	}
 
 	public static class ModelBark extends ModelDelegate {

@@ -30,4 +30,8 @@ public class Proxy {
 
 
 	}
+
+	public <R, T> R apply(ClientFunction<T, R> trClientFunction, T t) {
+		return trClientFunction.applyServer(t);
+	}
 }
