@@ -241,6 +241,7 @@ public class ItemBeeGun extends Item implements GuiHandler.ItemStackGuiContainer
 			int y = beeCoord[1] - (18 + 66) / 2 + y0 - 72 / 4 + 4 + 6;
 			mc.getRenderItem().renderItemAndEffectIntoGUI(mc.player, stackInSlot, x, y);
 			mc.getRenderItem().renderItemOverlayIntoGUI(currentScreen.getFontRenderer(), stackInSlot, x, y, null);
+			GlStateManager.disableLighting();
 		}
 
 		if (selectedChamber >= 0 && selectedChamber < 6) {
@@ -290,7 +291,7 @@ public class ItemBeeGun extends Item implements GuiHandler.ItemStackGuiContainer
 				} else {
 					return;
 				}
-				timeout = 20 * 2;
+				timeout = 20 * 6;
 
 				IItemHandler capability = currentItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 				ItemStack stackInSlot = capability.getStackInSlot(selectedChamber);
