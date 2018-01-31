@@ -57,7 +57,7 @@ public abstract class EffectBaseEntity<T extends Entity> extends EffectBaseThrot
 
 	@Override
 	public boolean canHandleEntity(Entity livingBase, @Nonnull IBeeGenome genome) {
-		return entityClazz.isInstance(entityClazz) && entityPredicate.test(entityClazz.cast(livingBase)) ;
+		return entityClazz.isInstance(livingBase) && entityPredicate.test(entityClazz.cast(livingBase)) ;
 	}
 
 	@Override
