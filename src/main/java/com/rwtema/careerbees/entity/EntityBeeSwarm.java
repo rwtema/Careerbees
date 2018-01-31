@@ -40,17 +40,23 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 	private static final DataParameter<ItemStack> ITEM = EntityDataManager.createKey(EntityBeeSwarm.class, DataSerializers.ITEM_STACK);
 	private static final DataParameter<Optional<BlockPos>> POS = EntityDataManager.createKey(EntityBeeSwarm.class, DataSerializers.OPTIONAL_BLOCK_POS);
 	private static final DataParameter<Integer> ENTITY_ID = EntityDataManager.createKey(EntityBeeSwarm.class, DataSerializers.VARINT);
-	private static final ClientFunction.RunnableProvider<EntityBeeSwarm> tickerCreator = new ClientFunction.RunnableProvider<EntityBeeSwarm>() {
+	private static final ClientFunction<EntityBeeSwarm, Void> ticker = new ClientFunction<EntityBeeSwarm, Void>() {
+
+		@Override
+		public Void applyServer(EntityBeeSwarm entityBeeSwarm) {
+			return null;
+		}
+
 		@Override
 		@SideOnly(Side.CLIENT)
-		public void tick(EntityBeeSwarm o) {
-			o.tickClient();
+		public Void applyClient(EntityBeeSwarm entityBeeSwarm) {
+			entityBeeSwarm.tickClient();
+			return null;
 		}
 	};
 	ISpecialBeeEffect cache;
 	IAlleleBeeSpecies cacheSpecies;
 	IBeeGenome cacheGenome;
-	ClientRunnable clientTicker = tickerCreator.apply(this);
 
 	@Nullable
 	Entity owner;
@@ -231,7 +237,7 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 
 
 		if (world.isRemote) {
-			clientTicker.run();
+			ticker.apply(this);
 		} else {
 			IBee member = BeeManager.beeRoot.getMember(getItem());
 			if (member == null) {
