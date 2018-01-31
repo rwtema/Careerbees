@@ -1,5 +1,6 @@
 package com.rwtema.careerbees.effects;
 
+import com.rwtema.careerbees.helpers.MethodAccessor;
 import com.rwtema.careerbees.helpers.PrivateHelper;
 import forestry.api.apiculture.IBeeHousing;
 import net.minecraft.entity.EntityLiving;
@@ -28,6 +29,8 @@ public class EffectStealMobTaxation extends EffectSteal<EntityLiving> {
 		super(steal, 100);
 	}
 
+	MethodAccessor.NoParams<ResourceLocation, EntityLiving> lootTableMethod = new MethodAccessor.NoParams<ResourceLocation, EntityLiving>(EntityLiving.class, "getLootTable", "func_184276_b", "func_184647_J" );
+
 	@Override
 	protected boolean steal(@Nonnull EntityLiving livingBase, @Nonnull IBeeHousing housing, EffectSteal effectSteal) {
 		List<ItemStack> grabbed_stacks = new ArrayList<>();
@@ -36,7 +39,8 @@ public class EffectStealMobTaxation extends EffectSteal<EntityLiving> {
 
 		WorldServer worldServer = (WorldServer) livingBase.world;
 
-		ResourceLocation lootTable = PrivateHelper.getLootTable(livingBase);
+
+		ResourceLocation lootTable = lootTableMethod.invoke(livingBase);
 		if (lootTable == null) return false;
 
 		LootTable loottable = livingBase.world.getLootTableManager().getLootTableFromLocation(lootTable);
