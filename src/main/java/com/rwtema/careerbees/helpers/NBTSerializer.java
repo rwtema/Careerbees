@@ -1,22 +1,28 @@
 package com.rwtema.careerbees.helpers;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.INBTSerializable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.function.*;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.ObjIntConsumer;
+import java.util.function.ToIntFunction;
 
-@SuppressWarnings("unused")
-public class NBTSerializer<T> {
+@SuppressWarnings({"unused", "Guava"})
+public class NBTSerializer<T> implements INBTSerializer<T> {
 	private static final HashMap<Class<?>, NBTSerializer<?>> clazzMap = new HashMap<>();
 	@Nonnull
 	public final List<NBTSerializerEntry<? super T>> serializers;
@@ -32,6 +38,11 @@ public class NBTSerializer<T> {
 		}
 	}
 
+	public NBTSerializer(@Nonnull List<NBTSerializerEntry<? super T>> serializers, @Nonnull Iterable<NBTSerializerEntry<? super T>> iterable) {
+		this.serializers = serializers;
+		this.iterable = iterable;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Nonnull
 	public static <T, K extends NBTBase> BiConsumer<T, NBTBase> convertSetterSerializable(@Nonnull Function<T, INBTSerializable<K>> nbtSerializable) {
@@ -41,6 +52,14 @@ public class NBTSerializer<T> {
 	@Nonnull
 	public static <T, K extends NBTBase> Function<T, NBTBase> convertGetterSerializable(@Nonnull Function<T, INBTSerializable<K>> nbtSerializable) {
 		return t -> nbtSerializable.apply(t).serializeNBT();
+	}
+
+	public static <T extends TileEntity> NBTSerializer<T> getTileEntitySeializer(Class<T> clazz) {
+		return getClassSerializer(clazz, TileEntity.class);
+	}
+
+	public static <T extends Entity> NBTSerializer<T> getEntitySeializer(Class<T> clazz) {
+		return getClassSerializer(clazz, Entity.class);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -58,7 +77,24 @@ public class NBTSerializer<T> {
 		return (NBTSerializer<T>) nbtSerializer;
 	}
 
-	public void readFromNBT(T t, @Nonnull NBTTagCompound tag) {
+	public NBTSerializer<T> getPartial(String... keys) {
+		Set<String> set = ImmutableSet.copyOf(keys);
+		//noinspection StaticPseudoFunctionalStyleMethod
+		return new NBTSerializer<T>(ImmutableList.of(), Iterables.filter(iterable, s -> set.contains(s != null ? s.key : false)));
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public <K> NBTSerializer<T> addDataManagerKey(String key, DataParameter<K> dataParameter, NBTSerializerInterface<T, K> addType) {
+		Function<Entity, K> entityKFunction = e -> e.getDataManager().get(dataParameter);
+		BiConsumer<Entity, K> entityKBiConsumer = (e, t) -> {
+			e.getDataManager().set(dataParameter, t);
+			e.getDataManager().setDirty(dataParameter);
+		};
+		return addType.invoke(this, key, (Function<T, K>) entityKFunction, (BiConsumer<T, K>) entityKBiConsumer);
+	}
+
+	public void readFromNBT(@Nonnull T t, @Nonnull NBTTagCompound tag) {
 		for (NBTSerializerEntry<? super T> serializerEntry : iterable) {
 			if (serializerEntry.expectedType == -1 ?
 					tag.hasKey(serializerEntry.key) :
@@ -70,17 +106,15 @@ public class NBTSerializer<T> {
 		}
 	}
 
+
 	@Nonnull
-	public NBTTagCompound writeToNBT(T t, @Nonnull NBTTagCompound tag) {
+	public NBTTagCompound writeToNBT(@Nonnull T t, @Nonnull NBTTagCompound tag) {
 		for (NBTSerializerEntry<? super T> serializerEntry : iterable) {
-			NBTBase apply;
-			try {
-				apply = serializerEntry.getter.apply(t);
-			} catch (Exception err) {
-				err.printStackTrace();
-				continue;
+			NBTBase apply = serializerEntry.getter.apply(t);
+
+			if (apply != null) {
+				tag.setTag(serializerEntry.key, apply);
 			}
-			tag.setTag(serializerEntry.key, apply);
 		}
 		return tag;
 	}
@@ -105,17 +139,17 @@ public class NBTSerializer<T> {
 	}
 
 	@Nonnull
-	public NBTSerializer<T> addByte(String key, @Nonnull ToByteFunction<T> getter, @Nonnull ObjByteConsumer<T> setter) {
+	public NBTSerializer<T> addByte(String key, @Nonnull Function<T, Byte> getter, @Nonnull BiConsumer<T, Byte> setter) {
 		return addEntry(new NBTSerializer.NBTSerializerEntry<>(key,
-				obj -> new NBTTagByte(getter.applyAsByte(obj)),
+				obj -> new NBTTagByte(getter.apply(obj)),
 				(t, nbtBase) -> setter.accept(t, ((NBTTagByte) nbtBase).getByte()),
 				Constants.NBT.TAG_BYTE));
 	}
 
 	@Nonnull
-	public NBTSerializer<T> addShort(String key, @Nonnull ToShortFunction<T> getter, @Nonnull ObjShortConsumer<T> setter) {
+	public NBTSerializer<T> addShort(String key, @Nonnull Function<T, Short> getter, @Nonnull BiConsumer<T, Short> setter) {
 		return addEntry(new NBTSerializer.NBTSerializerEntry<>(key,
-				obj -> new NBTTagShort(getter.applyAsShort(obj)),
+				obj -> new NBTTagShort(getter.apply(obj)),
 				(t, nbtBase) -> setter.accept(t, ((NBTTagShort) nbtBase).getShort()),
 				Constants.NBT.TAG_SHORT));
 	}
@@ -128,26 +162,33 @@ public class NBTSerializer<T> {
 				Constants.NBT.TAG_INT));
 	}
 
-	@Nonnull
-	public NBTSerializer<T> addFloat(String key, @Nonnull ToFloatFunction<T> getter, @Nonnull ObjFloatConsumer<T> setter) {
+	public NBTSerializer<T> addInteger(String key, Function<T, Integer> getter, BiConsumer<T, Integer> setter) {
 		return addEntry(new NBTSerializer.NBTSerializerEntry<>(key,
-				obj -> new NBTTagFloat(getter.applyAsFloat(obj)),
+				obj -> new NBTTagInt(getter.apply(obj)),
+				(t, nbtBase) -> setter.accept(t, ((NBTTagInt) nbtBase).getInt()),
+				Constants.NBT.TAG_INT));
+	}
+
+	@Nonnull
+	public NBTSerializer<T> addFloat(String key, @Nonnull Function<T, Float> getter, @Nonnull BiConsumer<T, Float> setter) {
+		return addEntry(new NBTSerializer.NBTSerializerEntry<>(key,
+				obj -> new NBTTagFloat(getter.apply(obj)),
 				(t, nbtBase) -> setter.accept(t, ((NBTTagFloat) nbtBase).getFloat()),
 				Constants.NBT.TAG_FLOAT));
 	}
 
 	@Nonnull
-	public NBTSerializer<T> addLong(String key, @Nonnull ToLongFunction<T> getter, @Nonnull ObjLongConsumer<T> setter) {
+	public NBTSerializer<T> addLong(String key, @Nonnull Function<T, Long> getter, @Nonnull BiConsumer<T, Long> setter) {
 		return addEntry(new NBTSerializer.NBTSerializerEntry<>(key,
-				obj -> new NBTTagLong(getter.applyAsLong(obj)),
+				obj -> new NBTTagLong(getter.apply(obj)),
 				(t, nbtBase) -> setter.accept(t, ((NBTTagLong) nbtBase).getLong()),
 				Constants.NBT.TAG_LONG));
 	}
 
 	@Nonnull
-	public NBTSerializer<T> addDouble(String key, @Nonnull ToDoubleFunction<T> getter, @Nonnull ObjDoubleConsumer<T> setter) {
+	public NBTSerializer<T> addDouble(String key, @Nonnull Function<T, Double> getter, @Nonnull BiConsumer<T, Double> setter) {
 		return addEntry(new NBTSerializer.NBTSerializerEntry<>(key,
-				obj -> new NBTTagDouble(getter.applyAsDouble(obj)),
+				obj -> new NBTTagDouble(getter.apply(obj)),
 				(t, nbtBase) -> setter.accept(t, ((NBTTagDouble) nbtBase).getDouble()),
 				Constants.NBT.TAG_DOUBLE));
 	}
@@ -190,8 +231,20 @@ public class NBTSerializer<T> {
 	}
 
 	@Nonnull
+	public NBTSerializer<T> addOptionalBlockPos(String key, @Nonnull Function<T, Optional<BlockPos>> getter, @Nonnull BiConsumer<T, Optional<BlockPos>> setter) {
+		return addEntry(new NBTSerializerEntry<>(key,
+				obj -> getter.apply(obj).transform(BlockPos::toLong).transform(NBTTagLong::new).orNull(),
+				(t1, nbtBase) -> setter.accept(t1, Optional.of(BlockPos.fromLong(((NBTPrimitive) nbtBase).getLong()))),
+				Constants.NBT.TAG_LONG));
+	}
+
+	@Nonnull
 	public NBTSerializer<T> addItemStack(String key, @Nonnull Function<T, ItemStack> getter, @Nonnull BiConsumer<T, ItemStack> setter) {
 		return addNBTTagCompound(key, t -> getter.apply(t).writeToNBT(new NBTTagCompound()), (t, nbtTagCompound) -> setter.accept(t, new ItemStack(nbtTagCompound)));
+	}
+
+	public NBTSerializer<T> addBoolean(String key, Function<T, Boolean> getter, BiConsumer<T, Boolean> setter) {
+		return addByte(key, t -> (byte) (getter.apply(t) ? 1 : 0), (t, s) -> setter.accept(t, s != 0));
 	}
 
 	@Nonnull
@@ -218,28 +271,8 @@ public class NBTSerializer<T> {
 				}, Constants.NBT.TAG_LIST));
 	}
 
-	public interface ToByteFunction<T> {
-		byte applyAsByte(T t);
-	}
-
-	public interface ToShortFunction<T> {
-		short applyAsShort(T t);
-	}
-
-	public interface ToFloatFunction<T> {
-		float applyAsFloat(T t);
-	}
-
-	public interface ObjByteConsumer<T> {
-		void accept(T t, byte value);
-	}
-
-	public interface ObjShortConsumer<T> {
-		void accept(T t, short value);
-	}
-
-	public interface ObjFloatConsumer<T> {
-		void accept(T t, float value);
+	public interface NBTSerializerInterface<T, Z> {
+		NBTSerializer<T> invoke(NBTSerializer<T> serializer, String key, Function<T, Z> getter, BiConsumer<T, Z> setter);
 	}
 
 	private static class NBTSerializerEntry<T> {
@@ -260,7 +293,8 @@ public class NBTSerializer<T> {
 			this.getter = toCopy.getter;
 			this.setter = toCopy.setter;
 			this.expectedType = toCopy.expectedType;
-
 		}
 	}
+
+
 }

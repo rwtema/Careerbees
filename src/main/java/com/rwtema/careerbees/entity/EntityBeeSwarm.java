@@ -2,9 +2,8 @@ package com.rwtema.careerbees.entity;
 
 import com.google.common.base.Optional;
 import com.rwtema.careerbees.ClientFunction;
-import com.rwtema.careerbees.ClientRunnable;
 import com.rwtema.careerbees.effects.ISpecialBeeEffect;
-import com.rwtema.careerbees.helpers.NBTHelper;
+import com.rwtema.careerbees.helpers.NBTSerializer;
 import com.rwtema.careerbees.items.ItemBeeGun;
 import forestry.api.apiculture.*;
 import net.minecraft.client.Minecraft;
@@ -19,7 +18,6 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -62,6 +60,13 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 	Entity owner;
 	int buzzingTime = 0;
 	int searchingTime = 0;
+
+	private static NBTSerializer<EntityBeeSwarm> serializer = NBTSerializer.getEntitySeializer(EntityBeeSwarm.class)
+			.addInt("BuzzingTime", e -> e.buzzingTime, (e, v) -> e.buzzingTime = v)
+			.addInt("SearchTime", e -> e.searchingTime, (e, v) -> e.searchingTime = v)
+			.addDataManagerKey("Entity", ENTITY_ID, NBTSerializer::addInteger)
+			.addDataManagerKey("Item", ITEM, NBTSerializer::addItemStack)
+			.addDataManagerKey("Pos", POS, NBTSerializer::addOptionalBlockPos);
 
 	@SideOnly(Side.CLIENT)
 	ParticleBeeSwarm[] particles;
@@ -109,20 +114,7 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 
 	@Override
 	protected void readEntityFromNBT(@Nonnull NBTTagCompound compound) {
-		buzzingTime = compound.getInteger("BuzzingTime");
-		searchingTime = compound.getInteger("SearchTime");
-
-		getDataManager().set(ENTITY_ID, compound.getInteger("Entity"));
-
-		if (compound.hasKey("Pos", Constants.NBT.TAG_COMPOUND)) {
-			NBTTagCompound p = compound.getCompoundTag("Pos");
-			getDataManager().set(POS, Optional.of(new BlockPos(p.getInteger("x"), p.getInteger("y"), p.getInteger("z"))));
-		} else {
-			getDataManager().set(POS, Optional.absent());
-		}
-
-		NBTTagCompound nbttagcompound = compound.getCompoundTag("Item");
-		this.setItem(new ItemStack(nbttagcompound));
+		serializer.readFromNBT(this, compound);
 
 		if (this.getItem().isEmpty()) {
 			this.setDead();
@@ -131,18 +123,7 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 
 	@Override
 	protected void writeEntityToNBT(@Nonnull NBTTagCompound compound) {
-		compound.setInteger("BuzzingTime", buzzingTime);
-		compound.setInteger("SearchTime", searchingTime);
-		compound.setInteger("Entity", getDataManager().get(ENTITY_ID));
-
-		if (getTargetPos().isPresent()) {
-			BlockPos p = getTargetPos().get();
-			compound.setTag("Pos", NBTHelper.builder().setInteger("x", p.getX()).setInteger("y", p.getY()).setInteger("z", p.getZ()).build());
-		}
-
-		if (!this.getItem().isEmpty()) {
-			compound.setTag("Item", this.getItem().writeToNBT(new NBTTagCompound()));
-		}
+		serializer.writeToNBT(this, compound);
 	}
 
 	public void setAim(Entity shooter, float pitch, float yaw, float p_184547_4_, float velocity, float inaccuracy) {
@@ -341,7 +322,7 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 
 			RayTraceResult trace = world.rayTraceBlocks(start, end, false, true, false);
 
-			AxisAlignedBB axisAlignedBB = new AxisAlignedBB(start, end);
+			AxisAlignedBB axisAlignedBB = new AxisAlignedBB(start.x, start.y, start.z, end.x, end.y, end.z);
 
 			if (owner != null) {
 				if (owner.isDead || !owner.getEntityBoundingBox().grow(0.5).intersects(axisAlignedBB)) {
