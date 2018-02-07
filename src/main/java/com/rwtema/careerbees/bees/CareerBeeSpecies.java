@@ -49,7 +49,11 @@ public class CareerBeeSpecies {
 			.setTemplateEffect(() -> EffectPainting.INSTANCE)
 			.setCustomBeeModelProvider(new CustomBeeModel("artist"));
 	public static final CareerBeeEntry BUISNESS = new CareerBeeEntry("buisnessman", false, "negotiator", col(40, 40, 40), col(80, 80, 80))
-			.setCustomBeeModelProvider(new CustomBeeModel("tophat"));
+			.setCustomBeeModelProvider(new CustomBeeModel("tophat"))
+			.setTemplateEffect(() -> EffectBuisness.INSTANCE);
+	public static final CareerBeeEntry JUNK = new CareerBeeEntry("junk_seller", false, "negotiator", col(179, 89, 73), col(220, 170, 94))
+			.setCustomBeeModelProvider(new CustomBeeModel("junk"))
+			.setTemplateEffect(() -> EffectBuisness.JUNK);
 	public static final CareerBeeEntry DIGGING_BASE = new CareerBeeEntry("digging", false, "digging:diggicus", col(222, 122, 20))
 			.setTemplateAllelleBool(EnumBeeChromosome.CAVE_DWELLING, true)
 			.setTemplateEffect(() -> EffectDigging.INSTANCE_NORMAL)
@@ -157,7 +161,7 @@ public class CareerBeeSpecies {
 			.setCustomBeeModelProvider(new CustomBeeModel("smelter"))
 			.setTemplateEffect(() -> EffectSmelt.INSTANCE);
 
-	public static final CareerBeeEntry HONEY_SMELTER = new CareerBeeEntry("honey_smelter", false, "smelter:smelter", col(230,160, 10), col(120, 50, 0))
+	public static final CareerBeeEntry HONEY_SMELTER = new CareerBeeEntry("honey_smelter", false, "smelter:smelter", col(230, 160, 10), col(120, 50, 0))
 			.setCustomBeeModelProvider(new CustomBeeModel("smelter"))
 			.setTemplateEffect(() -> EffectHoneyCombIngotConvert.INSTANCE);
 
@@ -198,8 +202,7 @@ public class CareerBeeSpecies {
 			.setTemplateAllelleString(EnumBeeChromosome.TERRITORY, "forestry.territoryAverage")
 			.setTemplateAllelleString(EnumBeeChromosome.SPEED, "forestry.speedFast")
 			.removeVanillaProducts()
-			.addProduct(ItemIngredients.IngredientType.YING.get(), 0.1F)
-			;
+			.addProduct(ItemIngredients.IngredientType.YING.get(), 0.1F);
 
 	public static final CareerBeeEntry QUANTUM_STRANGE = new CareerBeeEntry("quantum_strange", false, "science", col(0, 0, 0), col(255, 255, 255))
 			.setCustomBeeSpriteColourProvider(new QuantumBeeColors(3.141F, 0F, 0.5F))
@@ -215,12 +218,20 @@ public class CareerBeeSpecies {
 			.setTemplateAllelleString(EnumBeeChromosome.TERRITORY, "forestry.territoryAverage")
 			.setTemplateAllelleString(EnumBeeChromosome.SPEED, "forestry.speedSlow")
 			.removeVanillaProducts()
-			.addProduct(ItemIngredients.IngredientType.YANG.get(), 0.1F)
-			;
+			.addProduct(ItemIngredients.IngredientType.YANG.get(), 0.1F);
 
 	public static final CareerBeeEntry MAD_SCIENTIST = new CareerBeeEntry("mad_scientist", false, "science", col(84, 121, 132))
 			.setCustomBeeModelProvider(new CustomBeeModel("mad_scientist"))
 			.setTemplateEffect(() -> EffectExplosion.INSTANCE);
+
+	public static final CareerBeeEntry BENSEN = new CareerBeeEntry("bensen", true, "jazz", col(255,255,255), col(94, 46, 24))
+			.setCustomBeeModelProvider(new CustomBeeModel("bensen"))
+			.setTemplateEffect(() -> EffectJazz.INSTANCE)
+			.setIsSecret();
+//	public static final CareerBeeEntry LIGHT = new CareerBeeEntry("light", true, "glow", col(255,255,255))
+//			.setCustomBeeModelProvider(new CustomBeeModel("glow"))
+//			.setTemplateEffect(() -> EffectLumination.INSTANCE);
+
 
 
 	static final BeeMutationTree tree = new BeeMutationTree();
@@ -343,6 +354,8 @@ public class CareerBeeSpecies {
 		tree.add(VOCATIONAL, SMELTER, MASON, 0.5);
 		tree.add(SMELTER, ARTIST, COOK, 0.2);
 
+		tree.add(ARTIST, getFSpecies("Boggy") , BENSEN, 0.01);
+
 		tree.add(SMELTER, VOCATIONAL, HONEY_SMELTER, 0.2);
 
 		tree.add(VOCATIONAL, getFSpecies("Modest"), SMELTER, 0.5, v -> v.requireResource(BlockStateList.of(Blocks.FURNACE, Blocks.LIT_FURNACE)));
@@ -353,6 +366,7 @@ public class CareerBeeSpecies {
 		tree.add(PHD, getFSpecies("Industrious"), SCIENTIST, 0.2);
 
 		tree.add(PHD, getFSpecies("Imperial"), BUISNESS, 0.2);
+		tree.add(COMMON, BUISNESS, JUNK, 0.4);
 
 		tree.add(PHD, getFSpecies("Noble"), ENGINEER, 0.3);
 

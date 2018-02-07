@@ -1,0 +1,6 @@
+{
+  "parent": "forestry:item/mirror_hands",
+  "textures": {
+    "layer0": "careerbees:items/bees/bensen_queen"
+  }
+}

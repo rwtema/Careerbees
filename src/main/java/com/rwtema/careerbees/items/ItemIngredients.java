@@ -10,19 +10,20 @@ import forestry.api.apiculture.IBee;
 import forestry.api.genetics.AlleleManager;
 import forestry.api.genetics.IAllele;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.*;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
@@ -143,6 +144,13 @@ public class ItemIngredients extends Item {
 	public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
 		ItemStack stack = playerIn.getHeldItem(handIn);
 		return getIngredientType(stack).onItemRightClick(worldIn, playerIn, handIn, stack);
+	}
+
+	@Override
+	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		ItemStack stack = player.getHeldItem(hand);
+
+		return getIngredientType(stack).onItemUse(player, worldIn, pos, hand, facing, hitX, hitY, hitZ);
 	}
 
 	@Override
@@ -376,8 +384,23 @@ public class ItemIngredients extends Item {
 //			}
 //		},
 		INGOTHONEYCOLM(10, "ingotHoneyComb"),
-		YING(11),
-		YANG(12)
+		YING(11, "careerBeesYing"),
+		YANG(12, "careerBeesYang"),
+		TRIQUETRA(13){
+			@Override
+			public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+				IBlockState state = worldIn.getBlockState(pos);
+				for (IProperty prop : state.getProperties().keySet()) {
+					if (prop.getName().equals("color") && prop.getValueClass() == net.minecraft.item.EnumDyeColor.class) {
+						EnumDyeColor value = state.getValue((IProperty<EnumDyeColor>) prop);
+						EnumDyeColor next = EnumDyeColor.values()[(value.ordinal() + 1) % EnumDyeColor.values().length];
+						return state.getBlock().recolorBlock(worldIn, pos, facing, next) ? EnumActionResult.SUCCESS : EnumActionResult.FAIL;
+					}
+				}
+
+				return EnumActionResult.PASS;
+			}
+		}
 		;
 
 		public final int meta;
@@ -442,6 +465,10 @@ public class ItemIngredients extends Item {
 
 		public int getEntityLifespan(ItemStack itemStack, World world) {
 			return 6000;
+		}
+
+		public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+			return EnumActionResult.PASS;
 		}
 	}
 }
