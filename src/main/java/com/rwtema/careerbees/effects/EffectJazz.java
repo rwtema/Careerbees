@@ -70,7 +70,6 @@ public class EffectJazz extends EffectBase {
 		EntityPlayerSP player = Minecraft.getMinecraft().player;
 		Vec3d territory = getTerritory(genome, housing).scale(0.5);
 
-
 		Random random = new Random();
 
 		int time = this.time / 4;
