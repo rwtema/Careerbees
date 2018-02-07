@@ -4,6 +4,7 @@ import com.mojang.authlib.GameProfile;
 import com.rwtema.careerbees.gui.ContainerAlvearyFrame;
 import com.rwtema.careerbees.gui.GuiAlvearyFrame;
 import com.rwtema.careerbees.gui.GuiHandler;
+import com.rwtema.careerbees.helpers.NBTSerializer;
 import forestry.api.apiculture.*;
 import forestry.api.core.EnumHumidity;
 import forestry.api.core.EnumTemperature;
@@ -29,6 +30,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TileAlvearyHiveFrameHolder extends MultiblockTileEntityBase<IMultiblockLogicAlveary> implements IAlvearyComponent.BeeModifier, IAlvearyComponent.BeeListener, GuiHandler.ITileGui, IBeeHousing {
+	public static final NBTSerializer<TileAlvearyHiveFrameHolder> serializer = NBTSerializer.getTileEntitySeializer(TileAlvearyHiveFrameHolder.class)
+			.addNBTSerializable("inv", f -> f.handler)
+			;
 	private final ItemStackHandler handler = new ItemStackHandler(1) {
 		@Override
 		protected void onContentsChanged(int slot) {
@@ -229,14 +233,14 @@ public class TileAlvearyHiveFrameHolder extends MultiblockTileEntityBase<IMultib
 	@Override
 	public void readFromNBT(NBTTagCompound data) {
 		super.readFromNBT(data);
-		handler.deserializeNBT(data.getCompoundTag("inv"));
+		serializer.readFromNBT(this, data);
 	}
 
 	@Nonnull
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound data) {
 		NBTTagCompound nbtTagCompound = super.writeToNBT(data);
-		nbtTagCompound.setTag("inv", handler.serializeNBT());
+		serializer.writeToNBT(this, data);
 		return nbtTagCompound;
 	}
 

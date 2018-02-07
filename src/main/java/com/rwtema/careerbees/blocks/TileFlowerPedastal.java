@@ -2,6 +2,7 @@ package com.rwtema.careerbees.blocks;
 
 import com.rwtema.careerbees.bees.CareerBeeEntry;
 import com.rwtema.careerbees.effects.EffectBase;
+import com.rwtema.careerbees.helpers.NBTSerializer;
 import forestry.api.apiculture.IAlleleBeeEffect;
 import forestry.api.apiculture.IAlleleBeeSpecies;
 import forestry.api.apiculture.IBeeGenome;
@@ -26,9 +27,13 @@ import java.util.function.Predicate;
 
 public class TileFlowerPedastal extends TileEntity {
 	public static final HashMap<String, Predicate<ItemStack>> EFFECT_PREDICATE_MAP = new HashMap<>();
+	public static final NBTSerializer<TileFlowerPedastal> serializer = NBTSerializer.getTileEntitySeializer(TileFlowerPedastal.class)
+			.addItemStack("stack", TileFlowerPedastal::getStack, TileFlowerPedastal::setStack)
+			.addBoolean("canExtract", p -> p.canExtract, (p, s) -> p.canExtract = s)
+			.addString("speciesType", p -> p.speciesType, (p, s) -> p.speciesType = s);
+	public static final NBTSerializer<TileFlowerPedastal> updateTagSerializer = serializer.getPartial("stack", "speciesType");
 	boolean canExtract = false;
 	String speciesType = "";
-
 	@Nullable
 	final ItemStackHandler stackHandler = new ItemStackHandler(1) {
 		@Override
@@ -112,36 +117,28 @@ public class TileFlowerPedastal extends TileEntity {
 	@Override
 	public void handleUpdateTag(@Nonnull NBTTagCompound tag) {
 		super.handleUpdateTag(tag);
-		speciesType = tag.getString("speciesType");
-		ItemStack stack = new ItemStack(tag.getCompoundTag("stack"));
-		setStack(stack);
+		updateTagSerializer.readFromNBT(this, tag);
 	}
 
 	@Nonnull
 	@Override
 	public NBTTagCompound getUpdateTag() {
 		NBTTagCompound updateTag = super.getUpdateTag();
-		updateTag.setTag("stack", getStack().writeToNBT(new NBTTagCompound()));
-		updateTag.setString("speciesType", speciesType);
+		updateTagSerializer.writeToNBT(this, updateTag);
 		return updateTag;
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		super.readFromNBT(compound);
-		ItemStack stack = new ItemStack(compound.getCompoundTag("stack"));
-		setStack(stack);
-		canExtract = compound.getBoolean("canExtract");
-		speciesType = compound.getString("speciesType");
+		serializer.readFromNBT(this, compound);
 	}
 
 	@Nonnull
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		NBTTagCompound nbtTagCompound = super.writeToNBT(compound);
-		nbtTagCompound.setTag("stack", getStack().writeToNBT(new NBTTagCompound()));
-		compound.setBoolean("canExtract", canExtract);
-		compound.setString("speciesType", speciesType);
+		serializer.writeToNBT(this, nbtTagCompound);
 		return nbtTagCompound;
 	}
 
