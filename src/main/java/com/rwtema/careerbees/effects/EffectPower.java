@@ -43,11 +43,14 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 
 		int energyleft = rfrate;
 
+		BlockPos housingPos = housing.getCoordinates();
+		int x = housingPos.getX(), y = housingPos.getY(), z = housingPos.getZ();
 		for (BlockPos pos : getAdjacentTiles(housing)) {
 			World world = housing.getWorldObj();
 			TileEntity tileEntity = world.getTileEntity(pos);
 			if (tileEntity != null) {
-				IEnergyStorage energyStorage = tileEntity.getCapability(CapabilityEnergy.ENERGY, null);
+				EnumFacing side = EnumFacing.getFacingFromVector(x - pos.getX(), y - pos.getY(), z - pos.getZ());
+				IEnergyStorage energyStorage = tileEntity.getCapability(CapabilityEnergy.ENERGY, side);
 				if (energyStorage != null) {
 					energyleft -= energyStorage.receiveEnergy(energyleft, false);
 					if (energyleft <= 0) break;
