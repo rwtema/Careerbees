@@ -69,8 +69,7 @@ public class EffectPriest extends EffectItemModification {
 		}
 
 
-		IEffectData iEffectData = super.doFX(genome, storedData, housing);
-		return iEffectData;
+		return super.doFX(genome, storedData, housing);
 	}
 
 	@Nullable
