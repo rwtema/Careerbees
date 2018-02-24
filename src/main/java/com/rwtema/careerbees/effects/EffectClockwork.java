@@ -10,6 +10,7 @@ import forestry.api.genetics.IEffectData;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
@@ -40,7 +41,7 @@ public class EffectClockwork extends EffectBase implements ISpecialBeeEffect.Spe
 	}
 
 	@Override
-	public void processingTick(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+	public void processingTick(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, EnumFacing facing) {
 		if (tile == null) return;
 
 		TileEntity tileEntity = world.getTileEntity(pos);
@@ -103,13 +104,13 @@ public class EffectClockwork extends EffectBase implements ISpecialBeeEffect.Spe
 	}
 
 	@Override
-	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, EnumFacing sideHit) {
 		return tile != null && tile.isInstance(world.getTileEntity(pos));
 
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, EnumFacing facing, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		if (tile == null) return false;
 
 		TileEntity tileEntity = world.getTileEntity(pos);

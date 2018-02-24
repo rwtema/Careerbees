@@ -57,7 +57,7 @@ public class EffectPainting extends EffectWorldInteraction {
 	}
 
 	@Override
-	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, EnumFacing sideHit) {
 		IBlockState state = world.getBlockState(pos);
 		if (!state.isOpaqueCube()) return false;
 		Material material = state.getMaterial();

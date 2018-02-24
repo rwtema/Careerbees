@@ -1,5 +1,6 @@
 package com.rwtema.careerbees.entity;
 
+import forestry.apiculture.genetics.Bee;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 

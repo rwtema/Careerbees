@@ -6,6 +6,7 @@ import forestry.api.apiculture.IBeeHousing;
 import net.minecraft.block.BlockStone;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -38,7 +39,7 @@ public class EffectMason extends EffectWorldInteraction {
 	}
 
 	@Override
-	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, EnumFacing sideHit) {
 		return map.containsKey(world.getBlockState(pos));
 	}
 }

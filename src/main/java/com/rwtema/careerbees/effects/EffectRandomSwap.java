@@ -7,6 +7,7 @@ import forestry.api.genetics.IEffectData;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -39,7 +40,7 @@ public class EffectRandomSwap extends EffectBase implements ISpecialBeeEffect.Sp
 	}
 
 	@Override
-	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, EnumFacing sideHit) {
 
 		TileEntity tileEntity = world.getTileEntity(pos);
 		if (tileEntity != null) {
@@ -50,7 +51,7 @@ public class EffectRandomSwap extends EffectBase implements ISpecialBeeEffect.Sp
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, EnumFacing facing, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		return processPosition(world, world.rand, getAABB(genome, housing), pos);
 	}
 

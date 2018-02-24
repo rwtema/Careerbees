@@ -19,7 +19,7 @@ import java.util.Random;
 
 public class EffectElectrifying extends EffectBaseEntity<EntityLivingBase> {
 	@Nonnull
-	public static EffectElectrifying INSTANCE = new EffectElectrifying();
+	public static final EffectElectrifying INSTANCE = new EffectElectrifying();
 
 	@Nullable
 	EntityLivingBase currentEntity = null;
@@ -32,7 +32,7 @@ public class EffectElectrifying extends EffectBaseEntity<EntityLivingBase> {
 	@SubscribeEvent
 	public void lowerDamage(@Nonnull LivingHurtEvent event) {
 		if (event.getEntityLiving() == currentEntity) {
-			event.setAmount(event.getAmount() / 20);
+			event.setAmount(event.getAmount() / 50);
 		}
 	}
 

@@ -9,6 +9,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -34,12 +35,12 @@ public class EffectAcceleration extends EffectBase implements ISpecialBeeEffect.
 	}
 
 	@Override
-	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, EnumFacing sideHit) {
 		return true;
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, EnumFacing facing, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		TObjectIntHashMap<BlockPos> toTickPos = posToTick.computeIfAbsent(world, w -> new TObjectIntHashMap<>());
 		TileEntity tileEntity = world.getTileEntity(pos);
 		if (tileEntity instanceof ITickable) {

@@ -16,6 +16,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EntitySelectors;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -55,6 +56,7 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 	ISpecialBeeEffect cache;
 	IAlleleBeeSpecies cacheSpecies;
 	IBeeGenome cacheGenome;
+	EnumFacing facing = null;
 
 	@Nullable
 	Entity owner;
@@ -64,6 +66,7 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 	private static NBTSerializer<EntityBeeSwarm> serializer = NBTSerializer.getEntitySeializer(EntityBeeSwarm.class)
 			.addInt("BuzzingTime", e -> e.buzzingTime, (e, v) -> e.buzzingTime = v)
 			.addInt("SearchTime", e -> e.searchingTime, (e, v) -> e.searchingTime = v)
+			.addByte("Facing", e -> e.facing != null ? (byte)e.facing.ordinal() : 6, (e,v ) -> e.facing = v == 6 ? null : EnumFacing.values()[v])
 			.addDataManagerKey("Entity", ENTITY_ID, NBTSerializer::addInteger)
 			.addDataManagerKey("Item", ITEM, NBTSerializer::addItemStack)
 			.addDataManagerKey("Pos", POS, NBTSerializer::addOptionalBlockPos);
@@ -286,13 +289,13 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 				this.motionX = this.motionY = this.motionZ = 0;
 				if ((effect instanceof ISpecialBeeEffect.SpecialEffectBlock)) {
 					ISpecialBeeEffect.SpecialEffectBlock effectBlock = (ISpecialBeeEffect.SpecialEffectBlock) effect;
-					if (!effectBlock.canHandleBlock(world, pos, genome)) {
+					if (!effectBlock.canHandleBlock(world, pos, genome, facing)) {
 						setDead();
 					} else {
 						ItemBeeGun.FakeHousingPlayer housing = new ItemBeeGun.FakeHousingPlayer(this, pos, getItem());
-						effectBlock.processingTick(world, pos, genome, housing);
-						if (buzzingTime > effectBlock.getCooldown(world, pos, genome, world.rand)) {
-							effectBlock.handleBlock(world, pos, genome, housing);
+						effectBlock.processingTick(world, pos, genome, housing, facing);
+						if (buzzingTime > effectBlock.getCooldown(world, pos, genome, facing, world.rand)) {
+							effectBlock.handleBlock(world, pos, facing, genome, housing);
 							setDead();
 							return;
 						}
@@ -363,7 +366,8 @@ public class EntityBeeSwarm extends Entity implements IProjectile {
 
 				if (effect instanceof ISpecialBeeEffect.SpecialEffectBlock) {
 					ISpecialBeeEffect.SpecialEffectBlock effectBlock = (ISpecialBeeEffect.SpecialEffectBlock) effect;
-					if (effectBlock.canHandleBlock(world, pos, genome)) {
+					if (effectBlock.canHandleBlock(world, pos, genome, trace.sideHit)) {
+						this.facing = trace.sideHit;
 						getDataManager().set(POS, Optional.of(pos));
 						getDataManager().setDirty(POS);
 					} else {

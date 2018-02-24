@@ -19,9 +19,11 @@ public class SpecialProperties {
 	public static IAllele AGORAPHOBIC;
 	public static IAllele LEGENDARY_SPEED;
 	public static IAllele LEGENDARY_;
+	public static IAlleleFloat ROBO_SPEED;
 
 	public static void init() {
 		SPEED_0 = createFloat("lazy", 0.001F, true, EnumBeeChromosome.SPEED);
+		ROBO_SPEED = createFloat("robotic", 2.5F, true, EnumBeeChromosome.SPEED);
 		FERTILITY_6 = createInteger("prolific", 6, false, EnumBeeChromosome.FERTILITY);
 		FERTILITY_7 = createInteger("catholic", 7, false, EnumBeeChromosome.FERTILITY);
 		ETERNAL = createInteger("immortal", 3000, true, EnumBeeChromosome.LIFESPAN);

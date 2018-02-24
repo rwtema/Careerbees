@@ -172,12 +172,12 @@ public class EffectDigging extends EffectBaseThrottled implements ISpecialBeeEff
 	}
 
 	@Override
-	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, EnumFacing sideHit) {
 		return true;
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, EnumFacing facing, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		IBlockState blockState = world.getBlockState(pos);
 		return digPosition(housing, world, pos, blockState, blockState.getBlock());
 	}

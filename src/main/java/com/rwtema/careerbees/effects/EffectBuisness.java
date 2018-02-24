@@ -99,14 +99,14 @@ public abstract class EffectBuisness extends EffectBaseThrottled {
 		}
 	};
 
-	private static ArrayList<EntityVillager.ITradeList> trades;
+	private ArrayList<EntityVillager.ITradeList> trades;
 
 	public EffectBuisness(String name, float baseTicksBetweenProcessing) {
 		super(name, baseTicksBetweenProcessing);
 	}
 
-	public static ArrayList<EntityVillager.ITradeList> getTrades() {
-		ArrayList<EntityVillager.ITradeList> trades = EffectBuisness.trades;
+	public ArrayList<EntityVillager.ITradeList> getTrades() {
+		ArrayList<EntityVillager.ITradeList> trades = this.trades;
 		if (trades == null) {
 			trades = new ArrayList<>();
 			for (VillagerRegistry.VillagerProfession profession : GameRegistry.findRegistry(VillagerRegistry.VillagerProfession.class).getValues()) {
@@ -125,7 +125,7 @@ public abstract class EffectBuisness extends EffectBaseThrottled {
 
 				}
 			}
-			EffectBuisness.trades = trades;
+			this.trades = trades;
 		}
 		return trades;
 	}

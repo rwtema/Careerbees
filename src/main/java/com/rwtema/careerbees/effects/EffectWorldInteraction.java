@@ -6,6 +6,7 @@ import forestry.api.apiculture.IBeeHousing;
 import forestry.api.apiculture.IBeeModifier;
 import forestry.api.genetics.IEffectData;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -34,6 +35,7 @@ public abstract class EffectWorldInteraction extends EffectBaseThrottled impleme
 	public void performEffect(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, @Nonnull Random random, @Nonnull World world, BlockPos pos, IBeeModifier beeHousingModifier, IBeeModifier beeModeModifier, IEffectSettingsHolder settings) {
 		AxisAlignedBB aabb = getAABB(genome, housing);
 
+		mainLoop:
 		for (int i = 0; i < 40; i++)
 			for (int y = Math.max(0, MathHelper.floor(aabb.minY)); y <= Math.min(255, MathHelper.ceil(aabb.maxY)); y++) {
 				int x = getRand(MathHelper.floor(aabb.minX), MathHelper.ceil(aabb.maxX), random);
@@ -42,7 +44,7 @@ public abstract class EffectWorldInteraction extends EffectBaseThrottled impleme
 				BlockPos blockPos = new BlockPos(x, y, z);
 				IBlockState state = world.getBlockState(blockPos);
 				if (performPosEffect(world, blockPos, state, genome, housing))
-					break;
+						break mainLoop;
 			}
 	}
 
@@ -50,7 +52,7 @@ public abstract class EffectWorldInteraction extends EffectBaseThrottled impleme
 
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, EnumFacing facing, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		IBlockState blockState = world.getBlockState(pos);
 		return performPosEffect(world, pos, blockState, genome, housing);
 	}

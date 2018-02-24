@@ -4,6 +4,7 @@ import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -19,19 +20,19 @@ public interface ISpecialBeeEffect {
 	}
 
 	interface SpecialEffectBlock extends ISpecialBeeEffect {
-		boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome);
+		boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nullable EnumFacing sideHit);
 
-		boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing);
+		boolean handleBlock(World world, BlockPos pos, @Nullable EnumFacing facing, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing);
 
 		default boolean includeAirBlocks(){
 			return false;
 		}
 
-		default void processingTick(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing){
+		default void processingTick(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nullable EnumFacing facing){
 
 		}
 
-		default float getCooldown(World world, BlockPos pos, IBeeGenome genome, Random rand){
+		default float getCooldown(World world, BlockPos pos, IBeeGenome genome, @Nullable EnumFacing facing, Random rand){
 			return getCooldown(genome, rand);
 		}
 

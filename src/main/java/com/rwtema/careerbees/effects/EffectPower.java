@@ -5,6 +5,7 @@ import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
 import forestry.api.genetics.IEffectData;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -63,7 +64,7 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 	}
 
 	@Override
-	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome) {
+	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, EnumFacing sideHit) {
 		TileEntity tile = world.getTileEntity(pos);
 		return tile != null && tile.hasCapability(CapabilityEnergy.ENERGY, null);
 	}
@@ -74,7 +75,7 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 	}
 
 	@Override
-	public void processingTick(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+	public void processingTick(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, EnumFacing facing) {
 		TileEntity tile = world.getTileEntity(pos);
 		if (tile == null || !tile.hasCapability(CapabilityEnergy.ENERGY, null)) return;
 		IEnergyStorage storage = tile.getCapability(CapabilityEnergy.ENERGY, null);
@@ -85,7 +86,7 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 	}
 
 	@Override
-	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+	public boolean handleBlock(@Nonnull World world, @Nonnull BlockPos pos, EnumFacing facing, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
 		return true;
 	}
 

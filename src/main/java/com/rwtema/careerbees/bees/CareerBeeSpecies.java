@@ -232,6 +232,33 @@ public class CareerBeeSpecies {
 //			.setCustomBeeModelProvider(new CustomBeeModel("glow"))
 //			.setTemplateEffect(() -> EffectLumination.INSTANCE);
 
+	public static final CareerBeeEntry ELECTRICIAN = new CareerBeeEntry("electrician", false, "lightning", col(255,253,234 ) )
+			.setCustomBeeModelProvider(new CustomBeeModel("electrician"))
+			.setTemplateEffect(()-> EffectElectrifying.INSTANCE);
+
+	public static final CareerBeeEntry ASSASSIN = new CareerBeeEntry("assassin", false, "stab", col(144,47,153))
+			.setCustomBeeModelProvider(new CustomBeeModel("assassin"))
+			.setTemplateEffect(() -> EffectAssassin.INSTANCE);
+
+	public static final CareerBeeEntry ROBOT = new CareerBeeEntry("robot", false, "beepboop", col(70,76,81),col(151,175,200))
+			.setCustomBeeModelProvider(new CustomBeeModel("bender"))
+			.setTemplate(EnumBeeChromosome.SPEED, () -> SpecialProperties.ROBO_SPEED);
+
+	public static final CareerBeeEntry DEVIL = new CareerBeeEntry("devil", false, "evil", col(76,0,0),col(255,0,0))
+			.setCustomBeeModelProvider(new CustomBeeModel("devil"))
+			.setTemplateEffect(() -> EffectBurning.INSTANCE);
+
+	public static final CareerBeeEntry PRIEST = new CareerBeeEntry("priest", false, "priestly", col(144,47,153))
+			.setCustomBeeModelProvider(new CustomBeeModel("priest"))
+			.setTemplateEffect(() -> EffectPriest.INSTANCE);
+
+	public static final CareerBeeEntry POLITICIAN = new CareerBeeEntry("politician", false, "evil", col(43,69,145))
+			.setCustomBeeModelProvider(new CustomBeeModel("politician"))
+			.setTemplateEffect(() -> EffectPolitics.INSTANCE);
+
+	public static final CareerBeeEntry NCA = new CareerBeeEntry("nca", false, "evil", col(91,212,75),col(26,171,25))
+			.setCustomBeeModelProvider(new CustomBeeModel("creeper"))
+			.setTemplateEffect(() -> EffectCreeper.INSTANCE);
 
 
 	static final BeeMutationTree tree = new BeeMutationTree();
@@ -349,6 +376,9 @@ public class CareerBeeSpecies {
 		tree.add(VOCATIONAL, getFSpecies("Meadows"), HUSBANDRYIST, 0.5);
 		tree.add(STUDENT, HUSBANDRYIST, YENTE, 0.5);
 
+		tree.add(YENTE, VOCATIONAL, PRIEST, 0.2 );
+
+
 		tree.add(STUDENT, COMMON, WOMBLING, 0.5);
 
 		tree.add(VOCATIONAL, SMELTER, MASON, 0.5);
@@ -365,12 +395,22 @@ public class CareerBeeSpecies {
 		tree.add(STUDENT, VOCATIONAL, PHD, 0.3);
 		tree.add(PHD, getFSpecies("Industrious"), SCIENTIST, 0.2);
 
+		tree.add(SMELTER, getFSpecies("Demonic"), DEVIL, 0.05 );
+
+		tree.add(DEVIL, THIEF, POLITICIAN, 0.1);
+		tree.add(DEVIL, POLITICIAN, NCA, 0.1);
+		tree.add(DEVIL, POLICE, ASSASSIN, 0.2);
+
 		tree.add(PHD, getFSpecies("Imperial"), BUISNESS, 0.2);
 		tree.add(COMMON, BUISNESS, JUNK, 0.4);
 
 		tree.add(PHD, getFSpecies("Noble"), ENGINEER, 0.3);
 
 		tree.add(ENGINEER, SMELTER, CLOCKWORK, 0.2);
+
+		tree.add(ENGINEER, CLOCKWORK, ELECTRICIAN, 0.2);
+
+		tree.add(ELECTRICIAN, CLOCKWORK, ROBOT, 0.2);
 
 		tree.add(REPAIR, CLOCKWORK, ENERGY, 0.05);
 
