@@ -49,7 +49,7 @@ public abstract class EffectItemModification extends EffectBaseThrottled impleme
 		Collections.shuffle(frameList);
 		for (TileFlowerPedastal plantFrame : frameList) {
 			ItemStack stack = plantFrame.getStack();
-			if (stack.isEmpty() || !matcher.test(stack)) continue;
+			if (stack.isEmpty() || !canHandleStack(stack, genome) || !matcher.test(stack)) continue;
 			ItemStack itemStack = modifyStack(genome, stack, housing);
 			if (itemStack != null) {
 				plantFrame.setStack(itemStack);
@@ -62,8 +62,14 @@ public abstract class EffectItemModification extends EffectBaseThrottled impleme
 		}
 	}
 
+	@Nullable
+	@Override
+	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
+		return acceptItemStack(stack) ? modifyStack(genome, stack, housing) : null;
+	}
+
 	@Nonnull
-	private List<TileFlowerPedastal> getPlantFrames(@Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nonnull World world, @Nonnull BlockPos pos, IEffectSettingsHolder settings) {
+	protected List<TileFlowerPedastal> getPlantFrames(@Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, @Nonnull World world, @Nonnull BlockPos pos, IEffectSettingsHolder settings) {
 		Vec3d territory = getTerritory(genome, housing);
 
 		int x_min = MathHelper.floor(pos.getX() - territory.x);
@@ -94,7 +100,7 @@ public abstract class EffectItemModification extends EffectBaseThrottled impleme
 							}
 
 							ItemStack stack = plantFrame.getStack();
-							if (!stack.isEmpty() && matcher.test(stack)) {
+							if (!stack.isEmpty() && canHandleStack(stack, genome) && matcher.test(stack)) {
 								frameList.add(plantFrame);
 							}
 						}
@@ -103,12 +109,6 @@ public abstract class EffectItemModification extends EffectBaseThrottled impleme
 			}
 		}
 		return frameList;
-	}
-
-	@Nullable
-	@Override
-	public ItemStack handleStack(ItemStack stack, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing) {
-		return acceptItemStack(stack) ? modifyStack(genome, stack, housing) : null;
 	}
 
 	public boolean handleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing){
