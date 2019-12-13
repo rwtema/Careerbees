@@ -1,5 +1,6 @@
 package com.rwtema.careerbees.effects;
 
+// import com.rwtema.careerbees.BeeMod; // logger
 import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
 import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
@@ -14,6 +15,7 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
+import java.util.ArrayList;
 
 public class EffectPower extends EffectBase implements ISpecialBeeEffect.SpecialEffectBlock {
 	public static final EffectPower INSTANCE = new EffectPower("rf");
@@ -43,16 +45,12 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 
 		int energyleft = rfrate;
 
+		World world = housing.getWorldObj();
 		for (BlockPos pos : getAdjacentTiles(housing)) {
-			World world = housing.getWorldObj();
-			TileEntity tileEntity = world.getTileEntity(pos);
-			if (tileEntity != null) {
-				IEnergyStorage energyStorage = tileEntity.getCapability(CapabilityEnergy.ENERGY, null);
-				if (energyStorage != null) {
-					energyleft -= energyStorage.receiveEnergy(energyleft, false);
-					if (energyleft <= 0) break;
-				}
-			}
+			TEValidatedFaces TEFaces = getValidEnergyStorageFaces(world, pos);
+			int energysent = storeRFTEFaces(TEFaces, energyleft);
+			//BeeMod.logger.info("EnergyBee sent " + energysent + " RF to " + pos + " " + TEFaces.te);
+			energyleft -= energysent;
 		}
 		return storedData;
 	}
@@ -63,10 +61,65 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 		return MathHelper.ceil(400 * speed * speed);
 	}
 
+	// TEValidatedFaces a helper class for some code consolidation.
+	public class TEValidatedFaces {
+		boolean     valid;
+		World       world;
+		BlockPos    pos;
+		TileEntity  te;
+		ArrayList<EnumFacing> faces;
+		public TEValidatedFaces(World _world, BlockPos _pos) {
+			valid = false;
+			world = _world;
+			pos = _pos;
+			te = null;
+			faces = new ArrayList<EnumFacing>();
+		}
+	}
+
+	// Create a list of valid energy faces for later iteration.
+	private TEValidatedFaces getValidEnergyStorageFaces(World world, BlockPos pos) {
+		TEValidatedFaces TEFaces = new TEValidatedFaces(world, pos);
+		TEFaces.te = world.getTileEntity(pos);
+		if ( TEFaces.te == null )
+			return TEFaces;
+		// Fix #17, since no sides are being used, the actual desire appears to be testing all possible (including null/internal) sides and powering up the block if possible in any way.
+		if ( TEFaces.te.hasCapability(CapabilityEnergy.ENERGY, null) &&
+			 TEFaces.te.getCapability(CapabilityEnergy.ENERGY, null).canReceive() ) {
+			TEFaces.faces.add(null);
+			TEFaces.valid = true;
+			//BeeMod.logger.info("EnergyBee can interact with " + pos + " " + TEFaces.te + " on the inner side.");
+		}
+		for (EnumFacing face : EnumFacing.VALUES) {
+			if ( TEFaces.te.hasCapability(CapabilityEnergy.ENERGY, face) &&
+				 TEFaces.te.getCapability(CapabilityEnergy.ENERGY, face).canReceive() )
+				TEFaces.faces.add(face);
+				TEFaces.valid = true;
+				//BeeMod.logger.info("EnergyBee can interact with " + pos + " " + TEFaces.te + " on the " + face + " side.");
+		}
+		//BeeMod.logger.info("EnergyBee doesn't know how to handle the tile entity at " + pos + " on any face of the : " + tile);
+		return TEFaces;
+	}
+
+	private int storeRFTEFaces(@Nonnull TEValidatedFaces TEFaces, int maxRF) {
+		int energyleft = maxRF;
+		if ( TEFaces.valid ) {
+			for (EnumFacing face : TEFaces.faces) {
+				IEnergyStorage storage = TEFaces.te.getCapability(CapabilityEnergy.ENERGY, face);
+				if (storage != null) {
+					// BeeMod.logger.info("EnergyBee powering block at: " + pos + " with " + rfRate);
+					energyleft -= storage.receiveEnergy(energyleft, false); // max rate, simulate (is false; actually do it)
+				} else {
+					// BeeMod.logger.warn("EnergyBee couldn't get storage for the block at: " + pos);
+				}
+			}
+		}
+		return maxRF - energyleft; // energy used/sent
+	}
+
 	@Override
 	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, EnumFacing sideHit) {
-		TileEntity tile = world.getTileEntity(pos);
-		return tile != null && tile.hasCapability(CapabilityEnergy.ENERGY, null);
+		return getValidEnergyStorageFaces(world, pos).valid; // Is this a valid entity, and will this bee do something do it?
 	}
 
 	@Override
@@ -76,13 +129,9 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 
 	@Override
 	public void processingTick(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, EnumFacing facing) {
-		TileEntity tile = world.getTileEntity(pos);
-		if (tile == null || !tile.hasCapability(CapabilityEnergy.ENERGY, null)) return;
-		IEnergyStorage storage = tile.getCapability(CapabilityEnergy.ENERGY, null);
-		if (storage != null) {
-			int rfRate = getRFRate(genome, housing);
-			storage.receiveEnergy(rfRate, false);
-		}
+		TEValidatedFaces TEFaces = getValidEnergyStorageFaces(world, pos); // Is this a valid entity, and will this bee do something do it?
+		int rfRate = getRFRate(genome, housing);
+		storeRFTEFaces(TEFaces, rfRate);
 	}
 
 	@Override
