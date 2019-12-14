@@ -51,6 +51,8 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 			int energysent = storeRFTEFaces(TEFaces, energyleft);
 			//BeeMod.logger.info("EnergyBee sent " + energysent + " RF to " + pos + " " + TEFaces.te);
 			energyleft -= energysent;
+			if ( 0 == energyleft )
+				break;
 		}
 		return storedData;
 	}
@@ -112,6 +114,8 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 				} else {
 					// BeeMod.logger.warn("EnergyBee couldn't get storage for the block at: " + pos);
 				}
+				if ( 0 == energyleft )
+					break;
 			}
 		}
 		return maxRF - energyleft; // energy used/sent
