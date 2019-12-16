@@ -36,9 +36,11 @@ public class EffectAssassin extends EffectWorldInteraction {
 			return false;
 		if (tileEntity instanceof IBeeHousing) {
 			ItemStack queen = ((IBeeHousing) tileEntity).getBeeInventory().getQueen();
-			if (queen.isEmpty() || BeeManager.beeRoot.getType(queen) != EnumBeeType.QUEEN) return false;
+			if (queen.isEmpty() || BeeManager.beeRoot.getType(queen) != EnumBeeType.QUEEN)
+				return false;
 			IBee member = BeeManager.beeRoot.getMember(queen);
-			if (member == null) return false;
+			if (member == null)
+				return false;
 			IBeeGenome memberGenome = member.getGenome();
 			return memberGenome.getPrimary() != genome.getPrimary();
 		}
@@ -47,26 +49,20 @@ public class EffectAssassin extends EffectWorldInteraction {
 
 	@Override
 	protected boolean performPosEffect(World world, BlockPos blockPos, IBlockState state, IBeeGenome genome, IBeeHousing housing) {
-		// Fix bugs #22 #25 (do not work on source hive) and use the bee gun's canHandleBlock guard to fix bugs #23 #37
-		if (housing.getCoordinates() != blockPos &&
-			canHandleBlock(world, blockPos, genome, null)) {
-
+		if ( housing.getCoordinates() == blockPos )
+			return false;
+		if ( canHandleBlock(world, blockPos, genome, null) ) {
 			IBeeHousing house = (IBeeHousing) world.getTileEntity(blockPos);
-			// Guarded by canHandleBlock, this should always succeed.
-
 			ItemStack queenStack = house.getBeeInventory().getQueen();
 			IBee queen = BeeManager.beeRoot.getMember(queenStack);
 			if (queen == null || queenStack.isEmpty() || !queenStack.hasTagCompound())
 				return false;
-
 			queen.setHealth(0);
 			NBTTagCompound nbttagcompound = new NBTTagCompound();
 			queen.writeToNBT(nbttagcompound);
-			//BeeMod.logger.info("Assassin Bee profiled: " + queen + " as: " + nbttagcompound);
 			queenStack.setTagCompound(nbttagcompound);
 			house.getBeeInventory().setQueen(queenStack);
 			house.getBeekeepingLogic().canWork();
-			//BeeMod.logger.info("Assassin Bee reports back from: " + blockPos);
 			return true;
 		}
 		return false;
