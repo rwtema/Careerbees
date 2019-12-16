@@ -1,6 +1,5 @@
 package com.rwtema.careerbees.effects;
 
-// import com.rwtema.careerbees.BeeMod; // logger
 import forestry.api.apiculture.*;
 import forestry.apiculture.PluginApiculture;
 import net.minecraft.block.state.IBlockState;
