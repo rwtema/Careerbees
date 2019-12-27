@@ -31,11 +31,15 @@ public class EffectAssassin extends EffectWorldInteraction {
 	@Override
 	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nullable EnumFacing sideHit) {
 		TileEntity tileEntity = world.getTileEntity(pos);
+		if ( tileEntity == null )
+			return false;
 		if (tileEntity instanceof IBeeHousing) {
 			ItemStack queen = ((IBeeHousing) tileEntity).getBeeInventory().getQueen();
-			if (queen.isEmpty() || BeeManager.beeRoot.getType(queen) != EnumBeeType.QUEEN) return false;
+			if (queen.isEmpty() || BeeManager.beeRoot.getType(queen) != EnumBeeType.QUEEN)
+				return false;
 			IBee member = BeeManager.beeRoot.getMember(queen);
-			if (member == null) return false;
+			if (member == null)
+				return false;
 			IBeeGenome memberGenome = member.getGenome();
 			return memberGenome.getPrimary() != genome.getPrimary();
 		}
@@ -44,17 +48,22 @@ public class EffectAssassin extends EffectWorldInteraction {
 
 	@Override
 	protected boolean performPosEffect(World world, BlockPos blockPos, IBlockState state, IBeeGenome genome, IBeeHousing housing) {
-		IBeeHousing house = (IBeeHousing) world.getTileEntity(blockPos);
-		if(house == null) return false;
-		ItemStack queenStack = house.getBeeInventory().getQueen();
-		IBee queen = BeeManager.beeRoot.getMember(queenStack);
-		if(queen == null || queenStack.isEmpty() || !queenStack.hasTagCompound()) return false;
-		queen.setHealth(0);
-		NBTTagCompound nbttagcompound = new NBTTagCompound();
-		queen.writeToNBT(nbttagcompound);
-		queenStack.setTagCompound(nbttagcompound);
-		housing.getBeeInventory().setQueen(queenStack);
-		house.getBeekeepingLogic().canWork();
-		return true;
+		if ( housing.getCoordinates() == blockPos )
+			return false;
+		if ( canHandleBlock(world, blockPos, genome, null) ) {
+			IBeeHousing house = (IBeeHousing) world.getTileEntity(blockPos);
+			ItemStack queenStack = house.getBeeInventory().getQueen();
+			IBee queen = BeeManager.beeRoot.getMember(queenStack);
+			if (queen == null || queenStack.isEmpty() || !queenStack.hasTagCompound())
+				return false;
+			queen.setHealth(0);
+			NBTTagCompound nbttagcompound = new NBTTagCompound();
+			queen.writeToNBT(nbttagcompound);
+			queenStack.setTagCompound(nbttagcompound);
+			house.getBeeInventory().setQueen(queenStack);
+			house.getBeekeepingLogic().canWork();
+			return true;
+		}
+		return false;
 	}
 }
