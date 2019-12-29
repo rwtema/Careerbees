@@ -1,5 +1,6 @@
 package com.rwtema.careerbees.effects;
 
+import com.rwtema.careerbees.BeeMod; // get BeeMod.logger to record erroring
 import com.rwtema.careerbees.effects.settings.IEffectSettingsHolder;
 import forestry.api.apiculture.IBeeGenome;
 import forestry.api.apiculture.IBeeHousing;
@@ -14,6 +15,7 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
+import java.util.ArrayList;
 
 public class EffectPower extends EffectBase implements ISpecialBeeEffect.SpecialEffectBlock {
 	public static final EffectPower INSTANCE = new EffectPower("rf");
@@ -29,7 +31,7 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 	@Nonnull
 	@Override
 	public IEffectData doEffectBase(@Nonnull IBeeGenome genome, @Nonnull IEffectData storedData, @Nonnull IBeeHousing housing, IEffectSettingsHolder settings) {
-		int rfrate = getRFRate(genome, housing);
+		int rfRate = getRFRate(genome, housing);
 
 		TileEntity entity = housing.getWorldObj().getTileEntity(housing.getCoordinates());
 		if (!(entity instanceof IBeeHousing)) {
@@ -41,18 +43,15 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 			return storedData;
 		}
 
-		int energyleft = rfrate;
+		int energyleft = rfRate;
 
+		World world = housing.getWorldObj();
 		for (BlockPos pos : getAdjacentTiles(housing)) {
-			World world = housing.getWorldObj();
-			TileEntity tileEntity = world.getTileEntity(pos);
-			if (tileEntity != null) {
-				IEnergyStorage energyStorage = tileEntity.getCapability(CapabilityEnergy.ENERGY, null);
-				if (energyStorage != null) {
-					energyleft -= energyStorage.receiveEnergy(energyleft, false);
-					if (energyleft <= 0) break;
-				}
-			}
+			ArrayList faces = getEnergyStorageFaces(world, pos, true);
+			int energysent = storeRFTEFaces(world, pos, faces, rfRate);
+			energyleft -= energysent;
+			if ( 0 == energyleft )
+				break;
 		}
 		return storedData;
 	}
@@ -63,10 +62,57 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 		return MathHelper.ceil(400 * speed * speed);
 	}
 
+	private ArrayList<EnumFacing> getEnergyStorageFaces(World world, BlockPos pos, boolean scanAll) {
+		ArrayList<EnumFacing> faces = new ArrayList<EnumFacing>();
+		TileEntity te = world.getTileEntity(pos);
+		if ( null == te )
+			return faces;
+		if ( te.hasCapability(CapabilityEnergy.ENERGY, null) &&
+			 te.getCapability(CapabilityEnergy.ENERGY, null).canReceive() ) {
+			faces.add(null);
+			if ( ! scanAll )
+				return faces;
+		}
+		for (EnumFacing face : EnumFacing.VALUES) {
+			if ( te.hasCapability(CapabilityEnergy.ENERGY, face) &&
+				 te.getCapability(CapabilityEnergy.ENERGY, face).canReceive() )
+				faces.add(face);
+				if ( ! scanAll )
+					return faces;
+		}
+		return faces;
+	}
+
+	private int storeRFTEFaces(World world, BlockPos pos, ArrayList<EnumFacing> faces, int maxRF) {
+		int energyLeft = maxRF;
+		TileEntity te = world.getTileEntity(pos);
+		if ( null == te )
+			return 0; // no energy sent
+		for (EnumFacing face : faces) {
+			IEnergyStorage storage = te.getCapability(CapabilityEnergy.ENERGY, face);
+			if (storage != null) {
+				// max rate, simulate (is false; actually do it)
+				int energyStored = storage.receiveEnergy(energyLeft, false);
+				if ( energyStored > energyLeft ) {
+					BeeMod.logger.trace("The block at " + pos + " on face " + face +
+									" consumed (" + energyStored +
+									") more energy than was sent (" + energyLeft +
+									"); this should never happen.  " +
+									"Please report it to the author of the TileEntity: " + te);
+					energyLeft = 0;
+				} else {
+					energyLeft -= energyStored;
+				}
+			}
+			if ( 0 == energyLeft )
+				break;
+		}
+		return maxRF - energyLeft; // return used/sent
+	}
+
 	@Override
 	public boolean canHandleBlock(World world, BlockPos pos, @Nonnull IBeeGenome genome, EnumFacing sideHit) {
-		TileEntity tile = world.getTileEntity(pos);
-		return tile != null && tile.hasCapability(CapabilityEnergy.ENERGY, null);
+		return ! getEnergyStorageFaces(world, pos, false).isEmpty();
 	}
 
 	@Override
@@ -76,13 +122,9 @@ public class EffectPower extends EffectBase implements ISpecialBeeEffect.Special
 
 	@Override
 	public void processingTick(World world, BlockPos pos, @Nonnull IBeeGenome genome, @Nonnull IBeeHousing housing, EnumFacing facing) {
-		TileEntity tile = world.getTileEntity(pos);
-		if (tile == null || !tile.hasCapability(CapabilityEnergy.ENERGY, null)) return;
-		IEnergyStorage storage = tile.getCapability(CapabilityEnergy.ENERGY, null);
-		if (storage != null) {
-			int rfRate = getRFRate(genome, housing);
-			storage.receiveEnergy(rfRate, false);
-		}
+		ArrayList<EnumFacing> faces = getEnergyStorageFaces(world, pos, true);
+		int rfRate = getRFRate(genome, housing);
+		storeRFTEFaces(world, pos, faces, rfRate);
 	}
 
 	@Override
