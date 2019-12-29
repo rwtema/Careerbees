@@ -48,8 +48,6 @@ public class EffectAssassin extends EffectWorldInteraction {
 
 	@Override
 	protected boolean performPosEffect(World world, BlockPos blockPos, IBlockState state, IBeeGenome genome, IBeeHousing housing) {
-		if ( housing.getCoordinates() == blockPos )
-			return false;
 		if ( canHandleBlock(world, blockPos, genome, null) ) {
 			IBeeHousing house = (IBeeHousing) world.getTileEntity(blockPos);
 			ItemStack queenStack = house.getBeeInventory().getQueen();
